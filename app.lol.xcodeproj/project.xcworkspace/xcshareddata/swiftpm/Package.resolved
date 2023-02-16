@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "api.omg.lol",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/api.omg.lol.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b1e3e687c42c5d34432bfb115b3fec0ef9ff5f4c"
+      }
+    },
+    {
+      "identity" : "ui.app.lol",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/ui.app.lol.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "36075c29b0a6fff5a3c3c93399e84167a45e8684"
+      }
+    }
+  ],
+  "version" : 2
+}
