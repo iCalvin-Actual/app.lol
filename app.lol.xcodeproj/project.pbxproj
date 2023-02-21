@@ -7,21 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3E5F550C2999F342009AA468 /* app_lolApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5F550B2999F342009AA468 /* app_lolApp.swift */; };
-		3E5F550E2999F342009AA468 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5F550D2999F342009AA468 /* ContentView.swift */; };
+		3E5F550C2999F342009AA468 /* AppDotLOL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5F550B2999F342009AA468 /* AppDotLOL.swift */; };
 		3E5F55102999F343009AA468 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E5F550F2999F343009AA468 /* Assets.xcassets */; };
 		3E5F55142999F343009AA468 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E5F55132999F343009AA468 /* Preview Assets.xcassets */; };
 		3E5F552D299DB7F9009AA468 /* UIDotAppDotLOL in Frameworks */ = {isa = PBXBuildFile; productRef = 3E5F552C299DB7F9009AA468 /* UIDotAppDotLOL */; };
 		3E5F5530299DB85B009AA468 /* api.lol in Frameworks */ = {isa = PBXBuildFile; productRef = 3E5F552F299DB85B009AA468 /* api.lol */; };
+		3E5F553229A16256009AA468 /* App+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5F553129A16256009AA468 /* App+API.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		3E5F55082999F342009AA468 /* app.lol.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.lol.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E5F550B2999F342009AA468 /* app_lolApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app_lolApp.swift; sourceTree = "<group>"; };
-		3E5F550D2999F342009AA468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3E5F550B2999F342009AA468 /* AppDotLOL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDotLOL.swift; sourceTree = "<group>"; };
 		3E5F550F2999F343009AA468 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3E5F55112999F343009AA468 /* app_lol.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = app_lol.entitlements; sourceTree = "<group>"; };
 		3E5F55132999F343009AA468 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		3E5F553129A16256009AA468 /* App+API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "App+API.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,8 +57,8 @@
 		3E5F550A2999F342009AA468 /* app.lol */ = {
 			isa = PBXGroup;
 			children = (
-				3E5F550B2999F342009AA468 /* app_lolApp.swift */,
-				3E5F550D2999F342009AA468 /* ContentView.swift */,
+				3E5F550B2999F342009AA468 /* AppDotLOL.swift */,
+				3E5F553129A16256009AA468 /* App+API.swift */,
 				3E5F550F2999F343009AA468 /* Assets.xcassets */,
 				3E5F55112999F343009AA468 /* app_lol.entitlements */,
 				3E5F55122999F343009AA468 /* Preview Content */,
@@ -159,8 +159,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E5F550E2999F342009AA468 /* ContentView.swift in Sources */,
-				3E5F550C2999F342009AA468 /* app_lolApp.swift in Sources */,
+				3E5F553229A16256009AA468 /* App+API.swift in Sources */,
+				3E5F550C2999F342009AA468 /* AppDotLOL.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,7 +283,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = app.lol/app_lol.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"app.lol/Preview Content\"";
 				DEVELOPMENT_TEAM = G9LCFVC8QK;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -304,7 +304,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MARKETING_VERSION = 2023.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.chestnut.app-lol";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -321,7 +321,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = app.lol/app_lol.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"app.lol/Preview Content\"";
 				DEVELOPMENT_TEAM = G9LCFVC8QK;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -342,7 +342,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MARKETING_VERSION = 2023.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.chestnut.app-lol";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
