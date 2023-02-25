@@ -15,6 +15,7 @@ struct AppDotLOL: App {
     var body: some Scene {
         WindowGroup {
             appUI.body
+            
         }
     }
 }

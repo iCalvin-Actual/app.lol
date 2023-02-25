@@ -240,8 +240,145 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "290"
             endingLineNumber = "290"
-            landmarkName = "update()"
-            landmarkType = "7">
+            landmarkName = "addressName"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - dd850cc865aa62f4"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "property wrapper backing initializer of UIDotAppDotLOL.AddressNowDataFetcher.addressName : Swift.String"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/Sources/DataFetchers/AppDataFetcher.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "290"
+                  endingLineNumber = "290"
+                  offsetFromSymbolStart = "52">
+               </Location>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - 3fd51ebe4cdddf86"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIDotAppDotLOL.AddressNowDataFetcher.addressName.getter : Swift.String"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/Sources/DataFetchers/AppDataFetcher.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "290"
+                  endingLineNumber = "290"
+                  offsetFromSymbolStart = "120">
+               </Location>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - d3082318338ccb2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIDotAppDotLOL.AddressNowDataFetcher.addressName.setter : Swift.String"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/Sources/DataFetchers/AppDataFetcher.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "290"
+                  endingLineNumber = "290"
+                  offsetFromSymbolStart = "160">
+               </Location>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - e07b89d9ce17ab45"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIDotAppDotLOL.AddressNowDataFetcher.addressName.modify : Swift.String"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/Sources/DataFetchers/AppDataFetcher.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "290"
+                  endingLineNumber = "290"
+                  offsetFromSymbolStart = "0">
+               </Location>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - 2475714a5aff7444"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIDotAppDotLOL.AddressNowDataFetcher.addressName.modify : Swift.String with unmangled suffix &quot;.resume.0&quot;"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/Sources/DataFetchers/AppDataFetcher.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "290"
+                  endingLineNumber = "290"
+                  offsetFromSymbolStart = "20">
+               </Location>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - 3534e0b5f7e2fd50"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIDotAppDotLOL.AddressNowDataFetcher.$addressName.getter : Combine.Published&lt;Swift.String&gt;.Publisher"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/Sources/DataFetchers/AppDataFetcher.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "290"
+                  endingLineNumber = "290"
+                  offsetFromSymbolStart = "96">
+               </Location>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - 49dc870e0470699c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIDotAppDotLOL.AddressNowDataFetcher.$addressName.setter : Combine.Published&lt;Swift.String&gt;.Publisher"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/Sources/DataFetchers/AppDataFetcher.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "290"
+                  endingLineNumber = "290"
+                  offsetFromSymbolStart = "216">
+               </Location>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - 45e6e4256dbcd843"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIDotAppDotLOL.AddressNowDataFetcher.$addressName.modify : Combine.Published&lt;Swift.String&gt;.Publisher"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/%3Ccompiler-generated%3E"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "56">
+               </Location>
+               <Location
+                  uuid = "C95A984D-1ADC-4387-AFC1-000BA7F55471 - 4ce94071fdd14f79"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIDotAppDotLOL.AddressNowDataFetcher.$addressName.modify : Combine.Published&lt;Swift.String&gt;.Publisher with unmangled suffix &quot;.resume.0&quot;"
+                  moduleName = "app.lol"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Library/Developer/Xcode/DerivedData/app.lol-bhtqpickknpcvdejpjgsuhsijmsu/SourcePackages/checkouts/ui.app.lol/Sources/DataFetchers/AppDataFetcher.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "290"
+                  endingLineNumber = "290"
+                  offsetFromSymbolStart = "24">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

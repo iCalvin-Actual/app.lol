@@ -6,7 +6,7 @@
       "location" : "https://github.com/iCalvin-Actual/api.omg.lol.git",
       "state" : {
         "branch" : "main",
-        "revision" : "61c24d9fdf1673856dfda7ab56f0a7cb530e832e"
+        "revision" : "b8f9752def71672df02506151bea1438f86ab890"
       }
     },
     {
@@ -15,7 +15,7 @@
       "location" : "https://github.com/iCalvin-Actual/ui.app.lol.git",
       "state" : {
         "branch" : "main",
-        "revision" : "b61797c3b82a48d1655d9b7d3e658ade76888883"
+        "revision" : "b814092a399dcb70ce2395a9c4098f317efe66d8"
       }
     }
   ],
