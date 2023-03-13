@@ -7,122 +7,149 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3E5F550C2999F342009AA468 /* AppDotLOL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5F550B2999F342009AA468 /* AppDotLOL.swift */; };
-		3E5F55102999F343009AA468 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E5F550F2999F343009AA468 /* Assets.xcassets */; };
-		3E5F55142999F343009AA468 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E5F55132999F343009AA468 /* Preview Assets.xcassets */; };
-		3E5F552D299DB7F9009AA468 /* UIDotAppDotLOL in Frameworks */ = {isa = PBXBuildFile; productRef = 3E5F552C299DB7F9009AA468 /* UIDotAppDotLOL */; };
-		3E5F5530299DB85B009AA468 /* api.lol in Frameworks */ = {isa = PBXBuildFile; productRef = 3E5F552F299DB85B009AA468 /* api.lol */; };
-		3E5F553229A16256009AA468 /* App+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5F553129A16256009AA468 /* App+API.swift */; };
+		3E0A744E29B4950200EFD8E4 /* appDOTlolApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0A744D29B4950200EFD8E4 /* appDOTlolApp.swift */; };
+		3E0A745229B4950300EFD8E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E0A745129B4950300EFD8E4 /* Assets.xcassets */; };
+		3E0A745629B4950300EFD8E4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E0A745529B4950300EFD8E4 /* Preview Assets.xcassets */; };
+		3E35A8B329B7B15200CF3E3B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3E35A8B229B7B15200CF3E3B /* MarkdownUI */; };
+		3E67DAF029B4B91000B7DF82 /* omgapi in Frameworks */ = {isa = PBXBuildFile; productRef = 3E67DAEF29B4B91000B7DF82 /* omgapi */; };
+		3E67DAF329B4BAEC00B7DF82 /* omgui in Frameworks */ = {isa = PBXBuildFile; productRef = 3E67DAF229B4BAEC00B7DF82 /* omgui */; };
+		3E67DAF629B4CC8100B7DF82 /* APIInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3E0A747B29B4959000EFD8E4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		3E5F55082999F342009AA468 /* app.lol.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.lol.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E5F550B2999F342009AA468 /* AppDotLOL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDotLOL.swift; sourceTree = "<group>"; };
-		3E5F550F2999F343009AA468 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		3E5F55112999F343009AA468 /* app_lol.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = app_lol.entitlements; sourceTree = "<group>"; };
-		3E5F55132999F343009AA468 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		3E5F553129A16256009AA468 /* App+API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "App+API.swift"; sourceTree = "<group>"; };
-		3E7D84E829A7B6660070BE45 /* app-lol-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "app-lol-Info.plist"; sourceTree = SOURCE_ROOT; };
+		3E0A744A29B4950200EFD8E4 /* appDOTlol.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = appDOTlol.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3E0A744D29B4950200EFD8E4 /* appDOTlolApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = appDOTlolApp.swift; sourceTree = "<group>"; };
+		3E0A745129B4950300EFD8E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3E0A745329B4950300EFD8E4 /* appDOTlol.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = appDOTlol.entitlements; sourceTree = "<group>"; };
+		3E0A745529B4950300EFD8E4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		3E67DAEE29B4B90100B7DF82 /* omgapi */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = omgapi; path = ../omgapi; sourceTree = "<group>"; };
+		3E67DAF129B4BA4000B7DF82 /* omgui */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = omgui; path = ../omgui; sourceTree = "<group>"; };
+		3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIInterface.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3E5F55052999F342009AA468 /* Frameworks */ = {
+		3E0A744729B4950200EFD8E4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E5F5530299DB85B009AA468 /* api.lol in Frameworks */,
-				3E5F552D299DB7F9009AA468 /* UIDotAppDotLOL in Frameworks */,
+				3E35A8B329B7B15200CF3E3B /* MarkdownUI in Frameworks */,
+				3E67DAF329B4BAEC00B7DF82 /* omgui in Frameworks */,
+				3E67DAF029B4B91000B7DF82 /* omgapi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3E5F54FF2999F342009AA468 = {
+		3E0A744129B4950200EFD8E4 = {
 			isa = PBXGroup;
 			children = (
-				3E5F550A2999F342009AA468 /* app.lol */,
-				3E5F55092999F342009AA468 /* Products */,
-				3E5F5526299DB2F5009AA468 /* Frameworks */,
+				3E67DAF129B4BA4000B7DF82 /* omgui */,
+				3E67DAED29B4B90100B7DF82 /* Packages */,
+				3E0A744C29B4950200EFD8E4 /* appDOTlol */,
+				3E0A744B29B4950200EFD8E4 /* Products */,
+				3E0A74BD29B4B2F600EFD8E4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		3E5F55092999F342009AA468 /* Products */ = {
+		3E0A744B29B4950200EFD8E4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3E5F55082999F342009AA468 /* app.lol.app */,
+				3E0A744A29B4950200EFD8E4 /* appDOTlol.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		3E5F550A2999F342009AA468 /* app.lol */ = {
+		3E0A744C29B4950200EFD8E4 /* appDOTlol */ = {
 			isa = PBXGroup;
 			children = (
-				3E7D84E829A7B6660070BE45 /* app-lol-Info.plist */,
-				3E5F550B2999F342009AA468 /* AppDotLOL.swift */,
-				3E5F553129A16256009AA468 /* App+API.swift */,
-				3E5F550F2999F343009AA468 /* Assets.xcassets */,
-				3E5F55112999F343009AA468 /* app_lol.entitlements */,
-				3E5F55122999F343009AA468 /* Preview Content */,
+				3E0A744D29B4950200EFD8E4 /* appDOTlolApp.swift */,
+				3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */,
+				3E0A745129B4950300EFD8E4 /* Assets.xcassets */,
+				3E0A745329B4950300EFD8E4 /* appDOTlol.entitlements */,
+				3E0A745429B4950300EFD8E4 /* Preview Content */,
 			);
-			path = app.lol;
+			path = appDOTlol;
 			sourceTree = "<group>";
 		};
-		3E5F55122999F343009AA468 /* Preview Content */ = {
+		3E0A745429B4950300EFD8E4 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				3E5F55132999F343009AA468 /* Preview Assets.xcassets */,
+				3E0A745529B4950300EFD8E4 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		3E5F5526299DB2F5009AA468 /* Frameworks */ = {
+		3E0A74BD29B4B2F600EFD8E4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		3E67DAED29B4B90100B7DF82 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				3E67DAEE29B4B90100B7DF82 /* omgapi */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3E5F55072999F342009AA468 /* app.lol */ = {
+		3E0A744929B4950200EFD8E4 /* appDOTlol */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3E5F55172999F343009AA468 /* Build configuration list for PBXNativeTarget "app.lol" */;
+			buildConfigurationList = 3E0A745929B4950300EFD8E4 /* Build configuration list for PBXNativeTarget "appDOTlol" */;
 			buildPhases = (
-				3E5F55042999F342009AA468 /* Sources */,
-				3E5F55052999F342009AA468 /* Frameworks */,
-				3E5F55062999F342009AA468 /* Resources */,
+				3E0A744629B4950200EFD8E4 /* Sources */,
+				3E0A744729B4950200EFD8E4 /* Frameworks */,
+				3E0A744829B4950200EFD8E4 /* Resources */,
+				3E0A747B29B4959000EFD8E4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = app.lol;
+			name = appDOTlol;
 			packageProductDependencies = (
-				3E5F552C299DB7F9009AA468 /* UIDotAppDotLOL */,
-				3E5F552F299DB85B009AA468 /* api.lol */,
+				3E67DAEF29B4B91000B7DF82 /* omgapi */,
+				3E67DAF229B4BAEC00B7DF82 /* omgui */,
+				3E35A8B229B7B15200CF3E3B /* MarkdownUI */,
 			);
-			productName = app.lol;
-			productReference = 3E5F55082999F342009AA468 /* app.lol.app */;
+			productName = appDOTlol;
+			productReference = 3E0A744A29B4950200EFD8E4 /* appDOTlol.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		3E5F55002999F342009AA468 /* Project object */ = {
+		3E0A744229B4950200EFD8E4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1420;
 				LastUpgradeCheck = 1420;
 				TargetAttributes = {
-					3E5F55072999F342009AA468 = {
+					3E0A744929B4950200EFD8E4 = {
 						CreatedOnToolsVersion = 14.2;
 					};
 				};
 			};
-			buildConfigurationList = 3E5F55032999F342009AA468 /* Build configuration list for PBXProject "app.lol" */;
+			buildConfigurationList = 3E0A744529B4950200EFD8E4 /* Build configuration list for PBXProject "appDOTlol" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -130,46 +157,45 @@
 				en,
 				Base,
 			);
-			mainGroup = 3E5F54FF2999F342009AA468;
+			mainGroup = 3E0A744129B4950200EFD8E4;
 			packageReferences = (
-				3E5F552B299DB7F9009AA468 /* XCRemoteSwiftPackageReference "ui.app.lol" */,
-				3E5F552E299DB85B009AA468 /* XCRemoteSwiftPackageReference "api.omg.lol" */,
+				3E35A8B129B7B15200CF3E3B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
-			productRefGroup = 3E5F55092999F342009AA468 /* Products */;
+			productRefGroup = 3E0A744B29B4950200EFD8E4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3E5F55072999F342009AA468 /* app.lol */,
+				3E0A744929B4950200EFD8E4 /* appDOTlol */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		3E5F55062999F342009AA468 /* Resources */ = {
+		3E0A744829B4950200EFD8E4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E5F55142999F343009AA468 /* Preview Assets.xcassets in Resources */,
-				3E5F55102999F343009AA468 /* Assets.xcassets in Resources */,
+				3E0A745629B4950300EFD8E4 /* Preview Assets.xcassets in Resources */,
+				3E0A745229B4950300EFD8E4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		3E5F55042999F342009AA468 /* Sources */ = {
+		3E0A744629B4950200EFD8E4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E5F553229A16256009AA468 /* App+API.swift in Sources */,
-				3E5F550C2999F342009AA468 /* AppDotLOL.swift in Sources */,
+				3E67DAF629B4CC8100B7DF82 /* APIInterface.swift in Sources */,
+				3E0A744E29B4950200EFD8E4 /* appDOTlolApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		3E5F55152999F343009AA468 /* Debug */ = {
+		3E0A745729B4950300EFD8E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -227,7 +253,7 @@
 			};
 			name = Debug;
 		};
-		3E5F55162999F343009AA468 /* Release */ = {
+		3E0A745829B4950300EFD8E4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -278,20 +304,19 @@
 			};
 			name = Release;
 		};
-		3E5F55182999F343009AA468 /* Debug */ = {
+		3E0A745A29B4950300EFD8E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = app.lol/app_lol.entitlements;
+				CODE_SIGN_ENTITLEMENTS = appDOTlol/appDOTlol.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_ASSET_PATHS = "\"app.lol/Preview Content\"";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"appDOTlol/Preview Content\"";
 				DEVELOPMENT_TEAM = G9LCFVC8QK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "app-lol-Info.plist";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -300,14 +325,13 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 2023.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.icalvin.appDOTlol;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -317,20 +341,19 @@
 			};
 			name = Debug;
 		};
-		3E5F55192999F343009AA468 /* Release */ = {
+		3E0A745B29B4950300EFD8E4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = app.lol/app_lol.entitlements;
+				CODE_SIGN_ENTITLEMENTS = appDOTlol/appDOTlol.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_ASSET_PATHS = "\"app.lol/Preview Content\"";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"appDOTlol/Preview Content\"";
 				DEVELOPMENT_TEAM = G9LCFVC8QK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "app-lol-Info.plist";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -339,14 +362,13 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 2023.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.icalvin.appDOTlol;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -359,20 +381,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3E5F55032999F342009AA468 /* Build configuration list for PBXProject "app.lol" */ = {
+		3E0A744529B4950200EFD8E4 /* Build configuration list for PBXProject "appDOTlol" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3E5F55152999F343009AA468 /* Debug */,
-				3E5F55162999F343009AA468 /* Release */,
+				3E0A745729B4950300EFD8E4 /* Debug */,
+				3E0A745829B4950300EFD8E4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3E5F55172999F343009AA468 /* Build configuration list for PBXNativeTarget "app.lol" */ = {
+		3E0A745929B4950300EFD8E4 /* Build configuration list for PBXNativeTarget "appDOTlol" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3E5F55182999F343009AA468 /* Debug */,
-				3E5F55192999F343009AA468 /* Release */,
+				3E0A745A29B4950300EFD8E4 /* Debug */,
+				3E0A745B29B4950300EFD8E4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -380,36 +402,31 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3E5F552B299DB7F9009AA468 /* XCRemoteSwiftPackageReference "ui.app.lol" */ = {
+		3E35A8B129B7B15200CF3E3B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/iCalvin-Actual/ui.app.lol.git";
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
 			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		3E5F552E299DB85B009AA468 /* XCRemoteSwiftPackageReference "api.omg.lol" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/iCalvin-Actual/api.omg.lol.git";
-			requirement = {
-				branch = main;
-				kind = branch;
+				kind = exactVersion;
+				version = 2.0.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3E5F552C299DB7F9009AA468 /* UIDotAppDotLOL */ = {
+		3E35A8B229B7B15200CF3E3B /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3E5F552B299DB7F9009AA468 /* XCRemoteSwiftPackageReference "ui.app.lol" */;
-			productName = UIDotAppDotLOL;
+			package = 3E35A8B129B7B15200CF3E3B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
 		};
-		3E5F552F299DB85B009AA468 /* api.lol */ = {
+		3E67DAEF29B4B91000B7DF82 /* omgapi */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3E5F552E299DB85B009AA468 /* XCRemoteSwiftPackageReference "api.omg.lol" */;
-			productName = api.lol;
+			productName = omgapi;
+		};
+		3E67DAF229B4BAEC00B7DF82 /* omgui */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = omgui;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = 3E5F55002999F342009AA468 /* Project object */;
+	rootObject = 3E0A744229B4950200EFD8E4 /* Project object */;
 }
