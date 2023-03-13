@@ -11,9 +11,9 @@
 		3E0A745229B4950300EFD8E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E0A745129B4950300EFD8E4 /* Assets.xcassets */; };
 		3E0A745629B4950300EFD8E4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E0A745529B4950300EFD8E4 /* Preview Assets.xcassets */; };
 		3E35A8B329B7B15200CF3E3B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3E35A8B229B7B15200CF3E3B /* MarkdownUI */; };
-		3E67DAF029B4B91000B7DF82 /* omgapi in Frameworks */ = {isa = PBXBuildFile; productRef = 3E67DAEF29B4B91000B7DF82 /* omgapi */; };
-		3E67DAF329B4BAEC00B7DF82 /* omgui in Frameworks */ = {isa = PBXBuildFile; productRef = 3E67DAF229B4BAEC00B7DF82 /* omgui */; };
 		3E67DAF629B4CC8100B7DF82 /* APIInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */; };
+		3EC12B2429BF7FA700367B45 /* omgui in Frameworks */ = {isa = PBXBuildFile; productRef = 3EC12B2329BF7FA700367B45 /* omgui */; };
+		3EC12B2829BF810500367B45 /* omgapi in Frameworks */ = {isa = PBXBuildFile; productRef = 3EC12B2729BF810500367B45 /* omgapi */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,8 +35,6 @@
 		3E0A745129B4950300EFD8E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3E0A745329B4950300EFD8E4 /* appDOTlol.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = appDOTlol.entitlements; sourceTree = "<group>"; };
 		3E0A745529B4950300EFD8E4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		3E67DAEE29B4B90100B7DF82 /* omgapi */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = omgapi; path = ../omgapi; sourceTree = "<group>"; };
-		3E67DAF129B4BA4000B7DF82 /* omgui */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = omgui; path = ../omgui; sourceTree = "<group>"; };
 		3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIInterface.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -45,9 +43,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3EC12B2829BF810500367B45 /* omgapi in Frameworks */,
+				3EC12B2429BF7FA700367B45 /* omgui in Frameworks */,
 				3E35A8B329B7B15200CF3E3B /* MarkdownUI in Frameworks */,
-				3E67DAF329B4BAEC00B7DF82 /* omgui in Frameworks */,
-				3E67DAF029B4B91000B7DF82 /* omgapi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,8 +55,6 @@
 		3E0A744129B4950200EFD8E4 = {
 			isa = PBXGroup;
 			children = (
-				3E67DAF129B4BA4000B7DF82 /* omgui */,
-				3E67DAED29B4B90100B7DF82 /* Packages */,
 				3E0A744C29B4950200EFD8E4 /* appDOTlol */,
 				3E0A744B29B4950200EFD8E4 /* Products */,
 				3E0A74BD29B4B2F600EFD8E4 /* Frameworks */,
@@ -100,14 +96,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3E67DAED29B4B90100B7DF82 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				3E67DAEE29B4B90100B7DF82 /* omgapi */,
-			);
-			name = Packages;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -126,9 +114,9 @@
 			);
 			name = appDOTlol;
 			packageProductDependencies = (
-				3E67DAEF29B4B91000B7DF82 /* omgapi */,
-				3E67DAF229B4BAEC00B7DF82 /* omgui */,
 				3E35A8B229B7B15200CF3E3B /* MarkdownUI */,
+				3EC12B2329BF7FA700367B45 /* omgui */,
+				3EC12B2729BF810500367B45 /* omgapi */,
 			);
 			productName = appDOTlol;
 			productReference = 3E0A744A29B4950200EFD8E4 /* appDOTlol.app */;
@@ -160,6 +148,8 @@
 			mainGroup = 3E0A744129B4950200EFD8E4;
 			packageReferences = (
 				3E35A8B129B7B15200CF3E3B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				3EC12B1D29BF7F2700367B45 /* XCRemoteSwiftPackageReference "ui.app" */,
+				3EC12B2029BF7F5700367B45 /* XCRemoteSwiftPackageReference "api.omg" */,
 			);
 			productRefGroup = 3E0A744B29B4950200EFD8E4 /* Products */;
 			projectDirPath = "";
@@ -410,6 +400,22 @@
 				version = 2.0.1;
 			};
 		};
+		3EC12B1D29BF7F2700367B45 /* XCRemoteSwiftPackageReference "ui.app" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/iCalvin-Actual/ui.app.lol";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		3EC12B2029BF7F5700367B45 /* XCRemoteSwiftPackageReference "api.omg" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/iCalvin-Actual/api.omg.lol";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -418,13 +424,15 @@
 			package = 3E35A8B129B7B15200CF3E3B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
 		};
-		3E67DAEF29B4B91000B7DF82 /* omgapi */ = {
+		3EC12B2329BF7FA700367B45 /* omgui */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = omgapi;
-		};
-		3E67DAF229B4BAEC00B7DF82 /* omgui */ = {
-			isa = XCSwiftPackageProductDependency;
+			package = 3EC12B1D29BF7F2700367B45 /* XCRemoteSwiftPackageReference "ui.app" */;
 			productName = omgui;
+		};
+		3EC12B2729BF810500367B45 /* omgapi */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3EC12B2029BF7F5700367B45 /* XCRemoteSwiftPackageReference "api.omg" */;
+			productName = omgapi;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
