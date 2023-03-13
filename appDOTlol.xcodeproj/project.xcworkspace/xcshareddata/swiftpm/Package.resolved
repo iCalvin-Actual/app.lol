@@ -1,0 +1,32 @@
+{
+  "pins" : [
+    {
+      "identity" : "api.omg.lol",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/api.omg.lol",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b7666bb750ff811ba77ac8d207b12b52812bd2f5"
+      }
+    },
+    {
+      "identity" : "swift-markdown-ui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gonzalezreal/swift-markdown-ui",
+      "state" : {
+        "revision" : "5e15c0d75e42b9840301503e0df681027d4bea05",
+        "version" : "2.0.1"
+      }
+    },
+    {
+      "identity" : "ui.app.lol",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/ui.app.lol",
+      "state" : {
+        "branch" : "main",
+        "revision" : "9a004030ea1f27ea3b4f4a925d24a71c6d5cd6e4"
+      }
+    }
+  ],
+  "version" : 2
+}
