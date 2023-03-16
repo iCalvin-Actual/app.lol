@@ -14,10 +14,24 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3E5F55072999F342009AA468"
-               BuildableName = "app.lol.app"
-               BlueprintName = "app.lol"
-               ReferencedContainer = "container:app.lol.xcodeproj">
+               BlueprintIdentifier = "3E0A744929B4950200EFD8E4"
+               BuildableName = "appDOTlol.app"
+               BlueprintName = "appDOTlol"
+               ReferencedContainer = "container:appDOTlol.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3E0A74C329B4B38F00EFD8E4"
+               BuildableName = "omgapi.framework"
+               BlueprintName = "omgapi"
+               ReferencedContainer = "container:appDOTlol.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -44,10 +58,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3E5F55072999F342009AA468"
-            BuildableName = "app.lol.app"
-            BlueprintName = "app.lol"
-            ReferencedContainer = "container:app.lol.xcodeproj">
+            BlueprintIdentifier = "3E0A744929B4950200EFD8E4"
+            BuildableName = "appDOTlol.app"
+            BlueprintName = "appDOTlol"
+            ReferencedContainer = "container:appDOTlol.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -61,10 +75,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3E5F55072999F342009AA468"
-            BuildableName = "app.lol.app"
-            BlueprintName = "app.lol"
-            ReferencedContainer = "container:app.lol.xcodeproj">
+            BlueprintIdentifier = "3E0A744929B4950200EFD8E4"
+            BuildableName = "appDOTlol.app"
+            BlueprintName = "appDOTlol"
+            ReferencedContainer = "container:appDOTlol.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
