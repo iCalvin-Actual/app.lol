@@ -27,10 +27,6 @@ struct APIDataInterface: DataInterface {
         api.authURL(with: Self.clientId, redirect: "app-omg-lol://oauth")
     }
     
-    public func fetchGlobalBlocklist() async throws -> [AddressName] {
-        []
-    }
-    
     public func fetchServiceInfo() async throws -> ServiceInfoModel {
         let info = try await api.serviceInfo()
         return ServiceInfoModel(members: info.members, addresses: info.addresses, profiles: info.profiles)

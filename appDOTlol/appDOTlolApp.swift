@@ -19,7 +19,7 @@ struct appDOTlolApp: App {
             callback: "://oauth"
         )
     }
-    let ui: omgui = .init(client: Self.clientInfo, interface: APIDataInterface())
+    let ui: omgui = .init(client: Self.clientInfo, interface: SampleData())
     
     var body: some Scene {
         WindowGroup {
