@@ -1,0 +1,32 @@
+{
+  "pins" : [
+    {
+      "identity" : "omgapi",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/omgapi",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b7666bb750ff811ba77ac8d207b12b52812bd2f5"
+      }
+    },
+    {
+      "identity" : "omgui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/omgui",
+      "state" : {
+        "branch" : "main",
+        "revision" : "334a4036fc18c33952d07593be4eee2826f72855"
+      }
+    },
+    {
+      "identity" : "swift-markdown-ui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gonzalezreal/swift-markdown-ui",
+      "state" : {
+        "revision" : "5e15c0d75e42b9840301503e0df681027d4bea05",
+        "version" : "2.0.1"
+      }
+    }
+  ],
+  "version" : 2
+}
