@@ -36,6 +36,12 @@ struct APIDataInterface: DataInterface {
         return try await api.addressDirectory()
     }
     
+    public func fetchAccountInfo(_ address: AddressName, credential: APICredential) async throws -> AccountInfoModel? {
+        let response = try await api.account(for: "\(address)@omg.lol", with: credential)
+        
+        return .init(name: response.name, created: response.created)
+    }
+    
     public func fetchAccountAddresses(_ credential: String) async throws -> [AddressName] {
         return try await api.addresses(with: credential)
     }
