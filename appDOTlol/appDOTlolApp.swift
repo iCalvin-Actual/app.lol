@@ -22,7 +22,10 @@ struct appDOTlolApp: App {
     let interface = SampleData()
     
     @StateObject
-    var appModel: AppModel = AppModel(client: Self.clientInfo, dataInterface: APIDataInterface())
+    var appModel: AppModel = AppModel(
+        client: Self.clientInfo,
+        dataInterface: APIDataInterface()
+    )
     
     var body: some Scene {
         WindowGroup {
