@@ -6,7 +6,7 @@
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
         "branch" : "main",
-        "revision" : "83aa9063c2c476f3e0b346dbcaf99dfb5d31b8e6"
+        "revision" : "b39574063b81d0f338c63e01050587cb07141ab2"
       }
     },
     {
@@ -15,7 +15,7 @@
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
         "branch" : "main",
-        "revision" : "77416d90f3930ec2e56e1ca1559230a313fdf4f2"
+        "revision" : "a2287cee9b955e4beddcac65668c8928abd9c2a1"
       }
     },
     {
