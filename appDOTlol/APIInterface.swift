@@ -79,6 +79,9 @@ struct APIDataInterface: DataInterface {
     }
     
     public func fetchPaste(_ id: String, from address: AddressName) async throws -> PasteModel? {
+        guard !address.isEmpty else {
+            return nil
+        }
         let paste = try await api.paste(id, from: address, credential: nil)
         return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
     }
