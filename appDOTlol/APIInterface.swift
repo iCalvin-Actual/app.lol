@@ -78,11 +78,21 @@ struct APIDataInterface: DataInterface {
         }
     }
     
-    public func fetchPaste(_ id: String, from address: AddressName) async throws -> PasteModel? {
+    public func fetchPaste(_ id: String, from address: AddressName, credential: APICredential? = nil) async throws -> PasteModel? {
         guard !address.isEmpty else {
             return nil
         }
-        let paste = try await api.paste(id, from: address, credential: nil)
+        let paste = try await api.paste(id, from: address, credential: credential)
+        return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
+    }
+    
+    public func savePaste(_ draft: PasteModel, credential: APICredential) async throws -> PasteModel? {
+        guard !draft.owner.isEmpty, let content = draft.content else {
+            return nil
+        }
+        print("content: \(content)")
+        let newPaste = Paste.Draft(title: draft.name, content: content)
+        let paste = try await api.savePaste(newPaste, to: draft.owner, credential: credential)
         return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
     }
     
@@ -133,9 +143,16 @@ struct APIDataInterface: DataInterface {
         return .init(address: name, bio: bio.content)
     }
     
-    public func fetchAddressProfile(_ name: AddressName) async throws -> AddressProfile? {
-        let profile = try await api.publicProfile(name)
-        guard let content = profile.content else {
+    public func fetchAddressProfile(_ name: AddressName, credential: APICredential? = nil) async throws -> AddressProfile? {
+        var content: String?
+        if let credential = credential {
+            let profile = try await api.profile(name, with: credential)
+            content = profile.content
+        } else {
+            let profile = try await api.publicProfile(name)
+            content = profile.content
+        }
+        guard let content = content else {
             return nil
         }
         return .init(owner: name, content: content)
