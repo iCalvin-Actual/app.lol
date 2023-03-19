@@ -90,7 +90,6 @@ struct APIDataInterface: DataInterface {
         guard !draft.owner.isEmpty, let content = draft.content else {
             return nil
         }
-        print("content: \(content)")
         let newPaste = Paste.Draft(title: draft.name, content: content)
         let paste = try await api.savePaste(newPaste, to: draft.owner, credential: credential)
         return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
