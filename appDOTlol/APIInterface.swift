@@ -37,6 +37,9 @@ struct APIDataInterface: DataInterface {
     }
     
     public func fetchAccountInfo(_ address: AddressName, credential: APICredential) async throws -> AccountInfoModel? {
+        guard !address.isEmpty else {
+            return nil
+        }
         let response = try await api.account(for: "\(address)@omg.lol", with: credential)
         
         return .init(name: response.name, created: response.created)
@@ -82,8 +85,19 @@ struct APIDataInterface: DataInterface {
         guard !address.isEmpty else {
             return nil
         }
-        let paste = try await api.paste(id, from: address, credential: credential)
-        return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
+        do {
+            guard let paste = try await api.paste(id, from: address, credential: credential) else {
+                return nil
+            }
+            return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
+        } catch let error as APIError {
+            switch error {
+            case .notFound:
+                return nil
+            default:
+                throw error
+            }
+        }
     }
     
     public func savePaste(_ draft: PasteModel, credential: APICredential) async throws -> PasteModel? {
@@ -91,7 +105,9 @@ struct APIDataInterface: DataInterface {
             return nil
         }
         let newPaste = Paste.Draft(title: draft.name, content: content)
-        let paste = try await api.savePaste(newPaste, to: draft.owner, credential: credential)
+        guard let paste = try await api.savePaste(newPaste, to: draft.owner, credential: credential) else {
+            return nil
+        }
         return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
     }
     
