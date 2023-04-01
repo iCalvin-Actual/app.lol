@@ -172,5 +172,11 @@ struct APIDataInterface: DataInterface {
         }
         return .init(owner: name, content: content)
     }
+    
+    public func saveAddressProfile(_ name: AddressName, content: String, credential: APICredential) async throws -> AddressProfile? {
+        let profile = try await api.saveProfile(content, for: name, with: credential)
+        
+        return .init(owner: name, content: profile.content)
+    }
 }
 
