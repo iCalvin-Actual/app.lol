@@ -100,12 +100,9 @@ struct APIDataInterface: DataInterface {
         }
     }
     
-    public func savePaste(_ draft: PasteModel, credential: APICredential) async throws -> PasteModel? {
-        guard !draft.owner.isEmpty, let content = draft.content else {
-            return nil
-        }
-        let newPaste = Paste.Draft(title: draft.name, content: content)
-        guard let paste = try await api.savePaste(newPaste, to: draft.owner, credential: credential) else {
+    public func savePaste(_ draft: PasteModel.Draft, to address: AddressName, credential: APICredential) async throws -> PasteModel? {
+        let newPaste = Paste.Draft(title: draft.name, content: draft.content)
+        guard let paste = try await api.savePaste(newPaste, to: address, credential: credential) else {
             return nil
         }
         return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
