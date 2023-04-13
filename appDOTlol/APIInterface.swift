@@ -67,6 +67,19 @@ struct APIDataInterface: DataInterface {
         return .init(owner: now.address, content: now.content, updated: now.updated, listed: now.listed)
     }
     
+    public func saveAddressNow(_ name: AddressName, content: String, credential: APICredential) async throws -> NowModel? {
+        guard let now = try await api.saveNow(for: name, content: content, credential: credential) else {
+            return nil
+        }
+        
+        return NowModel(
+            owner: name,
+            content: now.content,
+            updated: now.updated,
+            listed: now.listed
+        )
+    }
+    
     public func fetchAddressPURLs(_ name: AddressName) async throws -> [PURLModel] {
         let purls = try await api.purls(from: name, credential: nil)
         return purls.map { purl in
