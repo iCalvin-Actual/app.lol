@@ -80,15 +80,26 @@ struct APIDataInterface: DataInterface {
         )
     }
     
-    public func fetchAddressPURLs(_ name: AddressName) async throws -> [PURLModel] {
-        let purls = try await api.purls(from: name, credential: nil)
+    public func fetchAddressPURLs(_ name: AddressName, credential: APICredential?) async throws -> [PURLModel] {
+        let purls = try await api.purls(from: name, credential: credential)
         return purls.map { purl in
             PURLModel(owner: purl.address, value: purl.name, destination: purl.url)
         }
     }
     
-    public func fetchAddressPastes(_ name: AddressName) async throws -> [PasteModel] {
-        let pastes = try await api.pasteBin(for: name, credential: nil)
+    public func fetchPURL(_ id: String, from address: AddressName, credential: APICredential?) async throws -> PURLModel? {
+        let purl = try await api.purl(id, for: address, credential: credential)
+        return PURLModel(owner: purl.address, value: purl.name, destination: purl.url)
+    }
+    
+    public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
+        let newPurl = PURL.Draft(name: draft.name, content: draft.content)
+        let _ = try await api.savePURL(newPurl, to: address, credential: credential)
+        return try await fetchPURL(draft.name, from: address, credential: credential)
+    }
+    
+    public func fetchAddressPastes(_ name: AddressName, credential: APICredential? = nil) async throws -> [PasteModel] {
+        let pastes = try await api.pasteBin(for: name, credential: credential)
         return pastes.map { paste in
             PasteModel(owner: paste.author, name: paste.title, content: paste.content)
         }
@@ -161,6 +172,17 @@ struct APIDataInterface: DataInterface {
         })
         return statuses
             .compactMap({ $0 })
+    }
+    
+    public func fetchAddressStatus(_ id: String, from address: AddressName) async throws -> StatusModel? {
+        let status = try await api.status(id, from: address)
+        return .init(id: id, address: address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
+    }
+    
+    public func saveStatusDraft(_ draft: StatusModel.Draft, to address: AddressName, credential: APICredential) async throws -> StatusModel? {
+        let newStatus: Status.Draft = .init(id: draft.id, content: draft.content, emoji: draft.emoji, externalUrl: draft.externalUrl)
+        let status = try await api.saveStatus(newStatus, to: address, credential: credential)
+        return .init(id: status.id, address: status.address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
     }
     
     public func fetchAddressBio(_ name: AddressName) async throws -> AddressBioModel {
