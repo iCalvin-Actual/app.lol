@@ -83,17 +83,17 @@ struct APIDataInterface: DataInterface {
     public func fetchAddressPURLs(_ name: AddressName, credential: APICredential?) async throws -> [PURLModel] {
         let purls = try await api.purls(from: name, credential: credential)
         return purls.map { purl in
-            PURLModel(owner: purl.address, value: purl.name, destination: purl.url)
+            PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
         }
     }
     
     public func fetchPURL(_ id: String, from address: AddressName, credential: APICredential?) async throws -> PURLModel? {
         let purl = try await api.purl(id, for: address, credential: credential)
-        return PURLModel(owner: purl.address, value: purl.name, destination: purl.url)
+        return PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
     }
     
     public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
-        let newPurl = PURL.Draft(name: draft.name, content: draft.content)
+        let newPurl = PURL.Draft(name: draft.name, content: draft.content, listed: draft.listed)
         let _ = try await api.savePURL(newPurl, to: address, credential: credential)
         return try await fetchPURL(draft.name, from: address, credential: credential)
     }
@@ -106,14 +106,14 @@ struct APIDataInterface: DataInterface {
     }
     
     public func fetchPaste(_ id: String, from address: AddressName, credential: APICredential? = nil) async throws -> PasteModel? {
-        guard !address.isEmpty else {
+        guard !address.isEmpty, !id.isEmpty else {
             return nil
         }
         do {
             guard let paste = try await api.paste(id, from: address, credential: credential) else {
                 return nil
             }
-            return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
+            return PasteModel(owner: paste.author, name: paste.title, content: paste.content, listed: paste.listed)
         } catch let error as APIError {
             switch error {
             case .notFound:
@@ -125,7 +125,7 @@ struct APIDataInterface: DataInterface {
     }
     
     public func savePaste(_ draft: PasteModel.Draft, to address: AddressName, credential: APICredential) async throws -> PasteModel? {
-        let newPaste = Paste.Draft(title: draft.name, content: draft.content)
+        let newPaste = Paste.Draft(title: draft.name, content: draft.content, listed: draft.listed)
         guard let paste = try await api.savePaste(newPaste, to: address, credential: credential) else {
             return nil
         }
