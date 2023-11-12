@@ -32,6 +32,21 @@ struct APIDataInterface: DataInterface {
         return ServiceInfoModel(members: info.members, addresses: info.addresses, profiles: info.profiles)
     }
     
+    public func fetchThemes() async throws -> [ThemeModel] {
+        return try await api.themes().map({ model in
+            ThemeModel(
+                id: model.id,
+                name: model.name,
+                created: model.created,
+                updated: model.updated,
+                author: model.author,
+                license: model.license,
+                description: model.description,
+                preview: model.previewCss
+            )
+        })
+    }
+    
     public func fetchAddressDirectory() async throws -> [AddressName] {
         return try await api.addressDirectory()
     }
