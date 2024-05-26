@@ -78,8 +78,19 @@ struct APIDataInterface: DataInterface {
     }
     
     public func fetchAddressNow(_ name: AddressName) async throws -> NowModel? {
-        let now = try await api.now(for: name)
-        return .init(owner: now.address, content: now.content, updated: now.updated, listed: now.listed)
+        async let now = try api.now(for: name)
+        async let page = try api.nowWebpage(for: name)
+        let content = try await now.content
+        let updated = try await now.updated
+        let listed = try await now.listed
+        let html = try await page.content
+        return .init(
+            owner: name,
+            content: content,
+            html: html,
+            updated: updated,
+            listed: listed
+        )
     }
     
     public func saveAddressNow(_ name: AddressName, content: String, credential: APICredential) async throws -> NowModel? {
