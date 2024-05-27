@@ -19,12 +19,21 @@
       }
     },
     {
+      "identity" : "networkimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gonzalezreal/NetworkImage",
+      "state" : {
+        "revision" : "7aff8d1b31148d32c5933d75557d42f6323ee3d1",
+        "version" : "6.0.0"
+      }
+    },
+    {
       "identity" : "omgapi",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
         "branch" : "main",
-        "revision" : "7c2094e67363477f30feec88704226904f1b2472"
+        "revision" : "d2c3c7d03f91044aedb602e3c1a1abae4c7ba0c8"
       }
     },
     {
@@ -33,16 +42,16 @@
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
         "branch" : "main",
-        "revision" : "327efb95279437b0e75f09c790f8442d9f85186c"
+        "revision" : "bb0bbf70d2ebea3ae7e7186309425462aa6056b8"
       }
     },
     {
       "identity" : "swift-markdown-ui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/gonzalezreal/swift-markdown-ui",
+      "location" : "https://github.com/iCalvin-Actual/swift-markdown-ui",
       "state" : {
-        "revision" : "5e15c0d75e42b9840301503e0df681027d4bea05",
-        "version" : "2.0.1"
+        "branch" : "main",
+        "revision" : "96438a4413f0cb0ab9a456984c104347e65c540b"
       }
     }
   ],
