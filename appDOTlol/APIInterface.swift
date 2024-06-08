@@ -118,6 +118,11 @@ struct APIDataInterface: DataInterface {
         return PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
     }
     
+    public func fetchPURLContent(_ id: String, from address: AddressName, credential: APICredential?) async throws -> String? {
+        let purlContent = try await api.purlContent(id, for: address, credential: credential)
+        return purlContent
+    }
+    
     public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
         let newPurl = PURL.Draft(name: draft.name, content: draft.content, listed: draft.listed)
         let _ = try await api.savePURL(newPurl, to: address, credential: credential)
