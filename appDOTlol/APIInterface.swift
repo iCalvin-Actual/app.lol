@@ -32,6 +32,21 @@ struct APIDataInterface: DataInterface {
         return ServiceInfoModel(members: info.members, addresses: info.addresses, profiles: info.profiles)
     }
     
+    public func fetchThemes() async throws -> [ThemeModel] {
+        return try await api.themes().map({ model in
+            ThemeModel(
+                id: model.id,
+                name: model.name,
+                created: model.created,
+                updated: model.updated,
+                author: model.author,
+                license: model.license,
+                description: model.description,
+                preview: model.previewCss
+            )
+        })
+    }
+    
     public func fetchAddressDirectory() async throws -> [AddressName] {
         return try await api.addressDirectory()
     }
@@ -63,33 +78,73 @@ struct APIDataInterface: DataInterface {
     }
     
     public func fetchAddressNow(_ name: AddressName) async throws -> NowModel? {
-        let now = try await api.now(for: name)
-        return .init(owner: now.address, content: now.content, updated: now.updated, listed: now.listed)
+        async let now = try api.now(for: name)
+        async let page = try api.nowWebpage(for: name)
+        let content = try await now.content
+        let updated = try await now.updated
+        let listed = try await now.listed
+        let html = try await page.content
+        return .init(
+            owner: name,
+            content: content,
+            html: html,
+            updated: updated,
+            listed: listed
+        )
     }
     
-    public func fetchAddressPURLs(_ name: AddressName) async throws -> [PURLModel] {
-        let purls = try await api.purls(from: name, credential: nil)
+    public func saveAddressNow(_ name: AddressName, content: String, credential: APICredential) async throws -> NowModel? {
+        guard let now = try await api.saveNow(for: name, content: content, credential: credential) else {
+            return nil
+        }
+        
+        return NowModel(
+            owner: name,
+            content: now.content,
+            updated: now.updated,
+            listed: now.listed
+        )
+    }
+    
+    public func fetchAddressPURLs(_ name: AddressName, credential: APICredential?) async throws -> [PURLModel] {
+        let purls = try await api.purls(from: name, credential: credential)
         return purls.map { purl in
-            PURLModel(owner: purl.address, value: purl.name, destination: purl.url)
+            PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
         }
     }
     
-    public func fetchAddressPastes(_ name: AddressName) async throws -> [PasteModel] {
-        let pastes = try await api.pasteBin(for: name, credential: nil)
+    public func fetchPURL(_ id: String, from address: AddressName, credential: APICredential?) async throws -> PURLModel? {
+        let purl = try await api.purl(id, for: address, credential: credential)
+        return PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
+    }
+    
+    public func fetchPURLContent(_ id: String, from address: AddressName, credential: APICredential?) async throws -> String? {
+        let purlContent = try await api.purlContent(id, for: address, credential: credential)
+        return purlContent
+    }
+    
+    public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
+        let newPurl = PURL.Draft(name: draft.name, content: draft.content, listed: draft.listed)
+        let _ = try await api.savePURL(newPurl, to: address, credential: credential)
+        return try await fetchPURL(draft.name, from: address, credential: credential)
+    }
+    
+    public func fetchAddressPastes(_ name: AddressName, credential: APICredential? = nil) async throws -> [PasteModel] {
+        let pastes = try await api.pasteBin(for: name, credential: credential)
         return pastes.map { paste in
             PasteModel(owner: paste.author, name: paste.title, content: paste.content)
         }
     }
     
     public func fetchPaste(_ id: String, from address: AddressName, credential: APICredential? = nil) async throws -> PasteModel? {
-        guard !address.isEmpty else {
+        guard !address.isEmpty, !id.isEmpty else {
             return nil
         }
         do {
             guard let paste = try await api.paste(id, from: address, credential: credential) else {
                 return nil
             }
-            return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
+            return PasteModel(owner: paste.author, name: paste.title, content: paste.content, listed: paste.listed)
         } catch let error as APIError {
             switch error {
             case .notFound:
@@ -100,12 +155,9 @@ struct APIDataInterface: DataInterface {
         }
     }
     
-    public func savePaste(_ draft: PasteModel, credential: APICredential) async throws -> PasteModel? {
-        guard !draft.owner.isEmpty, let content = draft.content else {
-            return nil
-        }
-        let newPaste = Paste.Draft(title: draft.name, content: content)
-        guard let paste = try await api.savePaste(newPaste, to: draft.owner, credential: credential) else {
+    public func savePaste(_ draft: PasteModel.Draft, to address: AddressName, credential: APICredential) async throws -> PasteModel? {
+        let newPaste = Paste.Draft(title: draft.name, content: draft.content, listed: draft.listed)
+        guard let paste = try await api.savePaste(newPaste, to: address, credential: credential) else {
             return nil
         }
         return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
@@ -153,6 +205,17 @@ struct APIDataInterface: DataInterface {
             .compactMap({ $0 })
     }
     
+    public func fetchAddressStatus(_ id: String, from address: AddressName) async throws -> StatusModel? {
+        let status = try await api.status(id, from: address)
+        return .init(id: id, address: address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
+    }
+    
+    public func saveStatusDraft(_ draft: StatusModel.Draft, to address: AddressName, credential: APICredential) async throws -> StatusModel? {
+        let newStatus: Status.Draft = .init(id: draft.id, content: draft.content, emoji: draft.emoji, externalUrl: draft.externalUrl)
+        let status = try await api.saveStatus(newStatus, to: address, credential: credential)
+        return .init(id: status.id, address: status.address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
+    }
+    
     public func fetchAddressBio(_ name: AddressName) async throws -> AddressBioModel {
         let bio = try await api.bio(for: name)
         return .init(address: name, bio: bio.content)
@@ -171,6 +234,12 @@ struct APIDataInterface: DataInterface {
             return nil
         }
         return .init(owner: name, content: content)
+    }
+    
+    public func saveAddressProfile(_ name: AddressName, content: String, credential: APICredential) async throws -> AddressProfile? {
+        let profile = try await api.saveProfile(content, for: name, with: credential)
+        
+        return .init(owner: name, content: profile.content)
     }
 }
 

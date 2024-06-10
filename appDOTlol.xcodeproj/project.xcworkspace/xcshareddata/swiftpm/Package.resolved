@@ -1,12 +1,39 @@
 {
   "pins" : [
     {
+      "identity" : "ink",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/JohnSundell/Ink",
+      "state" : {
+        "revision" : "77c3d8953374a9cf5418ef0bd7108524999de85a",
+        "version" : "0.5.1"
+      }
+    },
+    {
+      "identity" : "markupeditor",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/stevengharris/MarkupEditor",
+      "state" : {
+        "revision" : "45300e4d85da8dea56395da0ada8ff88662d54a3",
+        "version" : "0.5.1"
+      }
+    },
+    {
+      "identity" : "networkimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gonzalezreal/NetworkImage",
+      "state" : {
+        "revision" : "7aff8d1b31148d32c5933d75557d42f6323ee3d1",
+        "version" : "6.0.0"
+      }
+    },
+    {
       "identity" : "omgapi",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
         "branch" : "main",
-        "revision" : "5efaf4f8ae8cefd0794503305bbf31814b38d947"
+        "revision" : "5fd73f3b40d20e02a144cd1278cdb2c8e821222a"
       }
     },
     {
@@ -15,16 +42,16 @@
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
         "branch" : "main",
-        "revision" : "0a73230ccf6a680893051d6adea88c846db40c29"
+        "revision" : "9e81922d67112509f3a2fe7ffdde3c46f6b658d3"
       }
     },
     {
       "identity" : "swift-markdown-ui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/gonzalezreal/swift-markdown-ui",
+      "location" : "https://github.com/iCalvin-Actual/swift-markdown-ui",
       "state" : {
-        "revision" : "5e15c0d75e42b9840301503e0df681027d4bea05",
-        "version" : "2.0.1"
+        "branch" : "main",
+        "revision" : "96438a4413f0cb0ab9a456984c104347e65c540b"
       }
     }
   ],
