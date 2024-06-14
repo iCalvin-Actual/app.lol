@@ -1,4 +1,5 @@
 {
+  "originHash" : "2d73c99fcaa7ec71e28813b9939c79c5af5263cb70d048859b1420a299e1c044",
   "pins" : [
     {
       "identity" : "ink",
@@ -51,9 +52,9 @@
       "location" : "https://github.com/iCalvin-Actual/swift-markdown-ui",
       "state" : {
         "branch" : "main",
-        "revision" : "96438a4413f0cb0ab9a456984c104347e65c540b"
+        "revision" : "bdbd43f80239966be3b451a5dba6c70753705975"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
