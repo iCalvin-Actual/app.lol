@@ -9,7 +9,7 @@ import omgapi
 import omgui
 import Foundation
 
-actor APIDataInterface: DataInterface {
+final class APIDataInterface: DataInterface, Sendable {
     
     let api: omgapi.api = .init()
     
