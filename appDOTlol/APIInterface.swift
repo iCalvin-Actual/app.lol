@@ -9,7 +9,7 @@ import omgapi
 import omgui
 import Foundation
 
-struct APIDataInterface: DataInterface {
+actor APIDataInterface: DataInterface {
     
     let api: omgapi.api = .init()
     
@@ -23,8 +23,9 @@ struct APIDataInterface: DataInterface {
         try await api.oAuthExchange(with: clientID, and: clientSecret, redirect: redirect, code: authCode)!
     }
     
+    nonisolated 
     public func authURL() -> URL? {
-        api.authURL(with: Self.clientId, redirect: "app-omg-lol://oauth")
+        api.authURL(with: Self.clientId, redirect: Self.redirect)
     }
     
     public func fetchServiceInfo() async throws -> ServiceInfoModel {
@@ -182,7 +183,8 @@ struct APIDataInterface: DataInterface {
         var statuses: [StatusModel] = []
         try await withThrowingTaskGroup(of: [StatusModel].self, body: { group in
             for address in addresses {
-                group.addTask {
+                group.addTask { [weak self] in
+                    guard let self = self else { return [] }
                     async let log = try api.statusLog(from: address)
                     return try await log.statuses.map({ status in
                         StatusModel(
