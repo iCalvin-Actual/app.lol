@@ -212,8 +212,16 @@ final class APIDataInterface: DataInterface, Sendable {
         return .init(id: id, address: address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
     }
     
+    public func deleteAddressStatus(_ draft: StatusModel.Draft, from address: AddressName, credential: APICredential) async throws -> StatusModel? {
+        let deleteStatus: Status.Draft = .init(id: draft.id, content: draft.content, emoji: draft.emoji, externalUrl: draft.externalUrl)
+        guard let status = try await api.deleteStatus(deleteStatus, from: address, credential: credential) else {
+            return nil
+        }
+        return .init(id: status.id, address: address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
+    }
+    
     public func saveStatusDraft(_ draft: StatusModel.Draft, to address: AddressName, credential: APICredential) async throws -> StatusModel? {
-        let newStatus: Status.Draft = .init(id: draft.id, content: draft.content, emoji: draft.emoji, externalUrl: draft.externalUrl)
+        let newStatus: Status.Draft = .init(id: draft.id, content: draft.content, emoji: draft.emoji.isEmpty ? "💗" : draft.emoji, externalUrl: draft.externalUrl)
         let status = try await api.saveStatus(newStatus, to: address, credential: credential)
         return .init(id: status.id, address: status.address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
     }
