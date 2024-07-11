@@ -119,15 +119,28 @@ final class APIDataInterface: DataInterface, Sendable {
         return PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
     }
     
+    public func deletePURL(_ id: String, from address: AddressName, credential: APICredential) async throws {
+        try await api.deletePURL(id, for: address, credential: credential)
+    }
+    
     public func fetchPURLContent(_ id: String, from address: AddressName, credential: APICredential?) async throws -> String? {
-        let purlContent = try await api.purlContent(id, for: address, credential: credential)
-        return purlContent
+        do {
+            let purlContent = try await api.purlContent(id, for: address, credential: credential)
+            return purlContent
+        } catch {
+            throw error
+        }
     }
     
     public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
-        let newPurl = PURL.Draft(name: draft.name, content: draft.content, listed: draft.listed)
-        let _ = try await api.savePURL(newPurl, to: address, credential: credential)
-        return try await fetchPURL(draft.name, from: address, credential: credential)
+        let newPurl = PURL.Draft(name: draft.name, content: draft.content.urlString, listed: draft.listed)
+        do {
+            let purl = try await api.savePURL(newPurl, to: address, credential: credential)
+            
+            return try await fetchPURL(draft.name, from: address, credential: credential)
+        } catch {
+            throw error
+        }
     }
     
     public func fetchAddressPastes(_ name: AddressName, credential: APICredential? = nil) async throws -> [PasteModel] {
