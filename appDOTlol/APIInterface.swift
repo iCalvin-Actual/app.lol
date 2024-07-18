@@ -135,7 +135,7 @@ final class APIDataInterface: DataInterface, Sendable {
     public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
         let newPurl = PURL.Draft(name: draft.name, content: draft.content.urlString, listed: draft.listed)
         do {
-            let purl = try await api.savePURL(newPurl, to: address, credential: credential)
+            let _ = try await api.savePURL(newPurl, to: address, credential: credential)
             
             return try await fetchPURL(draft.name, from: address, credential: credential)
         } catch {
