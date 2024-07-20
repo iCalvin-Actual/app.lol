@@ -169,6 +169,10 @@ final class APIDataInterface: DataInterface, Sendable {
         }
     }
     
+    public func deletePaste(_ id: String, from address: AddressName, credential: APICredential) async throws {
+        try await api.deletePaste(id, for: address, credential: credential)
+    }
+    
     public func savePaste(_ draft: PasteModel.Draft, to address: AddressName, credential: APICredential) async throws -> PasteModel? {
         let newPaste = Paste.Draft(title: draft.name, content: draft.content, listed: draft.listed)
         guard let paste = try await api.savePaste(newPaste, to: address, credential: credential) else {
@@ -177,10 +181,10 @@ final class APIDataInterface: DataInterface, Sendable {
         return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
     }
     
-    public func fetchStatusLog() async throws -> [StatusModel] {
+    public func fetchStatusLog() async throws -> [StatusResponse] {
         let log = try await api.latestStatusLog()
         return log.statuses.map { status in
-            StatusModel(
+            StatusResponse(
                 id: status.id,
                 address: status.address,
                 posted: status.created,
@@ -192,15 +196,15 @@ final class APIDataInterface: DataInterface, Sendable {
         }
     }
     
-    public func fetchAddressStatuses(addresses: [AddressName]) async throws -> [StatusModel] {
-        var statuses: [StatusModel] = []
-        try await withThrowingTaskGroup(of: [StatusModel].self, body: { group in
+    public func fetchAddressStatuses(addresses: [AddressName]) async throws -> [StatusResponse] {
+        var statuses: [StatusResponse] = []
+        try await withThrowingTaskGroup(of: [StatusResponse].self, body: { group in
             for address in addresses {
                 group.addTask { [weak self] in
                     guard let self = self else { return [] }
                     async let log = try api.statusLog(from: address)
                     return try await log.statuses.map({ status in
-                        StatusModel(
+                        StatusResponse(
                             id: status.id,
                             address: status.address,
                             posted: status.created,
@@ -220,12 +224,12 @@ final class APIDataInterface: DataInterface, Sendable {
             .compactMap({ $0 })
     }
     
-    public func fetchAddressStatus(_ id: String, from address: AddressName) async throws -> StatusModel? {
+    public func fetchAddressStatus(_ id: String, from address: AddressName) async throws -> StatusResponse? {
         let status = try await api.status(id, from: address)
         return .init(id: id, address: address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
     }
     
-    public func deleteAddressStatus(_ draft: StatusModel.Draft, from address: AddressName, credential: APICredential) async throws -> StatusModel? {
+    public func deleteAddressStatus(_ draft: StatusResponse.Draft, from address: AddressName, credential: APICredential) async throws -> StatusResponse? {
         let deleteStatus: Status.Draft = .init(id: draft.id, content: draft.content, emoji: draft.emoji, externalUrl: draft.externalUrl)
         guard let status = try await api.deleteStatus(deleteStatus, from: address, credential: credential) else {
             return nil
@@ -233,19 +237,19 @@ final class APIDataInterface: DataInterface, Sendable {
         return .init(id: status.id, address: address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
     }
     
-    public func saveStatusDraft(_ draft: StatusModel.Draft, to address: AddressName, credential: APICredential) async throws -> StatusModel? {
+    public func saveStatusDraft(_ draft: StatusResponse.Draft, to address: AddressName, credential: APICredential) async throws -> StatusResponse? {
         let newStatus: Status.Draft = .init(id: draft.id, content: draft.content, emoji: draft.emoji.isEmpty ? "💗" : draft.emoji, externalUrl: draft.externalUrl)
         let status = try await api.saveStatus(newStatus, to: address, credential: credential)
         return .init(id: status.id, address: status.address, posted: status.created, status: status.content, emoji: status.emoji, linkText: status.externalURL?.absoluteString, link: status.externalURL)
     }
     
-    public func fetchAddressBio(_ name: AddressName) async throws -> AddressBioModel {
+    public func fetchAddressBio(_ name: AddressName) async throws -> AddressBioResponse {
         let bio = try await api.bio(for: name)
         return .init(address: name, bio: bio.content)
     }
     
     public func fetchAddressProfile(_ name: AddressName, credential: APICredential? = nil) async throws -> AddressProfile? {
-        var content: String?
+        let content: String?
         if let credential = credential {
             let profile = try await api.profile(name, with: credential)
             content = profile.content
@@ -265,4 +269,3 @@ final class APIDataInterface: DataInterface, Sendable {
         return .init(owner: name, content: profile.content)
     }
 }
-
