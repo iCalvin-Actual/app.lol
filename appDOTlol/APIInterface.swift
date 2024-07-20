@@ -107,16 +107,16 @@ final class APIDataInterface: DataInterface, Sendable {
         )
     }
     
-    public func fetchAddressPURLs(_ name: AddressName, credential: APICredential?) async throws -> [PURLModel] {
+    public func fetchAddressPURLs(_ name: AddressName, credential: APICredential?) async throws -> [PURLResponse] {
         let purls = try await api.purls(from: name, credential: credential)
         return purls.map { purl in
-            PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
+            PURLResponse(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
         }
     }
     
-    public func fetchPURL(_ id: String, from address: AddressName, credential: APICredential?) async throws -> PURLModel? {
+    public func fetchPURL(_ id: String, from address: AddressName, credential: APICredential?) async throws -> PURLResponse? {
         let purl = try await api.purl(id, for: address, credential: credential)
-        return PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
+        return PURLResponse(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
     }
     
     public func deletePURL(_ id: String, from address: AddressName, credential: APICredential) async throws {
@@ -132,7 +132,7 @@ final class APIDataInterface: DataInterface, Sendable {
         }
     }
     
-    public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
+    public func savePURL(_ draft: PURLResponse.Draft, to address: AddressName, credential: APICredential) async throws -> PURLResponse? {
         let newPurl = PURL.Draft(name: draft.name, content: draft.content.urlString, listed: draft.listed)
         do {
             let _ = try await api.savePURL(newPurl, to: address, credential: credential)
@@ -143,14 +143,14 @@ final class APIDataInterface: DataInterface, Sendable {
         }
     }
     
-    public func fetchAddressPastes(_ name: AddressName, credential: APICredential? = nil) async throws -> [PasteModel] {
+    public func fetchAddressPastes(_ name: AddressName, credential: APICredential? = nil) async throws -> [PasteResponse] {
         let pastes = try await api.pasteBin(for: name, credential: credential)
         return pastes.map { paste in
-            PasteModel(owner: paste.author, name: paste.title, content: paste.content)
+            PasteResponse(owner: paste.author, name: paste.title, content: paste.content)
         }
     }
     
-    public func fetchPaste(_ id: String, from address: AddressName, credential: APICredential? = nil) async throws -> PasteModel? {
+    public func fetchPaste(_ id: String, from address: AddressName, credential: APICredential? = nil) async throws -> PasteResponse? {
         guard !address.isEmpty, !id.isEmpty else {
             return nil
         }
@@ -158,7 +158,7 @@ final class APIDataInterface: DataInterface, Sendable {
             guard let paste = try await api.paste(id, from: address, credential: credential) else {
                 return nil
             }
-            return PasteModel(owner: paste.author, name: paste.title, content: paste.content, listed: paste.listed)
+            return PasteResponse(owner: paste.author, name: paste.title, content: paste.content, listed: paste.listed)
         } catch let error as APIError {
             switch error {
             case .notFound:
@@ -173,12 +173,12 @@ final class APIDataInterface: DataInterface, Sendable {
         try await api.deletePaste(id, for: address, credential: credential)
     }
     
-    public func savePaste(_ draft: PasteModel.Draft, to address: AddressName, credential: APICredential) async throws -> PasteModel? {
+    public func savePaste(_ draft: PasteResponse.Draft, to address: AddressName, credential: APICredential) async throws -> PasteResponse? {
         let newPaste = Paste.Draft(title: draft.name, content: draft.content, listed: draft.listed)
         guard let paste = try await api.savePaste(newPaste, to: address, credential: credential) else {
             return nil
         }
-        return PasteModel(owner: paste.author, name: paste.title, content: paste.content)
+        return PasteResponse(owner: paste.author, name: paste.title, content: paste.content)
     }
     
     public func fetchStatusLog() async throws -> [StatusResponse] {
