@@ -169,6 +169,10 @@ final class APIDataInterface: DataInterface, Sendable {
         }
     }
     
+    public func deletePaste(_ id: String, from address: AddressName, credential: APICredential) async throws {
+        try await api.deletePaste(id, for: address, credential: credential)
+    }
+    
     public func savePaste(_ draft: PasteModel.Draft, to address: AddressName, credential: APICredential) async throws -> PasteModel? {
         let newPaste = Paste.Draft(title: draft.name, content: draft.content, listed: draft.listed)
         guard let paste = try await api.savePaste(newPaste, to: address, credential: credential) else {
