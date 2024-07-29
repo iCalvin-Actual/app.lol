@@ -418,7 +418,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/iCalvin-Actual/omgui";
 			requirement = {
-				branch = beta;
+				branch = blackbird;
 				kind = branch;
 			};
 		};
@@ -426,7 +426,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/iCalvin-Actual/omgapi";
 			requirement = {
-				branch = beta;
+				branch = blackbird;
 				kind = branch;
 			};
 		};
