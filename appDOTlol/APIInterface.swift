@@ -110,13 +110,13 @@ final class APIDataInterface: DataInterface, Sendable {
     public func fetchAddressPURLs(_ name: AddressName, credential: APICredential?) async throws -> [PURLModel] {
         let purls = try await api.purls(from: name, credential: credential)
         return purls.map { purl in
-            PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
+            PURLModel(owner: purl.address, name: purl.name, content: URL(string: purl.url), listed: purl.listed)
         }
     }
     
     public func fetchPURL(_ id: String, from address: AddressName, credential: APICredential?) async throws -> PURLModel? {
         let purl = try await api.purl(id, for: address, credential: credential)
-        return PURLModel(owner: purl.address, value: purl.name, destination: purl.url, listed: purl.listed)
+        return PURLModel(owner: purl.address, name: purl.name, content: URL(string: purl.url), listed: purl.listed)
     }
     
     public func deletePURL(_ id: String, from address: AddressName, credential: APICredential) async throws {
