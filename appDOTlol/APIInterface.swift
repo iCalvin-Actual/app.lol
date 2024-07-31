@@ -110,13 +110,13 @@ final class APIDataInterface: DataInterface, Sendable {
     public func fetchAddressPURLs(_ name: AddressName, credential: APICredential?) async throws -> [PURLModel] {
         let purls = try await api.purls(from: name, credential: credential)
         return purls.map { purl in
-            PURLModel(owner: purl.address, name: purl.name, content: URL(string: purl.url), listed: purl.listed)
+            PURLModel(owner: purl.address, name: purl.name, content: purl.url, listed: purl.listed)
         }
     }
     
     public func fetchPURL(_ id: String, from address: AddressName, credential: APICredential?) async throws -> PURLModel? {
         let purl = try await api.purl(id, for: address, credential: credential)
-        return PURLModel(owner: purl.address, name: purl.name, content: URL(string: purl.url), listed: purl.listed)
+        return PURLModel(owner: purl.address, name: purl.name, content: purl.url, listed: purl.listed)
     }
     
     public func deletePURL(_ id: String, from address: AddressName, credential: APICredential) async throws {
@@ -145,6 +145,7 @@ final class APIDataInterface: DataInterface, Sendable {
     
     public func fetchAddressPastes(_ name: AddressName, credential: APICredential? = nil) async throws -> [PasteModel] {
         let pastes = try await api.pasteBin(for: name, credential: credential)
+        
         return pastes.map { paste in
             PasteModel(owner: paste.author, name: paste.title, content: paste.content)
         }
