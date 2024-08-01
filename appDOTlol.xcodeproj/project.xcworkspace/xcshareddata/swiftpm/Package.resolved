@@ -7,7 +7,7 @@
       "location" : "https://github.com/iCalvin-Actual/Blackbird",
       "state" : {
         "branch" : "main",
-        "revision" : "7c6aa23271523af1a36678ff54371fc59bb59b3f"
+        "revision" : "ce45e98a69304040fa5015933e19647aa721f1c3"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
-        "branch" : "blackbird",
-        "revision" : "f96d774dad2a9dec0c14e3a738e4a1ecb2f24f2a"
+        "branch" : "beta",
+        "revision" : "613973821ecabc567c7f870d89438e7f5399bb7c"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
-        "branch" : "blackbird",
-        "revision" : "04b3cbcab4b5583d4afb653744482e20822efd8a"
+        "branch" : "beta",
+        "revision" : "698bc749484ee377dff628184990a752904215ff"
       }
     },
     {
