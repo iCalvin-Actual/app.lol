@@ -52,6 +52,15 @@ final class APIDataInterface: DataInterface, Sendable {
         return try await api.addressDirectory()
     }
     
+    public func fetchAddressAvailability(_ address: AddressName) async throws -> AddressAvailabilityModel {
+        guard !address.isEmpty else {
+            return .init(address: address, available: false)
+        }
+        let response = try await api.availability(address)
+        
+        return .init(address: response.address, available: response.available, punyCode: response.punyCode)
+    }
+    
     public func fetchAccountInfo(_ address: AddressName, credential: APICredential) async throws -> AccountInfoModel? {
         guard !address.isEmpty else {
             return nil
