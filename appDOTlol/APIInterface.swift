@@ -64,7 +64,22 @@ final class APIDataInterface: DataInterface, Sendable {
         return log.statuses.map { status in
             StatusModel(
                 id: status.id,
-                address: status.address,
+                owner: status.address,
+                posted: status.created,
+                status: status.content,
+                emoji: status.emoji,
+                linkText: status.externalURL?.absoluteString,
+                link: status.externalURL
+            )
+        }
+    }
+    
+    public func fetchCompleteStatusLog() async throws -> [StatusModel] {
+        let log = try await api.completeStatusLog()
+        return log.statuses.map { status in
+            StatusModel(
+                id: status.id,
+                owner: status.address,
                 posted: status.created,
                 status: status.content,
                 emoji: status.emoji,
@@ -243,7 +258,7 @@ final class APIDataInterface: DataInterface, Sendable {
                     return try await log.statuses.map({ status in
                         StatusModel(
                             id: status.id,
-                            address: status.address,
+                            owner: status.address,
                             posted: status.created,
                             status: status.content,
                             emoji: status.emoji,
@@ -268,7 +283,7 @@ final class APIDataInterface: DataInterface, Sendable {
         )
         return .init(
             id: id,
-            address: address,
+            owner: address,
             posted: status.created,
             status: status.content,
             emoji: status.emoji,
@@ -349,7 +364,7 @@ final class APIDataInterface: DataInterface, Sendable {
         }
         return .init(
             id: status.id,
-            address: address,
+            owner: address,
             posted: status.created,
             status: status.content,
             emoji: status.emoji,
@@ -447,7 +462,7 @@ final class APIDataInterface: DataInterface, Sendable {
         )
         return .init(
             id: status.id,
-            address: status.address,
+            owner: status.address,
             posted: status.created,
             status: status.content,
             emoji: status.emoji,
