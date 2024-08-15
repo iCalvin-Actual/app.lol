@@ -54,7 +54,7 @@ final class APIDataInterface: DataInterface, Sendable {
             NowListing(
                 owner: entry.address,
                 url: entry.url,
-                updated: entry.updated.date
+                date: entry.updated.date
             )
         })
     }
@@ -65,7 +65,7 @@ final class APIDataInterface: DataInterface, Sendable {
             StatusModel(
                 id: status.id,
                 owner: status.address,
-                posted: status.created,
+                date: status.created,
                 status: status.content,
                 emoji: status.emoji,
                 linkText: status.externalURL?.absoluteString,
@@ -80,7 +80,7 @@ final class APIDataInterface: DataInterface, Sendable {
             StatusModel(
                 id: status.id,
                 owner: status.address,
-                posted: status.created,
+                date: status.created,
                 status: status.content,
                 emoji: status.emoji,
                 linkText: status.externalURL?.absoluteString,
@@ -114,7 +114,7 @@ final class APIDataInterface: DataInterface, Sendable {
         return .init(
             name: name,
             url: url,
-            registered: date
+            date: date
         )
     }
     
@@ -158,7 +158,7 @@ final class APIDataInterface: DataInterface, Sendable {
             owner: name,
             content: content,
             html: html,
-            updated: updated,
+            date: updated,
             listed: listed
         )
     }
@@ -173,7 +173,9 @@ final class APIDataInterface: DataInterface, Sendable {
             PasteModel(
                 owner: paste.author,
                 name: paste.title,
-                content: paste.content
+                content: paste.content,
+                date: paste.modifiedOn,
+                listed: paste.listed
             )
         }
     }
@@ -194,6 +196,7 @@ final class APIDataInterface: DataInterface, Sendable {
                 owner: paste.author,
                 name: paste.title,
                 content: paste.content,
+                date: paste.modifiedOn,
                 listed: paste.listed
             )
         } catch let error as APIError {
@@ -259,7 +262,7 @@ final class APIDataInterface: DataInterface, Sendable {
                         StatusModel(
                             id: status.id,
                             owner: status.address,
-                            posted: status.created,
+                            date: status.created,
                             status: status.content,
                             emoji: status.emoji,
                             linkText: status.externalURL?.absoluteString,
@@ -284,7 +287,7 @@ final class APIDataInterface: DataInterface, Sendable {
         return .init(
             id: id,
             owner: address,
-            posted: status.created,
+            date: status.created,
             status: status.content,
             emoji: status.emoji,
             linkText: status.externalURL?.absoluteString,
@@ -365,7 +368,7 @@ final class APIDataInterface: DataInterface, Sendable {
         return .init(
             id: status.id,
             owner: address,
-            posted: status.created,
+            date: status.created,
             status: status.content,
             emoji: status.emoji,
             linkText: status.externalURL?.absoluteString,
@@ -400,7 +403,7 @@ final class APIDataInterface: DataInterface, Sendable {
         return NowModel(
             owner: name,
             content: now.content,
-            updated: now.updated,
+            date: now.updated,
             listed: now.listed
         )
     }
@@ -444,7 +447,8 @@ final class APIDataInterface: DataInterface, Sendable {
         return PasteModel(
             owner: paste.author,
             name: paste.title,
-            content: paste.content
+            content: paste.content,
+            date: paste.modifiedOn
         )
     }
     
@@ -463,7 +467,7 @@ final class APIDataInterface: DataInterface, Sendable {
         return .init(
             id: status.id,
             owner: status.address,
-            posted: status.created,
+            date: status.created,
             status: status.content,
             emoji: status.emoji,
             linkText: status.externalURL?.absoluteString,
