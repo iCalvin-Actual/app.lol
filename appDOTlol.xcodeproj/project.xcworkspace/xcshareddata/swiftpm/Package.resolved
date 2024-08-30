@@ -7,7 +7,7 @@
       "location" : "https://github.com/iCalvin-Actual/Blackbird",
       "state" : {
         "branch" : "main",
-        "revision" : "ce45e98a69304040fa5015933e19647aa721f1c3"
+        "revision" : "f52d7b194d33306e25cecc848831512b7f0e5ef0"
       }
     },
     {
@@ -52,7 +52,7 @@
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
         "branch" : "beta",
-        "revision" : "9d6094d7444e4943def6282d82887b65a8432573"
+        "revision" : "124e26549656dcd48546310232acfa55933a0338"
       }
     },
     {
