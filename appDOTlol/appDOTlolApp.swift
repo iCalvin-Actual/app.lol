@@ -30,7 +30,7 @@ struct appDOTlolApp: App {
             omgui(
                 client: Self.clientInfo,
                 interface: interface,
-                dbDestination: documentDirectory
+                dbDestination: ""
             )
         }
     }
