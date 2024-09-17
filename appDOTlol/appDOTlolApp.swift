@@ -5,6 +5,7 @@
 //  Created by Calvin Chestnut on 3/5/23.
 //
 
+import Blackbird
 import omgapi
 import omgui
 import SwiftUI
@@ -19,18 +20,22 @@ struct appDOTlolApp: App {
             callback: "://oauth"
         )
     }
+    static var database: Blackbird.Database = {
+        let directory = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("blackbird", conformingTo: .database)
+            .absoluteString
+        
+        return try! .init(path: directory)
+    }()
     let interface = APIDataInterface()
-    
-    var documentDirectory: String {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("blackbird", conformingTo: .database).absoluteString
-    }
     
     var body: some Scene {
         WindowGroup {
             omgui(
                 client: Self.clientInfo,
                 interface: interface,
-                dbDestination: documentDirectory
+                database: Self.database
             )
         }
     }
