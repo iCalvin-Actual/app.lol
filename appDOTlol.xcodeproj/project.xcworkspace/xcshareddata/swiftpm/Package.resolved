@@ -2,6 +2,15 @@
   "originHash" : "2d73c99fcaa7ec71e28813b9939c79c5af5263cb70d048859b1420a299e1c044",
   "pins" : [
     {
+      "identity" : "blackbird",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/Blackbird",
+      "state" : {
+        "branch" : "main",
+        "revision" : "7cb648465eb4babf77952d68c855d20517f2b962"
+      }
+    },
+    {
       "identity" : "ink",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/JohnSundell/Ink",
@@ -33,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
-        "branch" : "main",
-        "revision" : "ed0569649e80e3d5c3361f58af69d5476e7b44dd"
+        "branch" : "develop",
+        "revision" : "e2d891b528b2eb0bf25b900292d8916f39c33973"
       }
     },
     {
@@ -42,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
-        "branch" : "main",
-        "revision" : "bef250baa394d0bd3ee44ef784e27d3bb9c6e490"
+        "branch" : "develop",
+        "revision" : "1e9c72076f6e6919920dbb4a7653513061352962"
       }
     },
     {

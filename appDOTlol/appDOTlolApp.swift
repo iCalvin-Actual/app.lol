@@ -21,11 +21,16 @@ struct appDOTlolApp: App {
     }
     let interface = APIDataInterface()
     
+    var documentDirectory: String {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("blackbird", conformingTo: .database).absoluteString
+    }
+    
     var body: some Scene {
         WindowGroup {
             omgui(
                 client: Self.clientInfo,
-                interface: interface
+                interface: interface,
+                dbDestination: documentDirectory
             )
         }
     }
