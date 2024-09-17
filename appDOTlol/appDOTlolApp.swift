@@ -39,11 +39,7 @@ struct appDOTlolApp: App {
             omgui(
                 client: Self.clientInfo,
                 interface: interface,
-<<<<<<< HEAD
-                dbDestination: documentDirectory
-=======
                 database: Self.database
->>>>>>> develop
             )
         }
     }
