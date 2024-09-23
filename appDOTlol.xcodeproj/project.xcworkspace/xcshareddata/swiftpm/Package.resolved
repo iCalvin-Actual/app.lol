@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
-        "branch" : "develop",
-        "revision" : "e2d891b528b2eb0bf25b900292d8916f39c33973"
+        "branch" : "main",
+        "revision" : "e669d967d0d3ecdee085ff401b9ab342c0bf8284"
       }
     },
     {
@@ -51,8 +51,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
-        "branch" : "develop",
-        "revision" : "9d3de44b551f111664060a4814374d4358e19f12"
+        "branch" : "main",
+        "revision" : "b011a2b18c493328334be27a2249d80a4379e22d"
+      }
+    },
+    {
+      "identity" : "punycodeswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/PunycodeSwift",
+      "state" : {
+        "branch" : "main",
+        "revision" : "30a462bdb4398ea835a3585472229e0d74b36ba5"
       }
     },
     {
