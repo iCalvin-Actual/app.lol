@@ -52,7 +52,16 @@
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
         "branch" : "main",
-        "revision" : "da9b9859612b5cf387b890b96d70f5eb7fb97d1b"
+        "revision" : "b011a2b18c493328334be27a2249d80a4379e22d"
+      }
+    },
+    {
+      "identity" : "punycodeswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iCalvin-Actual/PunycodeSwift",
+      "state" : {
+        "branch" : "main",
+        "revision" : "30a462bdb4398ea835a3585472229e0d74b36ba5"
       }
     },
     {
