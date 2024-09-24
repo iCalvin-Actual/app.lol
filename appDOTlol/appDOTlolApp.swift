@@ -21,10 +21,19 @@ struct appDOTlolApp: App {
         )
     }
     static var database: Blackbird.Database = {
-        let directory = FileManager.default
+        let old = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("blackbird", conformingTo: .database)
             .absoluteString
+        
+        let directory = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("appV1", conformingTo: .database)
+            .absoluteString
+        
+        if FileManager.default.fileExists(atPath: old), FileManager.default.isDeletableFile(atPath: old) {
+            try? FileManager.default.removeItem(atPath: old)
+        }
         
         return try! .init(path: directory)
     }()
