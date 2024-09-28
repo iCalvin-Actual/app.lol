@@ -118,11 +118,12 @@ final class APIDataInterface: DataInterface, Sendable {
         )
     }
     
-    public func fetchAddressBio(_ name: AddressName) async throws -> AddressBioModel {
+    public func fetchAddressBio(_ name: AddressName) async throws -> AddressSummaryModel {
         let bio = try await api.bio(for: name)
         return .init(
             address: name,
-            bio: bio.content
+            bio: bio.content,
+            date: nil
         )
     }
     
