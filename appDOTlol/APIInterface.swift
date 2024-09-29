@@ -127,6 +127,24 @@ final class APIDataInterface: DataInterface, Sendable {
         )
     }
     
+    public func fetchAddressFollowers(_ name: AddressName) async throws -> [AddressName] {
+        let followers = try await api.followers(for: name)
+        return followers
+    }
+    
+    public func fetchAddressFollowing(_ name: AddressName) async throws -> [AddressName] {
+        let followers = try await api.following(from: name)
+        return followers
+    }
+    
+    public func followAddress(_ target: AddressName, from address: AddressName, credential: APICredential) async throws {
+        try await api.follow(target, from: address, credential: credential)
+    }
+    
+    public func unfollowAddress(_ target: AddressName, from address: AddressName, credential: APICredential) async throws {
+        try await api.unfollow(target, from: address, credential: credential)
+    }
+    
     public func fetchAddressProfile(_ name: AddressName, credential: APICredential? = nil) async throws -> AddressProfile? {
         var content: String?
         if let credential = credential {
