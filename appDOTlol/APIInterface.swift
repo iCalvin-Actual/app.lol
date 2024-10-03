@@ -145,21 +145,24 @@ final class APIDataInterface: DataInterface, Sendable {
         try await api.unfollow(target, from: address, credential: credential)
     }
     
-    public func fetchAddressProfile(_ name: AddressName, credential: APICredential? = nil) async throws -> AddressProfile? {
-        var content: String?
-        if let credential = credential {
-            let profile = try await api.profile(
-                name,
-                with: credential
-            )
-            content = profile.content
-        } else {
-            let profile = try await api.publicProfile(name)
-            content = profile.content
-        }
+    public func fetchAddressProfile(_ name: AddressName) async throws -> AddressProfilePage? {
+        let profile = try await api.publicProfile(name)
+        let content = profile.content
         guard let content = content else {
             return nil
         }
+        return .init(
+            owner: name,
+            content: content
+        )
+    }
+    
+    public func fetchAddressProfile(_ name: AddressName, credential: APICredential) async throws -> ProfileMarkdown {
+        let profile = try await api.profile(
+            name,
+            with: credential
+        )
+        let content = profile.content
         return .init(
             owner: name,
             content: content
@@ -370,34 +373,34 @@ final class APIDataInterface: DataInterface, Sendable {
         )
     }
     
-    public func deleteAddressStatus(_ draft: StatusModel.Draft, from address: AddressName, credential: APICredential) async throws -> StatusModel? {
-        let deleteStatus: Status.Draft = .init(
-            id: draft.id,
-            content: draft.content,
-            emoji: draft.emoji,
-            externalUrl: draft.externalUrl
-        )
-        guard let status = try await api.deleteStatus(
-            deleteStatus,
-            from: address,
-            credential: credential
-        ) else {
-            return nil
-        }
-        return .init(
-            id: status.id,
-            owner: address,
-            date: status.created,
-            status: status.content,
-            emoji: status.emoji,
-            linkText: status.externalURL?.absoluteString,
-            link: status.externalURL
-        )
-    }
+//    public func deleteAddressStatus(_ draft: StatusModel.Draft, from address: AddressName, credential: APICredential) async throws -> StatusModel? {
+//        let deleteStatus: Status.Draft = .init(
+//            id: draft.id,
+//            content: draft.content,
+//            emoji: draft.emoji,
+//            externalUrl: draft.externalUrl
+//        )
+//        guard let status = try await api.deleteStatus(
+//            deleteStatus,
+//            from: address,
+//            credential: credential
+//        ) else {
+//            return nil
+//        }
+//        return .init(
+//            id: status.id,
+//            owner: address,
+//            date: status.created,
+//            status: status.content,
+//            emoji: status.emoji,
+//            linkText: status.externalURL?.absoluteString,
+//            link: status.externalURL
+//        )
+//    }
     
     // MARK: Posting
     
-    public func saveAddressProfile(_ name: AddressName, content: String, credential: APICredential) async throws -> AddressProfile? {
+    public func saveAddressProfile(_ name: AddressName, content: String, credential: APICredential) async throws -> ProfileMarkdown? {
         let profile = try await api.saveProfile(
             content,
             for: name,
@@ -427,28 +430,28 @@ final class APIDataInterface: DataInterface, Sendable {
         )
     }
     
-    public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
-        let newPurl = PURL.Draft(
-            name: draft.name,
-            content: draft.content.urlString,
-            listed: draft.listed
-        )
-        do {
-            let _ = try await api.savePURL(
-                newPurl,
-                to: address,
-                credential: credential
-            )
-            
-            return try await fetchPURL(
-                draft.name,
-                from: address,
-                credential: credential
-            )
-        } catch {
-            throw error
-        }
-    }
+//    public func savePURL(_ draft: PURLModel.Draft, to address: AddressName, credential: APICredential) async throws -> PURLModel? {
+//        let newPurl = PURL.Draft(
+//            name: draft.name,
+//            content: draft.content.urlString,
+//            listed: draft.listed
+//        )
+//        do {
+//            let _ = try await api.savePURL(
+//                newPurl,
+//                to: address,
+//                credential: credential
+//            )
+//            
+//            return try await fetchPURL(
+//                draft.name,
+//                from: address,
+//                credential: credential
+//            )
+//        } catch {
+//            throw error
+//        }
+//    }
     
     public func savePaste(_ draft: PasteModel.Draft, to address: AddressName, credential: APICredential) async throws -> PasteModel? {
         let newPaste = Paste.Draft(
@@ -471,27 +474,27 @@ final class APIDataInterface: DataInterface, Sendable {
         )
     }
     
-    public func saveStatusDraft(_ draft: StatusModel.Draft, to address: AddressName, credential: APICredential) async throws -> StatusModel? {
-        let newStatus: Status.Draft = .init(
-            id: draft.id,
-            content: draft.content,
-            emoji: draft.emoji.isEmpty ? "💗" : draft.emoji,
-            externalUrl: draft.externalUrl
-        )
-        let status = try await api.saveStatus(
-            newStatus,
-            to: address,
-            credential: credential
-        )
-        return .init(
-            id: status.id,
-            owner: status.address,
-            date: status.created,
-            status: status.content,
-            emoji: status.emoji,
-            linkText: status.externalURL?.absoluteString,
-            link: status.externalURL
-        )
-    }
+//    public func saveStatusDraft(_ draft: StatusModel.Draft, to address: AddressName, credential: APICredential) async throws -> StatusModel? {
+//        let newStatus: Status.Draft = .init(
+//            id: draft.id,
+//            content: draft.content,
+//            emoji: draft.emoji.isEmpty ? "💗" : draft.emoji,
+//            externalUrl: draft.externalUrl
+//        )
+//        let status = try await api.saveStatus(
+//            newStatus,
+//            to: address,
+//            credential: credential
+//        )
+//        return .init(
+//            id: status.id,
+//            owner: status.address,
+//            date: status.created,
+//            status: status.content,
+//            emoji: status.emoji,
+//            linkText: status.externalURL?.absoluteString,
+//            link: status.externalURL
+//        )
+//    }
 }
 
