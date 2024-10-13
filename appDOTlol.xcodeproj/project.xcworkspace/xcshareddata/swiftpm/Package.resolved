@@ -16,7 +16,7 @@
       "location" : "https://github.com/iCalvin-Actual/MarkdownEditor.git",
       "state" : {
         "branch" : "main",
-        "revision" : "226ca9db63fa6d4390e1434e5a13307c2f5d0e42"
+        "revision" : "0681d73398b4202a7c3308e6bbcee921117c101d"
       }
     },
     {
@@ -43,7 +43,7 @@
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
         "branch" : "develop",
-        "revision" : "233383785cad4302e50d5241e27bb9bbb7dd812f"
+        "revision" : "853e181167295995832705b25fa07a72bce25710"
       }
     },
     {
