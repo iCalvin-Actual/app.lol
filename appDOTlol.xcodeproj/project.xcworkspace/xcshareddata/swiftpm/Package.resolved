@@ -11,21 +11,12 @@
       }
     },
     {
-      "identity" : "ink",
+      "identity" : "markdowneditor",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/JohnSundell/Ink",
+      "location" : "https://github.com/iCalvin-Actual/MarkdownEditor.git",
       "state" : {
-        "revision" : "77c3d8953374a9cf5418ef0bd7108524999de85a",
-        "version" : "0.5.1"
-      }
-    },
-    {
-      "identity" : "markupeditor",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stevengharris/MarkupEditor",
-      "state" : {
-        "revision" : "45300e4d85da8dea56395da0ada8ff88662d54a3",
-        "version" : "0.5.1"
+        "branch" : "main",
+        "revision" : "4f40e85a59fa2906fe5da30c5615b1ba3f4f7df6"
       }
     },
     {
@@ -33,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gonzalezreal/NetworkImage",
       "state" : {
-        "revision" : "7aff8d1b31148d32c5933d75557d42f6323ee3d1",
-        "version" : "6.0.0"
+        "revision" : "2849f5323265386e200484b0d0f896e73c3411b9",
+        "version" : "6.0.1"
       }
     },
     {
@@ -43,7 +34,7 @@
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
         "branch" : "main",
-        "revision" : "19e851a00bd8d88f3fb2e7b1c340538bb762b505"
+        "revision" : "574ce4e791a285e6c3ac5d1c6abac601b9ba5a6b"
       }
     },
     {
@@ -52,7 +43,7 @@
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
         "branch" : "main",
-        "revision" : "f39808050b19436744e481860456994049ee62c3"
+        "revision" : "c99615b0e01e1e07e86c6f4971e3a91f75d60fd1"
       }
     },
     {
