@@ -46,7 +46,7 @@ final class APIDataInterface: DataInterface, Sendable {
     }
     
     public func fetchAddressDirectory() async throws -> [AddressName] {
-        return try await api.addressDirectory()
+        return try await api.directory()
     }
     
     public func fetchNowGarden() async throws -> [NowListing] {
@@ -54,14 +54,14 @@ final class APIDataInterface: DataInterface, Sendable {
             NowListing(
                 owner: entry.address,
                 url: entry.url,
-                date: entry.updated.date
+                date: entry.updated
             )
         })
     }
     
     public func fetchStatusLog() async throws -> [StatusModel] {
-        let log = try await api.latestStatusLog()
-        return log.statuses.map { status in
+        let log = try await api.latestStatuslog()
+        return log.map { status in
             StatusModel(
                 id: status.id,
                 owner: status.address,
@@ -75,8 +75,8 @@ final class APIDataInterface: DataInterface, Sendable {
     }
     
     public func fetchCompleteStatusLog() async throws -> [StatusModel] {
-        let log = try await api.completeStatusLog()
-        return log.statuses.map { status in
+        let log = try await api.completeStatuslog()
+        return log.map { status in
             StatusModel(
                 id: status.id,
                 owner: status.address,
@@ -110,7 +110,7 @@ final class APIDataInterface: DataInterface, Sendable {
     public func fetchAddressInfo(_ name: AddressName) async throws -> AddressModel {
         let profile = try await api.details(name)
         let url = URL(string: "https://\(name).omg.lol")
-        let date = profile.registered.date
+        let date = profile.registered
         return .init(
             name: name,
             url: url,
@@ -221,7 +221,7 @@ final class APIDataInterface: DataInterface, Sendable {
                 date: paste.modifiedOn,
                 listed: paste.listed
             )
-        } catch let error as APIError {
+        } catch let error as api.Error {
             switch error {
             case .notFound:
                 return nil
@@ -279,8 +279,8 @@ final class APIDataInterface: DataInterface, Sendable {
             for address in addresses {
                 group.addTask { [weak self] in
                     guard let self = self else { return [] }
-                    async let log = try api.statusLog(from: address)
-                    return try await log.statuses.map({ status in
+                    async let log = try api.logs(for: address)
+                    return try await log.map({ status in
                         StatusModel(
                             id: status.id,
                             owner: status.address,
@@ -414,11 +414,8 @@ final class APIDataInterface: DataInterface, Sendable {
     }
     
     public func saveAddressNow(_ name: AddressName, content: String, credential: APICredential) async throws -> NowModel? {
-        guard let now = try await api.saveNow(
-            for: name,
-            content: content,
-            credential: credential
-        ) else {
+        let draft = Now.Draft(content: content, listed: true)
+        guard let now = try await api.saveNow(draft, for: name, credential: credential) else {
             return nil
         }
         

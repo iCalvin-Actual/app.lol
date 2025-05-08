@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
-        "branch" : "develop",
-        "revision" : "574ce4e791a285e6c3ac5d1c6abac601b9ba5a6b"
+        "branch" : "main",
+        "revision" : "214ce6c91c06345b8fd48c040bdb7f6a33b5f21a"
       }
     },
     {
@@ -43,7 +43,7 @@
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
         "branch" : "develop",
-        "revision" : "43a180a3290ea395158b8f3e2fb5b9b419dcac61"
+        "revision" : "d12c66da3bf389f52ec08c87b7f1dc240971bf03"
       }
     },
     {
