@@ -1,5 +1,5 @@
 {
-  "originHash" : "2d73c99fcaa7ec71e28813b9939c79c5af5263cb70d048859b1420a299e1c044",
+  "originHash" : "9b4eaffba3ab26f3b8ef3f22f599cc7b4cad3bfe87e4b4a92a2a8dae4b307a85",
   "pins" : [
     {
       "identity" : "blackbird",
@@ -35,15 +35,6 @@
       "state" : {
         "branch" : "main",
         "revision" : "214ce6c91c06345b8fd48c040bdb7f6a33b5f21a"
-      }
-    },
-    {
-      "identity" : "omgui",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/iCalvin-Actual/omgui",
-      "state" : {
-        "branch" : "develop",
-        "revision" : "d12c66da3bf389f52ec08c87b7f1dc240971bf03"
       }
     },
     {

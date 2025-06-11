@@ -6,7 +6,6 @@
 //
 
 import omgapi
-import omgui
 import Foundation
 
 final class APIDataInterface: DataInterface, Sendable {

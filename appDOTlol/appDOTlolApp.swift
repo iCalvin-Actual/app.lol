@@ -7,7 +7,6 @@
 
 import Blackbird
 import omgapi
-import omgui
 import SwiftUI
 
 @main
@@ -21,30 +20,25 @@ struct appDOTlolApp: App {
         )
     }
     static var database: Blackbird.Database = {
-        let old = FileManager.default
-            .urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("blackbird", conformingTo: .database)
-            .absoluteString
-        
-        let directory = FileManager.default
-            .urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("appV1", conformingTo: .database)
-            .absoluteString
-        
-        if FileManager.default.fileExists(atPath: old), FileManager.default.isDeletableFile(atPath: old) {
-            try? FileManager.default.removeItem(atPath: old)
+        do {
+            return try .init(path:
+                        FileManager.default
+                .urls(for: .documentDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("appV1", conformingTo: .database)
+                .absoluteString
+            )
+        } catch {
+            return try! .inMemoryDatabase()
         }
-        
-        return try! .init(path: directory)
     }()
-    let interface = APIDataInterface()
+    let interface = APIDataInterface() /*SampleData()*/
     
     var body: some Scene {
         WindowGroup {
             omgui(
                 client: Self.clientInfo,
                 interface: interface,
-                database: Self.database
+                database: try! .inMemoryDatabase()
             )
         }
     }
