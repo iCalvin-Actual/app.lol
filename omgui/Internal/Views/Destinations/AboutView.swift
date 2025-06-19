@@ -24,7 +24,7 @@ struct AboutView: View {
                     .ignoresSafeArea(.container, edges: (horizontalSizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad) ? [.bottom] : [])
             })
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .principal) {
                     ThemedTextView(text: "info & help")
                 }
             }

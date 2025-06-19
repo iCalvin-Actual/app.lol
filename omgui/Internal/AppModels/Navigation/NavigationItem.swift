@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
     var id: String { rawValue }
@@ -135,6 +136,15 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
             return "questionmark.circle"
         case .newStatus, .newPURL, .newPaste:
             return "pencil.and.scribble"
+        }
+    }
+    
+    var role: TabRole? {
+        switch self {
+        case .search:
+            return .search
+        default:
+            return nil
         }
     }
     

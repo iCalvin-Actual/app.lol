@@ -35,7 +35,14 @@ struct Sidebar: View {
     }
     
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
+            HStack {
+                Spacer()
+                LogoView()
+                    .frame(height: 34)
+                ThemedTextView(text: "app.lol", font: .title)
+                Spacer()
+            }
             List(selection: $selected) {
                 ForEach(sidebarModel.sections) { section in
                     let items = sidebarModel.items(for: section, sizeClass: horizontalSize, context: .column)
@@ -58,40 +65,8 @@ struct Sidebar: View {
                     }
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
         }
         .environment(\.viewContext, ViewContext.column)
-//        .safeAreaInset(edge: .bottom) {
-//            AddressPicker()
-//        }
-//        .safeAreaInset(edge: .bottom, content: {
-//            if !sceneModel.addressBook.signedIn {
-//                Button {
-//                    selected = .account
-//                } label: {
-//                    Text("mor lol")
-//                        .font(.title3)
-//                        .bold()
-//                        .fontDesign(.serif)
-//                        .frame(maxWidth: .infinity)
-//                        .padding()
-//                }
-//                .background(Color.lolBlue)
-//                .cornerRadius(16)
-//                .padding()
-//                .background(Material.bar)
-//            }
-//        })
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                HStack(spacing: 4) {
-                    LogoView()
-                        .frame(height: 34)
-                    ThemedTextView(text: "app.lol", font: .title)
-                }
-            }
-        }
-        .navigationTitle("")
     }
     
     private func isActingAddress(_ address: AddressName) -> Bool {

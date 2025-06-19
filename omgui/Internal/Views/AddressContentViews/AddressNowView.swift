@@ -24,7 +24,7 @@ struct AddressNowView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .principal) {
                     AddressNameView(fetcher.addressName, suffix: "/now")
                 }
                 ToolbarItem(placement: .topBarTrailing) {

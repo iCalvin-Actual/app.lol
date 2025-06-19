@@ -50,7 +50,7 @@ struct AddressProfileView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .principal) {
                     AddressNameView(fetcher.addressName)
                 }
             }

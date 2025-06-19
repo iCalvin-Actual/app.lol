@@ -42,7 +42,6 @@ class ProfileMarkdownDataFetcher: ModelBackedDataFetcher<ProfileMarkdown> {
     init(name: AddressName, credential: APICredential, interface: DataInterface, db: Blackbird.Database) {
         self.addressName = name
         self.credential = credential
-        print("Credential \(credential)")
         super.init(interface: interface, db: db)
     }
     

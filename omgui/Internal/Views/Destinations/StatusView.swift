@@ -69,10 +69,9 @@ struct StatusView: View {
             }
             .padding(.vertical)
         }
-        .navigationTitle("")
         .toolbar {
             if viewContext != .profile {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .principal) {
                     AddressNameView(fetcher.address, suffix: "/status")
                 }
             }

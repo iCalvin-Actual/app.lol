@@ -36,7 +36,7 @@ struct StatusList: View {
         )
         .toolbarRole(.editor)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .principal) {
                 if let first = fetcher.addresses.first, fetcher.addresses.count == 1 {
                     AddressNameView(first, suffix: "/statuses")
                 }

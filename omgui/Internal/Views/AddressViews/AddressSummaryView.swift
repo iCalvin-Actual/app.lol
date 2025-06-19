@@ -103,7 +103,6 @@ struct AddressSummaryView: View {
             .background(Color.clear)
             .ignoresSafeArea(.container, edges: (horizontalSizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad) ? [.bottom] : [])
             .navigationSplitViewColumnWidth(min: 250, ideal: 600)
-            .navigationBarTitleDisplayMode(.inline)
     }
     
     func fetcherForContent(_ content: AddressContent) -> Request {

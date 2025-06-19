@@ -34,19 +34,8 @@ struct TabBar: View {
     }
     
     var body: some View {
-        if #available(iOS 18.0, *) {
-            updatedBody
-        } else {
-            SplitView()
-        }
-    }
-    
-    @available(iOS 18.0, *)
-    @ViewBuilder
-    var updatedBody: some View {
         if !Self.usingRegularTabBar(sizeClass: horizontalSizeClass) {
             compactTabBar
-                .toolbarColorScheme(.light, for: .tabBar)
                 .onAppear{
                     if selected == nil {
                         selected = .community
@@ -62,20 +51,22 @@ struct TabBar: View {
         }
     }
     
-    @available(iOS 18.0, *)
+    @State var searchQuery: String = ""
+    
     @ViewBuilder
     var compactTabBar: some View {
         TabView(selection: $selected) {
             ForEach(tabModel.tabs) { item in
-                Tab(item.displayString, systemImage: item.iconName, value: item) {
+                Tab(item.displayString, systemImage: item.iconName, value: item, role: item == .search ? .search : nil) {
                     tabContent(item.destination)
                 }
                 .hidden(Self.usingRegularTabBar(sizeClass: horizontalSizeClass))
             }
         }
+        .searchable(text: $searchQuery)
+        .tabBarMinimizeBehavior(.onScrollDown)
     }
     
-    @available(iOS 18.0, *)
     @ViewBuilder
     var regularTabBar: some View {
         TabView(selection: $selected) {
@@ -93,6 +84,7 @@ struct TabBar: View {
                 }
             }
         }
+        .searchable(text: $searchQuery)
         .tabViewStyle(.sidebarAdaptable)
     }
     
@@ -101,18 +93,12 @@ struct TabBar: View {
         NavigationStack {
             sceneModel.destinationConstructor.destination(destination)
                 .navigationDestination(for: NavigationDestination.self, destination: sceneModel.destinationConstructor.destination(_:))
-                .navigationTitle("")
         }
     }
 }
 
 #Preview {
-    if #available(iOS 18.0, visionOS 2.0, *) {
-        let sceneModel = SceneModel.sample
-        TabBar(sceneModel: .sample)
-            .environment(sceneModel)
-            .environment(AccountAuthDataFetcher(authKey: nil, client: .sample, interface: SampleData()))
-    } else {
-        Text("Not supported on iOS 17")
-    }
+    TabBar(sceneModel: .sample)
+        .environment(SceneModel.sample)
+        .environment(AccountAuthDataFetcher(authKey: nil, client: .sample, interface: SampleData()))
 }

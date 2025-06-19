@@ -63,7 +63,7 @@ struct SafetyView: View {
         }
         .scrollContentBackground(.hidden)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .principal) {
                 ThemedTextView(text: "safety")
             }
         }

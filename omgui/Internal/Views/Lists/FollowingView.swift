@@ -19,7 +19,7 @@ struct FollowingView: View {
         followingView
             .onAppear(perform: { needsRefresh = false })
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .principal) {
                     ThemedTextView(text: "following")
                 }
             }

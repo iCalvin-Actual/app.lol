@@ -43,7 +43,7 @@ struct PasteView: View {
             })
             .toolbar {
                 if viewContext != .profile {
-                    ToolbarItem(placement: .topBarLeading) {
+                    ToolbarItem(placement: .principal) {
                         AddressNameView(fetcher.address, suffix: "/pastebin")
                     }
                 }

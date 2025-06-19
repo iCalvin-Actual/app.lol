@@ -269,7 +269,7 @@ struct ListsView: View {
         })
         .scrollContentBackground(.hidden)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .principal) {
                 ThemedTextView(text: "app.lol")
             }
             
@@ -277,7 +277,6 @@ struct ListsView: View {
                 LogoView()
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -311,15 +310,15 @@ struct AddressCard: View {
 class ListsViewModel: ObservableObject {
     let sidebarModel: SidebarModel
     
-    var showPinned: Bool { !pinned.isEmpty }
-    var showFollowing: Bool { !following.isEmpty }
-    var showFollowers: Bool { !followers.isEmpty }
-    var showBlocked: Bool { !blocked.isEmpty }
-    
     init(sceneModel: SceneModel) {
         self.sidebarModel = .init(sceneModel: sceneModel)
     }
     
+    var showPinned: Bool { !pinned.isEmpty }
+    var showFollowing: Bool { !following.isEmpty }
+    var showFollowers: Bool { !followers.isEmpty }
+    var showBlocked: Bool { !blocked.isEmpty }
+
     var sceneModel: SceneModel {
         sidebarModel.sceneModel
     }

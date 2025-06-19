@@ -97,8 +97,6 @@ struct ListView<T: Listable, H: View>: View {
                     selected = nil
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle("")
             .onChange(of: sort, { oldValue, newValue in
                 dataFetcher.sort = newValue
             })
@@ -129,16 +127,11 @@ struct ListView<T: Listable, H: View>: View {
                 newFilters.append(.query(newValue))
                 filters = newFilters
             })
+            .navigationTitle(dataFetcher.title)
             .toolbar {
                 if (T.sortOptions.count > 1 || applicableFilters.count > 1), allowFilter {
-                    ToolbarItem(placement: .navigationBarTrailing) {
+                    ToolbarItem(placement: .topBarTrailing) {
                         SortOrderMenu(sort: $sort, filters: $filters, sortOptions: T.sortOptions, filterOptions: applicableFilters)
-                    }
-                }
-                
-                if headerBuilder == nil {
-                    ToolbarItem(placement: .topBarLeading) {
-                        ThemedTextView(text: dataFetcher.title)
                     }
                 }
             }
@@ -148,7 +141,7 @@ struct ListView<T: Listable, H: View>: View {
     var toolbarAwareBody: some View {
         if #available(iOS 18.0, visionOS 2.0,*) {
             sizeAppropriateBody
-                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
+//                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         } else {
             sizeAppropriateBody
         }
@@ -173,25 +166,15 @@ struct ListView<T: Listable, H: View>: View {
     @ViewBuilder
     func compactBody(width: CGFloat) -> some View {
         let body: some View = {
-            searchableList(width: width)
+            list(width: width)
                 .animation(.easeInOut(duration: 0.3), value: dataFetcher.loaded)
                 .listRowBackground(Color.clear)
         }()
         if #available(iOS 18.0, visionOS 2.0, *) {
             body
-                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
+//                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         } else {
             body
-        }
-    }
-    
-    @ViewBuilder
-    func searchableList(width: CGFloat) ->  some View {
-        if allowSearch {
-            list(width: width)
-                .searchable(text: $queryString, placement: .automatic)
-        } else {
-            list(width: width)
         }
     }
     
@@ -225,53 +208,45 @@ struct ListView<T: Listable, H: View>: View {
     
     @ViewBuilder
     func list(width: CGFloat) -> some View {
-        let body: some View = {
-            List(selection: $selected) {
-                listItems(width: width)
+        List(selection: $selected) {
+            listItems(width: width)
+                .listRowBackground(Color.clear)
+                .padding(.vertical, 4)
+            
+            if queryString.isEmpty && dataFetcher.nextPage != nil {
+                LoadingView()
+                    .padding(32)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .listRowBackground(Color.clear)
-                    .padding(.vertical, 4)
-                
-                if queryString.isEmpty && dataFetcher.nextPage != nil {
-                    LoadingView()
-                        .padding(32)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .listRowBackground(Color.clear)
-                        .onAppear { [dataFetcher] in
-                            dataFetcher.fetchNextPageIfNeeded()
-                        }
-                }
+                    .onAppear { [dataFetcher] in
+                        dataFetcher.fetchNextPageIfNeeded()
+                    }
             }
-            .refreshable(action: { [dataFetcher] in
-                await dataFetcher.updateIfNeeded(forceReload: true)
-            })
-            .listStyle(.plain)
-            .listRowSpacing(0)
-            .onReceive(dataFetcher.$loaded, perform: { _ in
-                var newSelection: T?
-                switch (
-                    horizontalSize == .regular,
-                    dataFetcher.loaded != nil,
-                    selected == nil
-                ) {
-                case (false, true, false):
-                    newSelection = nil
-                case (true, true, true):
-                    newSelection = dataFetcher.results.first
-                default:
-                    return
-                }
-                
-                withAnimation { @MainActor in
-                    self.selected = newSelection
-                }
-            })
-        }()
-        if #available(iOS 18.0, visionOS 2.0, *) {
-            body
-                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
-        } else {
-            body
         }
+        .refreshable(action: { [dataFetcher] in
+            await dataFetcher.updateIfNeeded(forceReload: true)
+        })
+        .listStyle(.plain)
+        .listRowSpacing(0)
+        .onReceive(dataFetcher.$loaded, perform: { _ in
+            var newSelection: T?
+            switch (
+                horizontalSize == .regular,
+                dataFetcher.loaded != nil,
+                selected == nil
+            ) {
+            case (false, true, false):
+                newSelection = nil
+            case (true, true, true):
+                newSelection = dataFetcher.results.first
+            default:
+                return
+            }
+            
+            withAnimation { @MainActor in
+                self.selected = newSelection
+            }
+        })
     }
     
     @ViewBuilder
@@ -283,11 +258,11 @@ struct ListView<T: Listable, H: View>: View {
             }
             Section(dataFetcher.title) {
                 listContent(width: width)
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, 8)
             }
         } else {
             listContent(width: width)
-                .padding(.horizontal, 4)
+                .padding(.horizontal, 8)
         }
     }
     
