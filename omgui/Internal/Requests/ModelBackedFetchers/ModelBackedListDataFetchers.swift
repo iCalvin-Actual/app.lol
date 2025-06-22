@@ -16,8 +16,8 @@ class AddressDirectoryDataFetcher: ModelBackedListDataFetcher<AddressModel> {
     override func fetchRemote() async throws -> Int {
         let directory = try await interface.fetchAddressDirectory()
         let listItems = directory.map({ AddressModel(name: $0) })
+        
         for model in listItems {
-            let db = db
             try await model.write(to: db)
         }
         return listItems.hashValue

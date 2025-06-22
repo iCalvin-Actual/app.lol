@@ -16,8 +16,6 @@ struct DestinationConstructor {
         if let destination {
             viewContent(destination)
                 .background(destination.gradient)
-                .toolbarBackground(destination.color, for: .navigationBar)
-                .toolbarBackground(destination.secondaryColor, for: .tabBar)
         } else {
             viewContent(destination)
         }
@@ -28,9 +26,8 @@ struct DestinationConstructor {
         let destination = destination ?? .community
         switch destination {
         case .directory:
-            DirectoryView(
-                fetcher: sceneModel.directoryFetcher
-            )
+            SearchLanding(sceneModel: sceneModel)
+//            DirectoryView(fetcher: sceneModel.directoryFetcher)
         case .community:
             CommunityView(sceneModel.statusFetcher)
         case .address(let name):

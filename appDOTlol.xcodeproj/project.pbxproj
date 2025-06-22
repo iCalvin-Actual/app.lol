@@ -35,7 +35,6 @@
 		3E2FBCB92DCC5919007B9C24 /* AppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC312DCC5919007B9C24 /* AppFeature.swift */; };
 		3E2FBCBA2DCC5919007B9C24 /* AddressPastesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC612DCC5919007B9C24 /* AddressPastesView.swift */; };
 		3E2FBCBB2DCC5919007B9C24 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC902DCC5919007B9C24 /* Sidebar.swift */; };
-		3E2FBCBC2DCC5919007B9C24 /* SplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC912DCC5919007B9C24 /* SplitView.swift */; };
 		3E2FBCBD2DCC5919007B9C24 /* PathTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC7F2DCC5919007B9C24 /* PathTextField.swift */; };
 		3E2FBCBE2DCC5919007B9C24 /* AddressNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC662DCC5919007B9C24 /* AddressNameView.swift */; };
 		3E2FBCBF2DCC5919007B9C24 /* MyStatusesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC892DCC5919007B9C24 /* MyStatusesView.swift */; };
@@ -111,6 +110,7 @@
 		3E2FBD182DCC5A1A007B9C24 /* Blackbird in Frameworks */ = {isa = PBXBuildFile; productRef = 3E2FBD172DCC5A1A007B9C24 /* Blackbird */; };
 		3E2FBD1B2DCC5A26007B9C24 /* MarkdownEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 3E2FBD1A2DCC5A26007B9C24 /* MarkdownEditor */; };
 		3E2FBD1E2DCC5A3A007B9C24 /* Punycode in Frameworks */ = {isa = PBXBuildFile; productRef = 3E2FBD1D2DCC5A3A007B9C24 /* Punycode */; };
+		3E3C62592E04A6830035E466 /* SearchLanding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3C62582E04A6830035E466 /* SearchLanding.swift */; };
 		3E67DAF629B4CC8100B7DF82 /* APIInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */; };
 		3E7C162329C35777007C85EC /* omgapi in Frameworks */ = {isa = PBXBuildFile; productRef = 3E7C162229C35777007C85EC /* omgapi */; };
 /* End PBXBuildFile section */
@@ -209,7 +209,6 @@
 		3E2FBC8D2DCC5919007B9C24 /* SortButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortButton.swift; sourceTree = "<group>"; };
 		3E2FBC8F2DCC5919007B9C24 /* NavigationItem+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NavigationItem+View.swift"; sourceTree = "<group>"; };
 		3E2FBC902DCC5919007B9C24 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
-		3E2FBC912DCC5919007B9C24 /* SplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitView.swift; sourceTree = "<group>"; };
 		3E2FBC922DCC5919007B9C24 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
 		3E2FBC942DCC5919007B9C24 /* HTMLContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLContentView.swift; sourceTree = "<group>"; };
 		3E2FBC952DCC5919007B9C24 /* HTMLFetcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLFetcherView.swift; sourceTree = "<group>"; };
@@ -231,6 +230,7 @@
 		3E2FBD022DCC591E007B9C24 /* ViewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModels.swift; sourceTree = "<group>"; };
 		3E2FBD042DCC591E007B9C24 /* omgui.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = omgui.swift; sourceTree = "<group>"; };
 		3E2FBD052DCC591E007B9C24 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		3E3C62582E04A6830035E466 /* SearchLanding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLanding.swift; sourceTree = "<group>"; };
 		3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIInterface.swift; sourceTree = "<group>"; };
 		3EC12B2929BF92CA00367B45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -458,6 +458,7 @@
 				3E2FBC742DCC5919007B9C24 /* PURLView.swift */,
 				3E2FBC752DCC5919007B9C24 /* StatusView.swift */,
 				3E2FBC762DCC5919007B9C24 /* UpsellView.swift */,
+				3E3C62582E04A6830035E466 /* SearchLanding.swift */,
 			);
 			path = Destinations;
 			sourceTree = "<group>";
@@ -514,7 +515,6 @@
 			children = (
 				3E2FBC8F2DCC5919007B9C24 /* NavigationItem+View.swift */,
 				3E2FBC902DCC5919007B9C24 /* Sidebar.swift */,
-				3E2FBC912DCC5919007B9C24 /* SplitView.swift */,
 				3E2FBC922DCC5919007B9C24 /* TabBar.swift */,
 			);
 			path = NavigationView;
@@ -653,7 +653,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1420;
-				LastUpgradeCheck = 1630;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					3E0A744929B4950200EFD8E4 = {
 						CreatedOnToolsVersion = 14.2;
@@ -729,7 +729,6 @@
 				3E2FBCB92DCC5919007B9C24 /* AppFeature.swift in Sources */,
 				3E2FBCBA2DCC5919007B9C24 /* AddressPastesView.swift in Sources */,
 				3E2FBCBB2DCC5919007B9C24 /* Sidebar.swift in Sources */,
-				3E2FBCBC2DCC5919007B9C24 /* SplitView.swift in Sources */,
 				3E2FBCBD2DCC5919007B9C24 /* PathTextField.swift in Sources */,
 				3E2FBCBE2DCC5919007B9C24 /* AddressNameView.swift in Sources */,
 				3E2FBCBF2DCC5919007B9C24 /* MyStatusesView.swift in Sources */,
@@ -737,6 +736,7 @@
 				3E2FBCC12DCC5919007B9C24 /* AddressBook.swift in Sources */,
 				3E2FBCC22DCC5919007B9C24 /* PresentationDetent+.swift in Sources */,
 				3E2FBCC32DCC5919007B9C24 /* HTMLContentView.swift in Sources */,
+				3E3C62592E04A6830035E466 /* SearchLanding.swift in Sources */,
 				3E2FBCC42DCC5919007B9C24 /* DataFetcher.swift in Sources */,
 				3E2FBCC52DCC5919007B9C24 /* AddressIconView.swift in Sources */,
 				3E2FBCC62DCC5919007B9C24 /* CommunityView.swift in Sources */,
@@ -864,6 +864,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -919,6 +920,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -937,11 +939,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"appDOTlol/Preview Content\"";
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = appDOTlol/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = app.lol;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -953,12 +958,12 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MARKETING_VERSION = 2025.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
+				PRODUCT_BUNDLE_IDENTIFIER = "dev.chestnut.app.lol-beta";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -985,11 +990,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"appDOTlol/Preview Content\"";
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = appDOTlol/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = app.lol;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -1001,12 +1009,12 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MARKETING_VERSION = 2025.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
+				PRODUCT_BUNDLE_IDENTIFIER = "dev.chestnut.app.lol-beta";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
