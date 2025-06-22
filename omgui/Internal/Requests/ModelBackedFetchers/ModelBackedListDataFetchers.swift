@@ -16,12 +16,10 @@ class AddressDirectoryDataFetcher: ModelBackedListDataFetcher<AddressModel> {
     override func fetchRemote() async throws -> Int {
         let directory = try await interface.fetchAddressDirectory()
         let listItems = directory.map({ AddressModel(name: $0) })
-        listItems.forEach({ model in
+        for model in listItems {
             let db = db
-            Task {
-                try await model.write(to: db)
-            }
-        })
+            try await model.write(to: db)
+        }
         return listItems.hashValue
     }
 }
@@ -240,10 +238,8 @@ class NowGardenDataFetcher: ModelBackedListDataFetcher<NowListing> {
     
     override func fetchRemote() async throws -> Int {
         let garden = try await interface.fetchNowGarden()
-        garden.forEach { model in
-            Task { [db] in
-                try await model.write(to: db)
-            }
+        for model in garden {
+            try await model.write(to: db)
         }
         return garden.hashValue
     }
@@ -271,11 +267,9 @@ class AddressPasteBinDataFetcher: ModelBackedListDataFetcher<PasteModel> {
             return $0.name != "app.lol.blocked"
         }
         let db = db
-        pastes.forEach({ model in
-            Task {
-                try await model.write(to: db)
-            }
-        })
+        for model in pastes {
+            try await model.write(to: db)
+        }
         return pastes.hashValue
     }
 }
@@ -296,11 +290,9 @@ class AddressPURLsDataFetcher: ModelBackedListDataFetcher<PURLModel> {
         }
         let purls = try await interface.fetchAddressPURLs(addressName, credential: credential)
         let db = db
-        purls.forEach({ model in
-            Task {
-                try await model.write(to: db)
-            }
-        })
+        for model in purls {
+            try await model.write(to: db)
+        }
         return purls.hashValue
     }
 }
@@ -332,19 +324,15 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
         }
         if addresses.isEmpty {
             let statuses = try await interface.fetchStatusLog()
-            statuses.forEach({ model in
-                Task {
-                    try await model.write(to: db)
-                }
-            })
+            for model in statuses {
+                try await model.write(to: db)
+            }
             return statuses.hashValue
         } else {
             let statuses = try await interface.fetchAddressStatuses(addresses: addresses)
-            statuses.forEach({ model in
-                Task { [model] in
-                    try await model.write(to: db)
-                }
-            })
+            for model in statuses {
+                try await model.write(to: db)
+            }
             return statuses.hashValue
         }
     }
@@ -353,11 +341,9 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
     func fetchBacklog() async throws {
         let db = db
         let generalStatuses = try await self.interface.fetchCompleteStatusLog()
-        generalStatuses.forEach({ model in
-            Task { [model] in
-                try await model.write(to: db)
-            }
-        })
+        for model in generalStatuses {
+            try await model.write(to: db)
+        }
         self.loading = true
         self.loaded = .init()
         self.loading = false

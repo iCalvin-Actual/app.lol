@@ -97,9 +97,9 @@ public struct omgui: View {
                 }
             })
             .onReceive(accountAddressesFetcher.results.publisher, perform: { _ in
-                accountAddressesFetcher.results.forEach { model in
-                    let database = database
-                    Task {
+                Task { [results = accountAddressesFetcher.results] in
+                    for model in results {
+                        let database = database
                         try await model.write(to: database)
                     }
                 }
