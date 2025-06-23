@@ -6,11 +6,16 @@ struct PathField: View {
     var placeholder: String = ""
     
     var body: some View {
+        #if canImport(UIKit)
         PathTextField(text: $text, placeholder: placeholder)
             .frame(maxHeight: 55)
+        #else
+        TextField("path", text: $text)
+        #endif
     }
 }
 
+#if canImport(UIKit)
 struct PathTextField: UIViewRepresentable {
     @Binding var text: String
     var placeholder: String = ""
@@ -62,4 +67,4 @@ struct PathTextField: UIViewRepresentable {
         }
     }
 }
-
+#endif

@@ -16,10 +16,5 @@ struct AddressPastesView: View {
             filters: .everyone,
             dataFetcher: fetcher
         )
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                AddressNameView(fetcher.addressName, suffix: "/pastebin")
-            }
-        }
     }
 }

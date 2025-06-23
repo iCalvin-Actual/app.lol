@@ -6,10 +6,15 @@ struct EmojiPicker: View {
     var placeholder: String = ""
     
     var body: some View {
+        #if canImport(UIKit)
         EmojiTextField(text: $text, placeholder: placeholder)
+        #else
+        Text(text)
+        #endif
     }
 }
 
+#if canImport(UIKit)
 class UIEmojiTextField: UITextField {
     
     override func awakeFromNib() {
@@ -78,4 +83,4 @@ struct EmojiTextField: UIViewRepresentable {
         }
     }
 }
-
+#endif

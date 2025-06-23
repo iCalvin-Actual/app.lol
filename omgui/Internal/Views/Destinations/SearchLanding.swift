@@ -39,7 +39,6 @@ struct SearchLanding: View {
                         }
                     }
                     .background(Material.regular)
-                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
                 } header: {
                     Label {
                         Text("pinned")
@@ -48,14 +47,14 @@ struct SearchLanding: View {
                     }
                     .foregroundStyle(.secondary)
                     .font(.callout)
-                    .padding(.horizontal, 10)
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
+                    .padding(.horizontal)
+                    .padding(.vertical, 4)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
+                    .background(Color.clear)
                 }
                 .frame(maxWidth: .infinity)
-                .background(Material.ultraThin)
+                .background(Material.ultraThin, in: .rect)
                 .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                 .listRowBackground(Color.clear)
             } else {
@@ -101,6 +100,7 @@ struct SearchLanding: View {
             .labelStyle(SearchNavigationLabelStyle())
         }
         .animation(.default, value: viewModel.pinned)
+        .scrollContentBackground(.hidden)
     }
 }
 

@@ -62,11 +62,6 @@ struct SafetyView: View {
             .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
         }
         .scrollContentBackground(.hidden)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                ThemedTextView(text: "safety")
-            }
-        }
     }
     
     @ViewBuilder

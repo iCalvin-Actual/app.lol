@@ -44,7 +44,7 @@ class SidebarModel: ObservableObject {
     var tabs: [NavigationItem] {
         [
             .community,
-            .nowGarden,
+            .lists,
             .search
         ]
     }

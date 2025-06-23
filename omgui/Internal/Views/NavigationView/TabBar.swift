@@ -13,7 +13,8 @@ struct TabBar: View {
             return false
         }
         if let width {
-            return width >= 300
+            print("Width: \(width)")
+            return width >= 500
         }
         return true
     }
@@ -21,11 +22,18 @@ struct TabBar: View {
     @Environment(SceneModel.self)
     var sceneModel: SceneModel
     
+    @FocusState
+    var searching: Bool
+    
     @Environment(\.horizontalSizeClass)
     var horizontalSizeClass
     
     @SceneStorage("app.tab.selected")
-    var selected: NavigationItem?
+    var selected: NavigationItem? {
+        didSet {
+            searching = false
+        }
+    }
     
     let tabModel: SidebarModel
     
@@ -43,9 +51,9 @@ struct TabBar: View {
                 }
         } else {
             regularTabBar
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        LogoView()
+                .onAppear{
+                    if selected == nil {
+                        selected = .community
                     }
                 }
         }
@@ -64,28 +72,40 @@ struct TabBar: View {
             }
         }
         .searchable(text: $searchQuery)
+        .searchFocused($searching)
         .tabBarMinimizeBehavior(.onScrollDown)
     }
     
     @ViewBuilder
     var regularTabBar: some View {
-        TabView(selection: $selected) {
-            Tab(NavigationItem.search.displayString, systemImage: NavigationItem.search.iconName, value: NavigationItem.search, role: .search) {
-                tabContent(NavigationItem.search.destination)
-            }
-
-            ForEach(tabModel.sections) { section in
-                TabSection(section.displayName) {
-                    ForEach(tabModel.items(for: section, sizeClass: .regular, context: .column)) { item in
-                        Tab(item.displayString, systemImage: item.iconName, value: item) {
-                            tabContent(item.destination)
+        NavigationSplitView {
+            List(selection: $selected) {
+                // Sections from SidebarModel
+                ForEach(tabModel.sections, id: \.self) { section in
+                    Section {
+                        ForEach(tabModel.items(for: section, sizeClass: .regular, context: .column), id: \.self) { item in
+                            NavigationLink(value: item) {
+                                Label(item.displayString, systemImage: item.iconName)
+                            }
+                        }
+                    } header: {
+                        if section != .directory {
+                            Text(section.displayName)
                         }
                     }
                 }
             }
+        } detail: {
+            if searching {
+                sceneModel.destinationConstructor.destination(.search)
+            } else {
+                if let selected {
+                    tabContent(selected.destination)
+                }
+            }
         }
         .searchable(text: $searchQuery)
-        .tabViewStyle(.sidebarAdaptable)
+        .searchFocused($searching)
     }
     
     @ViewBuilder
@@ -102,3 +122,4 @@ struct TabBar: View {
         .environment(SceneModel.sample)
         .environment(AccountAuthDataFetcher(authKey: nil, client: .sample, interface: SampleData()))
 }
+

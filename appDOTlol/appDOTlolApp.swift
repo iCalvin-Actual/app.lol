@@ -31,14 +31,14 @@ struct appDOTlolApp: App {
             return try! .inMemoryDatabase()
         }
     }()
-    let interface = APIDataInterface() /*SampleData()*/
+    static let interface = APIDataInterface() /*SampleData()*/
     
     var body: some Scene {
         WindowGroup {
             omgui(
                 client: Self.clientInfo,
-                interface: interface,
-                database: try! .inMemoryDatabase()
+                interface: Self.interface,
+                database: Self.database
             )
         }
     }

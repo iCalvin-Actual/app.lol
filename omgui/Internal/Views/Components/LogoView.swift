@@ -1,5 +1,8 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
+
 
 struct LogoView: View {
     @Environment(\.colorScheme)
@@ -91,6 +94,7 @@ extension GeometryProxy {
     }
 }
 
+#if canImport(UIKit)
 extension UIView {
     func asImage() -> UIImage {
         let format = UIGraphicsImageRendererFormat()
@@ -109,4 +113,4 @@ extension View {
         return image
     }
 }
-
+#endif

@@ -127,7 +127,6 @@ struct ListView<T: Listable, H: View>: View {
                 newFilters.append(.query(newValue))
                 filters = newFilters
             })
-            .navigationTitle(dataFetcher.title)
             .toolbar {
                 if (T.sortOptions.count > 1 || applicableFilters.count > 1), allowFilter {
                     ToolbarItem(placement: .topBarTrailing) {

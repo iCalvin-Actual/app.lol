@@ -69,13 +69,6 @@ struct StatusView: View {
             }
             .padding(.vertical)
         }
-        .toolbar {
-            if viewContext != .profile {
-                ToolbarItem(placement: .principal) {
-                    AddressNameView(fetcher.address, suffix: "/status")
-                }
-            }
-        }
         .onChange(of: fetcher.id, {
             Task { [fetcher] in
                 await fetcher.updateIfNeeded(forceReload: true)

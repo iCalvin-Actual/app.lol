@@ -24,9 +24,6 @@ struct AddressNowView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    AddressNameView(fetcher.addressName, suffix: "/now")
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if let url = fetcher.result?.shareURLs.first?.content {
                         ShareLink(item: url)

@@ -9,6 +9,9 @@ import SwiftUI
 
 @MainActor
 struct DestinationConstructor {
+    @Environment(\.accessibilityReduceMotion)
+    var reduceAnimations
+    
     let sceneModel: SceneModel
 
     @ViewBuilder
@@ -63,6 +66,8 @@ struct DestinationConstructor {
             AccountView()
         case .lists:
             ListsView(sceneModel: sceneModel)
+        case .search:
+            SearchLanding(sceneModel: sceneModel)
         case .about:
             AboutView()
         case .latest:

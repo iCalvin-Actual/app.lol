@@ -49,11 +49,6 @@ struct AddressProfileView: View {
                     await draftFetcher.updateIfNeeded(forceReload: true)
                 }
             }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    AddressNameView(fetcher.addressName)
-                }
-            }
     }
     
     @ViewBuilder

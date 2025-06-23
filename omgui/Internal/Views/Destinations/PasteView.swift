@@ -42,11 +42,6 @@ struct PasteView: View {
                 }
             })
             .toolbar {
-                if viewContext != .profile {
-                    ToolbarItem(placement: .principal) {
-                        AddressNameView(fetcher.address, suffix: "/pastebin")
-                    }
-                }
 //                ToolbarItem(placement: .topBarTrailing) {
 //                    if fetcher.draftPoster != nil {
 //                        Menu {

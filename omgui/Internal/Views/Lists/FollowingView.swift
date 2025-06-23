@@ -18,11 +18,6 @@ struct FollowingView: View {
     var body: some View {
         followingView
             .onAppear(perform: { needsRefresh = false })
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    ThemedTextView(text: "following")
-                }
-            }
     }
     
     @ViewBuilder

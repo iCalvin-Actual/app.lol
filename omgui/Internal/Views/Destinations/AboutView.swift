@@ -23,10 +23,5 @@ struct AboutView: View {
                 SafariView(url: url)
                     .ignoresSafeArea(.container, edges: (horizontalSizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad) ? [.bottom] : [])
             })
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    ThemedTextView(text: "info & help")
-                }
-            }
     }
 }

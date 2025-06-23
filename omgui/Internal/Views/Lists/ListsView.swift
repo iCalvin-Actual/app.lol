@@ -72,9 +72,8 @@ struct ListsView: View {
                         }
                         .foregroundStyle(.secondary)
                         .font(.callout)
-                        .padding(.horizontal, 10)
-                        .padding(.top, 8)
-                        .padding(.bottom, 4)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .listRowSeparator(.hidden)
                     }
@@ -82,46 +81,6 @@ struct ListsView: View {
                     .background(Material.ultraThin)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color.clear)
-                }
-                if viewModel.showPinned {
-                    Section {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .top, spacing: 0) {
-                                ForEach(viewModel.pinned) { address in
-                                    AddressCard(address, embedInMenu: true)
-                                        .frame(maxWidth: 88)
-                                }
-                                Spacer()
-                            }
-                        }
-                        .background(Material.regular)
-                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
-                    } header: {
-                        Label {
-                            Text("pinned")
-                        } icon: {
-                            Image(systemName: "pin")
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.callout)
-                        .padding(.horizontal, 10)
-                        .padding(.top, 8)
-                        .padding(.bottom, 4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowSeparator(.hidden)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(Material.ultraThin)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                } else {
-                    Label(title: {
-                        Text("pin addresses here for later")
-                    }) {
-                        Image(systemName: "pin")
-                    }
-                    .foregroundStyle(.primary)
-                    .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
                 }
                 if !viewModel.following.isEmpty {
                     Section {
@@ -145,9 +104,8 @@ struct ListsView: View {
                         }
                         .foregroundStyle(.secondary)
                         .font(.callout)
-                        .padding(.horizontal, 10)
-                        .padding(.top, 8)
-                        .padding(.bottom, 4)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .listRowSeparator(.hidden)
                     }
@@ -178,9 +136,8 @@ struct ListsView: View {
                         }
                         .foregroundStyle(.secondary)
                         .font(.callout)
-                        .padding(.horizontal, 10)
-                        .padding(.top, 8)
-                        .padding(.bottom, 4)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .listRowSeparator(.hidden)
                     }
@@ -268,15 +225,6 @@ struct ListsView: View {
             }
         })
         .scrollContentBackground(.hidden)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                ThemedTextView(text: "app.lol")
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                LogoView()
-            }
-        }
     }
 }
 

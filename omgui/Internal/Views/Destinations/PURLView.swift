@@ -49,11 +49,6 @@ struct PURLView: View {
                 }
             }
             .toolbar {
-                if viewContext != .profile {
-                    ToolbarItem(placement: .principal) {
-                        AddressNameView(fetcher.address, suffix: "/purls")
-                    }
-                }
 ////                ToolbarItem(placement: .topBarTrailing) {
 ////                    if fetcher.draftPoster != nil {
 ////                        Menu {

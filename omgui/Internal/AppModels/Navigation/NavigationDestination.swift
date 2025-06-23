@@ -18,6 +18,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     case nowGarden
     case lists
     
+    case search
     case about
     case latest
     case support
@@ -52,6 +53,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
         case .directory:    return "directory"
         case .nowGarden:    return "garden"
         case .lists:        return "lists"
+        case .search:       return "search"
         case .about:        return "about"
         case .latest:       return "latest"
         case .support:      return "support"
@@ -88,6 +90,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
         case "directory":   self = .directory
         case "garden":      self = .nowGarden
         case "lists":       self = .lists
+        case "search":      self = .search
         case "about":       self = .about
         case "latest":      self = .latest
         case "support":     self = .support
