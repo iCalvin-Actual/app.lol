@@ -103,11 +103,13 @@ struct AddressProfileView: View {
                         }
                     }
                 }
+                #if !os(tvOS)
                 ToolbarItem(placement: .secondaryAction) {
                     if let url = fetcher.result?.primaryURL {
                         ShareLink(item: url.content)
                     }
                 }
+                #endif
             }
             .sheet(item: $draftPoster, onDismiss: {
                 Task { @MainActor [fetcher] in

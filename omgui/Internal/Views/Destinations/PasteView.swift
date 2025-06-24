@@ -85,7 +85,8 @@ struct PasteView: View {
 //                        }
 //                    }
 //                }
-                ToolbarItem(placement: .secondaryAction) {
+                #if !os(tvOS)
+                ToolbarItem(placement: .automatic) {
                     if let pasteURL = fetcher.result?.pasteURL {
                         Menu {
                             ShareLink("share paste", item: pasteURL)
@@ -125,6 +126,7 @@ struct PasteView: View {
                         }
                     }
                 }
+                #endif
             }
             .onChange(of: fetcher.result, initial: false) { _, model in
                 withAnimation {
@@ -154,7 +156,9 @@ struct PasteView: View {
                         .padding()
                 } else {
                     Text(fetcher.result?.content ?? "")
+                    #if !os(tvOS)
                         .textSelection(.enabled)
+                    #endif
                         .font(.body)
                         .fontDesign(.rounded)
                         .padding(.vertical, 4)

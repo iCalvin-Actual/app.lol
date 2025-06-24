@@ -70,12 +70,14 @@ struct StatusRowView: View {
                 image.resizable()
                     .aspectRatio(contentMode: .fit)
                     .scaleEffect(zoom)
+                #if !os(tvOS)
                     .gesture(
                         MagnifyGesture()
                             .updating($zoom) { value, gestureState, transaction in
                                 gestureState = value.magnification
                             }
                     )
+                #endif
             } placeholder: {
                 ThemedTextView(text: "Loading image...")
             }

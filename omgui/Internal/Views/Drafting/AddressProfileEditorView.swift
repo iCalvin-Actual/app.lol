@@ -44,7 +44,7 @@ public struct AddressProfileEditorView: View {
         appropriateEditor
             .tint(Color.primary)
             .padding(4)
-        #if canImport(UIKit)
+        #if os(iOS)
             .background(Color(uiColor: .systemBackground))
         #endif
             .cornerRadius(24)
@@ -52,7 +52,7 @@ public struct AddressProfileEditorView: View {
             .background(NavigationDestination.editWebpage(draftPoster.address).gradient)
             .interactiveDismissDisabled()
             .toolbar {
-                ToolbarItem(placement: .secondaryAction) {
+                ToolbarItem(placement: .automatic) {
                     Button {
                         if hasChanges {
                             confirmReset = true
@@ -67,7 +67,7 @@ public struct AddressProfileEditorView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .secondaryAction) {
+                ToolbarItem(placement: .automatic) {
                     Button {
                         applyContent()
                         Task { @MainActor in
@@ -124,11 +124,11 @@ public struct AddressProfileEditorView: View {
     
     @ViewBuilder
     var appropriateEditor: some View {
-        if #available (iOS 18, *) {
+        #if os(iOS) || os(macOS)
             MarkdownEditor<StandardToolbar>(text: $content, selection: $selection)
-        } else {
+        #elseif !os(tvOS)
             TextEditor(text: $content)
-        }
+        #endif
     }
 
     func applyContent() {

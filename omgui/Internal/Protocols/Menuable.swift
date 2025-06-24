@@ -132,6 +132,7 @@ extension AddressManagable where Self: Menuable {
 extension Sharable where Self: Menuable {
     @ViewBuilder
     func shareSection() -> some View {
+#if os(iOS) || os(macOS)
         if let option = primaryURL {
             shareLink(option)
         }
@@ -148,6 +149,10 @@ extension Sharable where Self: Menuable {
             Button {
                 #if canImport(UIKit)
                 UIPasteboard.general.string = option.content
+                #elseif canImport(AppKit)
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                pasteboard.setString(option.content, forType: .string)
                 #endif
             } label: {
                 Label("copy \(option.name)", systemImage: "doc.on.clipboard")
@@ -170,15 +175,18 @@ extension Sharable where Self: Menuable {
                 Label("copy", systemImage: "doc.on.clipboard")
             }
         }
+#endif
         Divider()
     }
     
+    #if !os(tvOS)
     @ViewBuilder
     private func shareLink(_ option: SharePacket) -> some View {
         ShareLink(item: option.content) {
             Label("share \(option.name)", systemImage: "square.and.arrow.up")
         }
     }
+    #endif
 }
 
 extension Listable where Self: Menuable {

@@ -37,7 +37,9 @@ struct AddressPicker: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
+        #if !os(tvOS)
         .background(Material.bar)
+        #endif
         .alert("Are you sure?", isPresented: $showConfirmLogout, actions: {
             Button("Cancel", role: .cancel) { }
             Button(

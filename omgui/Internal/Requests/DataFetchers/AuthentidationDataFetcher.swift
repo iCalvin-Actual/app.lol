@@ -49,6 +49,7 @@ final class AccountAuthDataFetcher: NSObject, Sendable {
         guard let url else {
             return
         }
+#if !(os(watchOS) || os(tvOS))
         webSession = ASWebAuthenticationSession(
             url: url,
             callbackURLScheme: client.urlScheme
@@ -78,7 +79,8 @@ final class AccountAuthDataFetcher: NSObject, Sendable {
                 setToken(token)
             }
         }
-        self.webSession?.presentationContextProvider = self
+        webSession?.presentationContextProvider = self
+#endif
     }
     
     func setToken(_ newValue: APICredential?) {
@@ -98,9 +100,11 @@ final class AccountAuthDataFetcher: NSObject, Sendable {
     }
 }
 
+#if !(os(watchOS) || os(tvOS))
 extension AccountAuthDataFetcher: ASWebAuthenticationPresentationContextProviding {
     nonisolated
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         anchor
     }
 }
+#endif

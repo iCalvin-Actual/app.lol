@@ -38,7 +38,9 @@ struct StatusList: View {
             filters: .everyone,
             dataFetcher: fetcher
         )
+#if !os(tvOS)
         .toolbarRole(.editor)
+        #endif
     }
 }
 

@@ -10,30 +10,42 @@ import SwiftUI
 struct TabBar: View {
     static func usingRegularTabBar(sizeClass: UserInterfaceSizeClass?, width: CGFloat? = nil) -> Bool {
         #if canImport(UIKit)
-        guard UIDevice.current.userInterfaceIdiom != .phone && (sizeClass ?? .regular) != .compact else {
+        switch UIDevice.current.userInterfaceIdiom {
+        case .vision,
+                .mac,
+                 .tv:
+            return true
+        case .pad:
+            return (sizeClass ?? .regular) != .compact && width ?? 500 >= 500
+        default:
             return false
         }
-        if let width {
-            print("Width: \(width)")
-            return width >= 500
-        }
-        #endif
+        #elseif os(macOS)
         return true
+        #endif
     }
     
     @Environment(SceneModel.self)
     var sceneModel: SceneModel
     
     @FocusState
-    var searching: Bool
+    var searching: Bool {
+        didSet {
+            if searching {
+                selected = .search
+            }
+        }
+    }
     
     @Environment(\.horizontalSizeClass)
     var horizontalSizeClass
     
     @SceneStorage("app.tab.selected")
     var selected: NavigationItem? {
-        didSet {
-            searching = false
+        willSet {
+            if newValue != .search {
+                searching = false
+            }
         }
     }
     
@@ -70,12 +82,16 @@ struct TabBar: View {
                 Tab(item.displayString, systemImage: item.iconName, value: item, role: item == .search ? .search : nil) {
                     tabContent(item.destination)
                 }
+#if !os(tvOS)
                 .hidden(Self.usingRegularTabBar(sizeClass: horizontalSizeClass))
+                #endif
             }
         }
         .searchable(text: $searchQuery)
+        #if !os(tvOS)
         .searchFocused($searching)
-        #if canImport(UIKit)
+        #endif
+        #if os(iOS)
         .tabBarMinimizeBehavior(.onScrollDown)
         #endif
     }
@@ -100,16 +116,14 @@ struct TabBar: View {
                 }
             }
         } detail: {
-            if searching {
-                sceneModel.destinationConstructor.destination(.search)
-            } else {
-                if let selected {
-                    tabContent(selected.destination)
-                }
+            if let selected {
+                tabContent(selected.destination)
             }
         }
         .searchable(text: $searchQuery)
+        #if !os(tvOS)
         .searchFocused($searching)
+        #endif
     }
     
     @ViewBuilder

@@ -23,13 +23,15 @@ struct AddressNowView: View {
                     await fetcher.updateIfNeeded()
                 }
             }
+        #if !os(tvOS)
             .toolbar {
-                ToolbarItem(placement: .secondaryAction) {
+                ToolbarItem(placement: .automatic) {
                     if let url = fetcher.result?.shareURLs.first?.content {
                         ShareLink(item: url)
                     }
                 }
             }
+        #endif
     }
     
     @ViewBuilder

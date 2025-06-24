@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if canImport(WebKit)
+import WebKit
+#endif
 
 struct HTMLFetcherView: View {
     @Environment(\.horizontalSizeClass)
@@ -53,12 +56,14 @@ struct HTMLFetcherView: View {
                     .background(Material.regular)
             }
         }
+        #if !os(tvOS)
         .sheet(item: $presentedURL, content: { url in
             SafariView(url: url)
                 .ignoresSafeArea(.container, edges: .all)
         })
-        #else
-        EmptyView()
+        #endif
+        #elseif canImport(WebKit)
+        WebView(url: baseURL)
         #endif
     }
 }

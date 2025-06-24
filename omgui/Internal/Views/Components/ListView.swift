@@ -129,7 +129,7 @@ struct ListView<T: Listable, H: View>: View {
             })
             .toolbar {
                 if (T.sortOptions.count > 1 || applicableFilters.count > 1), allowFilter {
-                    ToolbarItem(placement: .secondaryAction) {
+                    ToolbarItem(placement: .automatic) {
                         SortOrderMenu(sort: $sort, filters: $filters, sortOptions: T.sortOptions, filterOptions: applicableFilters)
                     }
                 }
@@ -226,7 +226,7 @@ struct ListView<T: Listable, H: View>: View {
             await dataFetcher.updateIfNeeded(forceReload: true)
         })
         .listStyle(.plain)
-        #if canImport(UIKit)
+        #if canImport(UIKit) && !os(tvOS)
         .listRowSpacing(0)
         #endif
         .onReceive(dataFetcher.$loaded, perform: { _ in
@@ -255,7 +255,9 @@ struct ListView<T: Listable, H: View>: View {
         if let headerBuilder = headerBuilder {
             Section {
                 headerBuilder()
+                #if !os(tvOS)
                     .listRowSeparator(.hidden)
+                #endif
             }
             Section(dataFetcher.title) {
                 listContent(width: width)
@@ -288,7 +290,9 @@ struct ListView<T: Listable, H: View>: View {
                 .padding()
             Spacer()
         }
+#if !os(tvOS)
         .listRowSeparator(.hidden, edges: .all)
+        #endif
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
@@ -296,7 +300,9 @@ struct ListView<T: Listable, H: View>: View {
     func rowView(_ item: T, width: CGFloat) -> some View {
         rowBody(item, width: width)
             .tag(item)
-            .listRowSeparator(.hidden, edges: .all)
+#if !os(tvOS)
+        .listRowSeparator(.hidden, edges: .all)
+        #endif
             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
             .contextMenu(menuItems: {
                 self.menuBuilder.contextMenu(for: item, fetcher: dataFetcher, sceneModel: sceneModel)

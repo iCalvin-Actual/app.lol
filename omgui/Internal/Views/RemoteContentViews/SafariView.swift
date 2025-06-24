@@ -5,10 +5,12 @@
 //  Created by Calvin Chestnut on 5/23/24.
 //
 
+#if canImport(SafariServices)
 import SafariServices
+#endif
 import SwiftUI
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(tvOS)
 struct SafariView: UIViewControllerRepresentable {
 
     let url: URL
@@ -20,7 +22,6 @@ struct SafariView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: SFSafariViewController, context: UIViewControllerRepresentableContext<SafariView>) {
 
     }
-
 }
 
 #Preview {

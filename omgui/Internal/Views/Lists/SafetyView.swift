@@ -42,7 +42,7 @@ struct SafetyView: View {
                 ReportButton()
             }
             .foregroundStyle(.primary)
-            #if canImport(UIKit)
+#if !os(tvOS) && !os(macOS)
             .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
             #endif
             
@@ -53,7 +53,9 @@ struct SafetyView: View {
                     ForEach(sceneModel.addressBook.visibleBlocked.map({ AddressModel(name: $0) })) { item in
                         ListRow(model: item)
                             .tag(item)
+                        #if !os(tvOS)
                             .listRowSeparator(.hidden, edges: .all)
+                        #endif
                             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                             .contextMenu(menuItems: {
                                 self.menuBuilder.contextMenu(for: item, fetcher: nil, sceneModel: sceneModel)
@@ -62,17 +64,21 @@ struct SafetyView: View {
                 }
             }
             .foregroundStyle(.primary)
-            #if canImport(UIKit)
+            #if canImport(UIKit) && !os(tvOS)
             .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
             #endif
         }
+        #if !os(tvOS)
         .scrollContentBackground(.hidden)
+        #endif
     }
     
     @ViewBuilder
     var visibleBlockedList: some View {
         ListView<AddressModel, EmptyView>(filters: .none, dataFetcher: sceneModel.privateSummary(for: sceneModel.addressBook.actingAddress.wrappedValue)?.blockedFetcher ?? sceneModel.addressBook.localBlocklistFetcher)
+        #if !os(tvOS)
             .scrollContentBackground(.hidden)
+        #endif
         // Add toolbar item to insert new
     }
 }

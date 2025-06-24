@@ -77,13 +77,14 @@ struct StatusView: View {
                 await fetcher.updateIfNeeded(forceReload: true)
             }
         })
-        #if canImport(UIKit)
+        #if canImport(UIKit) && !os(tvOS)
         .sheet(item: $presentURL, content: { url in
             SafariView(url: url)
                 .ignoresSafeArea(.container, edges: .all)
         })
         #endif
         .environment(\.viewContext, ViewContext.detail)
+        #if !os(tvOS)
         .toolbar {
             ToolbarItem(placement: .secondaryAction) {
                 if let url = fetcher.result?.shareURLs.first?.content {
@@ -91,6 +92,7 @@ struct StatusView: View {
                 }
             }
         }
+        #endif
     }
     
     @ViewBuilder
@@ -149,7 +151,7 @@ struct StatusView: View {
                 
                 if item.content.scheme?.contains("http") ?? false {
                     ZStack {
-                        #if canImport(UIKit)
+                        #if canImport(UIKit) && !os(tvOS)
                         RemoteHTMLContentView(activeAddress: fetcher.address, startingURL: item.content, activeURL: $presentURL, scrollEnabled: .constant(false))
                         #endif
                             

@@ -50,7 +50,9 @@ struct SearchLanding: View {
                     .padding(.horizontal)
                     .padding(.vertical, 4)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    #if !os(tvOS)
                     .listRowSeparator(.hidden)
+                    #endif
                     .background(Color.clear)
                 }
                 .frame(maxWidth: .infinity)
@@ -64,7 +66,7 @@ struct SearchLanding: View {
                     Image(systemName: "pin")
                 }
                 .foregroundStyle(.primary)
-                #if canImport(UIKit)
+                #if canImport(UIKit) && !os(tvOS)
                 .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
                 #endif
             }
@@ -102,7 +104,9 @@ struct SearchLanding: View {
             .labelStyle(SearchNavigationLabelStyle())
         }
         .animation(.default, value: viewModel.pinned)
+        #if !os(tvOS)
         .scrollContentBackground(.hidden)
+        #endif
     }
 }
 
@@ -122,7 +126,9 @@ struct SearchNavigationButtonStyle: ButtonStyle {
             .padding()
             .frame(maxWidth: .infinity)
             .foregroundColor(.primary)
+        #if !os(visionOS)
             .glassEffect()
+        #endif
     }
 }
 

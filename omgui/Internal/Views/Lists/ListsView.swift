@@ -227,7 +227,9 @@ struct ListsView: View {
                 .padding(32)
             }
         })
+        #if !os(tvOS)
         .scrollContentBackground(.hidden)
+        #endif
     }
 }
 

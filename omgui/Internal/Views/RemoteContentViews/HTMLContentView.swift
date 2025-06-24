@@ -7,9 +7,11 @@
 
 import SwiftUI
 import Foundation
+#if canImport(WebKit)
 import WebKit
+#endif
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(tvOS)
 struct HTMLContentView: UIViewRepresentable {
     @MainActor
     class Coordinator: NSObject, WKNavigationDelegate {
@@ -205,6 +207,24 @@ struct RemoteHTMLContentView: UIViewRepresentable {
                                        
         context.coordinator.load(url: startingURL, webView: uiView)
 //        context.coordinator.showContent(htmlContent, in: uiView)
+    }
+}
+#else
+struct HTMLContentView: View {
+    
+    let activeAddress: AddressName?
+    let htmlContent: String?
+    let baseURL: URL?
+    
+    @Binding
+    var activeURL: URL?
+    
+    var body: some View {
+        #if canImport(WebKit)
+        WebView(url: baseURL)
+        #else
+        EmptyView()
+        #endif
     }
 }
 #endif

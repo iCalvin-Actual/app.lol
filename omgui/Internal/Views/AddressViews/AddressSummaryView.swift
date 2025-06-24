@@ -73,7 +73,7 @@ struct AddressSummaryView: View {
                 .bold()
                 .padding(8)
                 .frame(minWidth: 44, maxHeight: .infinity, alignment: .bottom)
-            #if canImport(UIKit)
+            #if canImport(UIKit) && !os(tvOS)
                 .background(page == selectedPage ? Color(UIColor.systemBackground).opacity(0.42) : Color.clear)
             #endif
                 .clipShape(RoundedRectangle(cornerRadius: 12))

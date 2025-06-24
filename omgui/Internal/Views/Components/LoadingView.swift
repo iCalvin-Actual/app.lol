@@ -21,7 +21,9 @@ struct LoadingView: View {
     
     var body: some View {
         content
+#if !os(tvOS)
             .listRowSeparator(.hidden)
+        #endif
     }
     
     @ViewBuilder

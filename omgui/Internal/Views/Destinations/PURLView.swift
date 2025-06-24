@@ -93,6 +93,7 @@ struct PURLView: View {
 ////                        }
 ////                    }
 ////                }
+                #if !os(tvOS)
                 ToolbarItem(placement: .secondaryAction) {
                     if let purlURL = fetcher.result?.purlURL {
                         Menu {
@@ -133,6 +134,7 @@ struct PURLView: View {
                         }
                     }
                 }
+                #endif
             }
 //            .onReceive(fetcher.$result, perform: { model in
 //                withAnimation {
@@ -188,7 +190,7 @@ struct PURLView: View {
     @ViewBuilder
     var preview: some View {
         if let content = fetcher.result?.content, let url = URL(string: content) {
-            #if canImport(UIKit)
+            #if os(visionOS) || os(iOS)
             RemoteHTMLContentView(activeAddress: fetcher.address, startingURL: url, activeURL: $presented, scrollEnabled: .constant(true))
             #endif
         } else {
@@ -211,7 +213,9 @@ struct PURLView: View {
                 
                 if let destination = fetcher.result?.content, !destination.isEmpty {
                     Text(destination)
+                    #if !os(tvOS)
                         .textSelection(.enabled)
+                    #endif
                         .font(.caption)
                         .fontDesign(.rounded)
                         .multilineTextAlignment(.leading)
