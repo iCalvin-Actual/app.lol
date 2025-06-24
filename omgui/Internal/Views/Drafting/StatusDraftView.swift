@@ -77,7 +77,7 @@ import SwiftUI
 //                            @State var innerConfirmDelete: Bool = false
 //                            sceneModel.destinationConstructor.destination(.status(result.address, id: result.id))
 //                                .toolbar {
-//                                    ToolbarItem(placement: .topBarTrailing) {
+//                                    ToolbarItem(placement: .secondaryAction) { // changed from .topBarTrailing to .secondaryAction
 //                                        Button {
 //                                            withAnimation {
 //                                                clearResult = false
@@ -119,7 +119,7 @@ import SwiftUI
 //            ToolbarItem(placement: .topBarLeading) {
 //                ThemedTextView(text: draftPoster.navigationTitle, font: .title)
 //            }
-//            ToolbarItem(placement: .topBarTrailing) {
+//            ToolbarItem(placement: .secondaryAction) { // changed from .topBarTrailing to .secondaryAction
 //                if !(draftPoster.draft.id ?? "").isEmpty {
 //                    Button(role: .destructive) {
 //                        confirmDelete = true
@@ -287,3 +287,4 @@ import SwiftUI
 //            }
 //    }
 //}
+

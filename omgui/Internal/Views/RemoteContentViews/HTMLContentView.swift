@@ -9,6 +9,7 @@ import SwiftUI
 import Foundation
 import WebKit
 
+#if canImport(UIKit)
 struct HTMLContentView: UIViewRepresentable {
     @MainActor
     class Coordinator: NSObject, WKNavigationDelegate {
@@ -206,3 +207,4 @@ struct RemoteHTMLContentView: UIViewRepresentable {
 //        context.coordinator.showContent(htmlContent, in: uiView)
     }
 }
+#endif

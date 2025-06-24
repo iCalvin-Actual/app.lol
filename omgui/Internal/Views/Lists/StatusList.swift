@@ -25,7 +25,11 @@ struct StatusList: View {
         if #available(iOS 18.0, visionOS 2.0, *) {
             return TabBar.usingRegularTabBar(sizeClass: sizeClass)
         } else {
+            #if canImport(UIKit)
             return sizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad
+            #else
+            return true
+            #endif
         }
     }
     

@@ -129,7 +129,7 @@ struct ListView<T: Listable, H: View>: View {
             })
             .toolbar {
                 if (T.sortOptions.count > 1 || applicableFilters.count > 1), allowFilter {
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItem(placement: .secondaryAction) {
                         SortOrderMenu(sort: $sort, filters: $filters, sortOptions: T.sortOptions, filterOptions: applicableFilters)
                     }
                 }
@@ -226,7 +226,9 @@ struct ListView<T: Listable, H: View>: View {
             await dataFetcher.updateIfNeeded(forceReload: true)
         })
         .listStyle(.plain)
+        #if canImport(UIKit)
         .listRowSpacing(0)
+        #endif
         .onReceive(dataFetcher.$loaded, perform: { _ in
             var newSelection: T?
             switch (

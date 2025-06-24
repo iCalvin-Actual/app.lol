@@ -6,11 +6,17 @@ struct URLField: View {
     var placeholder: String = "https://"
     
     var body: some View {
+        #if canImport(UIKit)
         URLTextField(text: $text, placeholder: placeholder)
             .frame(maxHeight: 55)
+        #else
+        TextField("", text: $text, prompt: Text(placeholder))
+            .frame(maxHeight: 55)
+        #endif
     }
 }
 
+#if canImport(UIKit)
 struct URLTextField: UIViewRepresentable {
     @Binding var text: String
     var placeholder: String
@@ -80,4 +86,5 @@ struct URLTextField: UIViewRepresentable {
         }
     }
 }
+#endif
 

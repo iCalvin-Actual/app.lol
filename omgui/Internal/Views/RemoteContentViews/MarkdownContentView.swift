@@ -70,8 +70,12 @@ struct MarkdownContentView: View {
                         return .handled
                     })
                     .sheet(item: $presentedURL, content: { url in
+                        #if canImport(UIKit)
                         SafariView(url: url)
                             .ignoresSafeArea(.container, edges: .all)
+                        #else
+                        EmptyView()
+                        #endif
                     })
             }
         }

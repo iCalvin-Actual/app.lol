@@ -24,7 +24,7 @@ struct AddressNowView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .secondaryAction) {
                     if let url = fetcher.result?.shareURLs.first?.content {
                         ShareLink(item: url)
                     }

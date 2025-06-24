@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if canImport(AppKit)
+import AppKit
+#endif
 
 struct PasteView: View {
     @Environment(\.dismiss)
@@ -82,13 +85,19 @@ struct PasteView: View {
 //                        }
 //                    }
 //                }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .secondaryAction) {
                     if let pasteURL = fetcher.result?.pasteURL {
                         Menu {
                             ShareLink("share paste", item: pasteURL)
                             Divider()
                             Button(action: {
+                                #if canImport(UIKit)
                                 UIPasteboard.general.string = pasteURL.absoluteString
+                                #elseif canImport(AppKit)
+                                let pasteboard = NSPasteboard.general
+                                pasteboard.clearContents()
+                                pasteboard.setString(pasteURL.absoluteString, forType: .string)
+                                #endif
                             }, label: {
                                 Label(
                                     title: { Text("copy paste") },
@@ -97,7 +106,13 @@ struct PasteView: View {
                             })
                             if let shareItem = fetcher.result?.content {
                                 Button(action: {
+                                    #if canImport(UIKit)
                                     UIPasteboard.general.string = shareItem
+                                    #elseif canImport(AppKit)
+                                    let pasteboard = NSPasteboard.general
+                                    pasteboard.clearContents()
+                                    pasteboard.setString(shareItem, forType: .string)
+                                    #endif
                                 }, label: {
                                     Label(
                                         title: { Text("copy paste content") },
@@ -170,3 +185,4 @@ struct PasteView: View {
 //        }
     }
 }
+

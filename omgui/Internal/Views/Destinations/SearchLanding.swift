@@ -64,7 +64,9 @@ struct SearchLanding: View {
                     Image(systemName: "pin")
                 }
                 .foregroundStyle(.primary)
+                #if canImport(UIKit)
                 .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+                #endif
             }
             LazyVGrid(columns: gridColumns, spacing: 16) {
                 Button(action : { }, label: {

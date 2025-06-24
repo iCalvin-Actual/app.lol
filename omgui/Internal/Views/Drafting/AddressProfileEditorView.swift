@@ -44,13 +44,15 @@ public struct AddressProfileEditorView: View {
         appropriateEditor
             .tint(Color.primary)
             .padding(4)
+        #if canImport(UIKit)
             .background(Color(uiColor: .systemBackground))
+        #endif
             .cornerRadius(24)
             .padding()
             .background(NavigationDestination.editWebpage(draftPoster.address).gradient)
             .interactiveDismissDisabled()
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .secondaryAction) {
                     Button {
                         if hasChanges {
                             confirmReset = true
@@ -65,7 +67,7 @@ public struct AddressProfileEditorView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .secondaryAction) {
                     Button {
                         applyContent()
                         Task { @MainActor in
@@ -80,7 +82,7 @@ public struct AddressProfileEditorView: View {
                     }
                     .disabled(!hasChanges)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .primaryAction) {
                     Button {
                         applyContent()
                         Task { @MainActor in

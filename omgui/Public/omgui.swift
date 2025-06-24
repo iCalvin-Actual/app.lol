@@ -46,7 +46,9 @@ public struct omgui: View {
     
     
     public init(client: ClientInfo, interface: DataInterface, database: Blackbird.Database) {
+        #if canImport(UIKit)
         UITabBar.appearance().unselectedItemTintColor = UIColor.white
+        #endif
         self.clientInfo = client
         self.dataInterface = interface
         self._database = StateObject(wrappedValue: database)

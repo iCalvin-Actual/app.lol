@@ -38,21 +38,34 @@ struct AddressIconView: View {
     
     @ViewBuilder
     var iconView: some View {
-        if let data = sceneModel.appropriateFetcher(for: address).iconFetcher.result?.data, let dataImage = UIImage(data: data) {
+        let data = sceneModel.appropriateFetcher(for: address).iconFetcher.result?.data
+        let fallback = AsyncImage(url: address.addressIconURL) { image in
+            image.resizable()
+                .aspectRatio(contentMode: .fill)
+        } placeholder: {
+            Color.lolRandom(address)
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        
+        #if canImport(UIKit)
+        if let data = data, let dataImage = UIImage(data: data) {
             Image(uiImage: dataImage)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: size, height: size)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
-        } else {
-            AsyncImage(url: address.addressIconURL) { image in
-                image.resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Color.lolRandom(address)
-            }
-            .frame(width: size, height: size)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
+        else { fallback }
+        #else
+        if let data = data, let dataImage = NSImage(data: data) {
+            Image(nsImage: dataImage)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: size, height: size)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        else { fallback }
+        #endif
     }
 }

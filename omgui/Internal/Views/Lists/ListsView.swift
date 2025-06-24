@@ -38,151 +38,154 @@ struct ListsView: View {
     
     var body: some View {
         List(selection: $selected) {
-            Section("Lists") {
-                if !viewModel.mine.isEmpty {
-                    Section {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .top, spacing: 0) {
-                                ForEach(viewModel.mine) { address in
-                                    if address == sceneModel.addressBook.actingAddress.wrappedValue {
-                                        NavigationLink(value: NavigationDestination.address(address)) {
-                                            AddressCard(address)
-                                                .background(Color(uiColor: .systemBackground))
-                                        }
-                                    } else {
-                                        Button {
-                                            withAnimation {
-                                                sceneModel.addressBook.actingAddress.wrappedValue = address
-                                            }
-                                        } label: {
-                                            AddressCard(address)
-                                        }
-                                    }
-                                }
-                                Spacer()
-                            }
-                        }
-                        .background(Material.regular)
-                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
-                    } header: {
-                        Label {
-                            Text("mine")
-                        } icon: {
-                            Image(systemName: "person")
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowSeparator(.hidden)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(Material.ultraThin)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                }
-                if !viewModel.following.isEmpty {
-                    Section {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .top, spacing: 0) {
-                                ForEach(viewModel.following) { address in
-                                    NavigationLink(value: NavigationDestination.address(address)) {
-                                        AddressCard(address)
-                                    }
-                                }
-                                Spacer()
-                            }
-                        }
-                        .background(Material.regular)
-                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
-                    } header: {
-                        Label {
-                            Text("following")
-                        } icon: {
-                            Image(systemName: "at")
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowSeparator(.hidden)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(Material.ultraThin)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                }
-                if !viewModel.followers.isEmpty {
-                    Section {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .top, spacing: 0) {
-                                ForEach(viewModel.followers) { address in
-                                    NavigationLink(value: NavigationDestination.address(address)) {
-                                        AddressCard(address)
-                                    }
-                                }
-                                Spacer()
-                            }
-                        }
-                        .background(Material.regular)
-                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
-                    } header: {
-                        Label {
-                            Text("followers")
-                        } icon: {
-                            Image(systemName: "at")
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowSeparator(.hidden)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(Material.ultraThin)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                }
-            }
+//            Section("Lists") {
+//                if !viewModel.mine.isEmpty {
+//                    Section {
+//                        ScrollView(.horizontal, showsIndicators: false) {
+//                            HStack(alignment: .top, spacing: 0) {
+//                                ForEach(viewModel.mine) { address in
+//                                    if address == sceneModel.addressBook.actingAddress.wrappedValue {
+//                                        NavigationLink(value: NavigationDestination.address(address)) {
+//                                            AddressCard(address)
+//                                                .background(Color(uiColor: .systemBackground))
+//                                        }
+//                                    } else {
+//                                        Button {
+//                                            withAnimation {
+//                                                sceneModel.addressBook.actingAddress.wrappedValue = address
+//                                            }
+//                                        } label: {
+//                                            AddressCard(address)
+//                                        }
+//                                    }
+//                                }
+//                                Spacer()
+//                            }
+//                        }
+//                        .background(Material.regular)
+//                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
+//                    } header: {
+//                        Label {
+//                            Text("mine")
+//                        } icon: {
+//                            Image(systemName: "person")
+//                        }
+//                        .foregroundStyle(.secondary)
+//                        .font(.callout)
+//                        .padding(.horizontal)
+//                        .padding(.vertical, 4)
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .listRowSeparator(.hidden)
+//                    }
+//                    .frame(maxWidth: .infinity)
+//                    .background(Material.ultraThin)
+//                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+//                    .listRowBackground(Color.clear)
+//                }
+//                if !viewModel.following.isEmpty {
+//                    Section {
+//                        ScrollView(.horizontal, showsIndicators: false) {
+//                            HStack(alignment: .top, spacing: 0) {
+//                                ForEach(viewModel.following) { address in
+//                                    NavigationLink(value: NavigationDestination.address(address)) {
+//                                        AddressCard(address)
+//                                    }
+//                                }
+//                                Spacer()
+//                            }
+//                        }
+//                        .background(Material.regular)
+//                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
+//                    } header: {
+//                        Label {
+//                            Text("following")
+//                        } icon: {
+//                            Image(systemName: "at")
+//                        }
+//                        .foregroundStyle(.secondary)
+//                        .font(.callout)
+//                        .padding(.horizontal)
+//                        .padding(.vertical, 4)
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .listRowSeparator(.hidden)
+//                    }
+//                    .frame(maxWidth: .infinity)
+//                    .background(Material.ultraThin)
+//                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+//                    .listRowBackground(Color.clear)
+//                }
+//                if !viewModel.followers.isEmpty {
+//                    Section {
+//                        ScrollView(.horizontal, showsIndicators: false) {
+//                            HStack(alignment: .top, spacing: 0) {
+//                                ForEach(viewModel.followers) { address in
+//                                    NavigationLink(value: NavigationDestination.address(address)) {
+//                                        AddressCard(address)
+//                                    }
+//                                }
+//                                Spacer()
+//                            }
+//                        }
+//                        .background(Material.regular)
+//                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
+//                    } header: {
+//                        Label {
+//                            Text("followers")
+//                        } icon: {
+//                            Image(systemName: "at")
+//                        }
+//                        .foregroundStyle(.secondary)
+//                        .font(.callout)
+//                        .padding(.horizontal)
+//                        .padding(.vertical, 4)
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .listRowSeparator(.hidden)
+//                    }
+//                    .frame(maxWidth: .infinity)
+//                    .background(Material.ultraThin)
+//                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+//                    .listRowBackground(Color.clear)
+//                }
+//            }
             
-            ForEach(viewModel.sidebarModel.sectionsForLists) { section in
-                Section(section.displayName) {
-                    ForEach(viewModel.sidebarModel.items(for: section, sizeClass: sizeClass, context: .detail)) { item in
-                        NavigationLink {
-                            sceneModel.destinationConstructor.destination(item.destination)
-                        } label: {
-                            item.label
-                        }
-                        .foregroundStyle(.primary)
-                        .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-                    }
-                }
-
-            }
+//            ForEach(viewModel.sidebarModel.sectionsForLists) { section in
+//                Section(section.displayName) {
+//                    ForEach(viewModel.sidebarModel.items(for: section, sizeClass: sizeClass, context: .detail)) { item in
+//                        NavigationLink {
+//                            sceneModel.destinationConstructor.destination(item.destination)
+//                        } label: {
+//                            item.label
+//                        }
+//                        .foregroundStyle(.primary)
+//                        #if canImport(UIKit)
+//                        .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+//                        #endif
+//                    }
+//                }
+//            }
             
-            if sceneModel.addressBook.signedIn {
-                Button(
-                    role: .destructive,
-                    action: {
-                        withAnimation {
-                            confirmLogout = true
-                        }
-                    },
-                    label: {
-                        Label {
-                            Text("log out")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        } icon: {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                        }
-                    }
-                )
-                .buttonStyle(.plain)
-                .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-            }
+//            if sceneModel.addressBook.signedIn {
+//                Button(
+//                    role: .destructive,
+//                    action: {
+//                        withAnimation {
+//                            confirmLogout = true
+//                        }
+//                    },
+//                    label: {
+//                        Label {
+//                            Text("log out")
+//                                .frame(maxWidth: .infinity, alignment: .leading)
+//                        } icon: {
+//                            Image(systemName: "rectangle.portrait.and.arrow.right")
+//                        }
+//                    }
+//                )
+//                .buttonStyle(.plain)
+//                #if canImport(UIKit)
+//                .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+//                #endif
+//            }
         }
         .animation(.default, value: sceneModel.addressBook.signedIn)
         .animation(.default, value: viewModel.following)
@@ -245,7 +248,9 @@ struct AddressCard: View {
             Text(address.addressDisplayString)
                 .font(.caption)
                 .fontDesign(.serif)
+            #if canImport(UIKit)
                 .foregroundStyle(Color(uiColor: UIColor.label))
+            #endif
                 .multilineTextAlignment(.trailing)
                 .lineLimit(3)
         }

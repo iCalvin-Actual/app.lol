@@ -16,6 +16,9 @@ struct StatusView: View {
     @Environment(\.viewContext)
     var viewContext
     
+    @Environment(\.openURL)
+    var openUrl
+    
     @State
     var shareURL: URL?
     @State
@@ -74,13 +77,15 @@ struct StatusView: View {
                 await fetcher.updateIfNeeded(forceReload: true)
             }
         })
+        #if canImport(UIKit)
         .sheet(item: $presentURL, content: { url in
             SafariView(url: url)
                 .ignoresSafeArea(.container, edges: .all)
         })
+        #endif
         .environment(\.viewContext, ViewContext.detail)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .secondaryAction) {
                 if let url = fetcher.result?.shareURLs.first?.content {
                     ShareLink(item: url)
                 }
@@ -117,7 +122,7 @@ struct StatusView: View {
     private func linkPreviewBuilder(_ item: SharePacket) -> some View {
         Button {
             guard item.content.scheme?.contains("http") ?? false else {
-                UIApplication.shared.open(item.content)
+                openUrl(item.content)
                 return
             }
             withAnimation {
@@ -144,7 +149,9 @@ struct StatusView: View {
                 
                 if item.content.scheme?.contains("http") ?? false {
                     ZStack {
+                        #if canImport(UIKit)
                         RemoteHTMLContentView(activeAddress: fetcher.address, startingURL: item.content, activeURL: $presentURL, scrollEnabled: .constant(false))
+                        #endif
                             
                         LinearGradient(
                             stops: [

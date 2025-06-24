@@ -62,7 +62,7 @@ struct AddressProfileView: View {
             )
             .toolbar {
                 if let markdown = mdFetcher.result, sceneModel.addressBook.myAddresses.contains(fetcher.addressName) {
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItem(placement: .primaryAction) {
                         if let draft = draftFetcher.results.first {
                             Menu {
                                 Button {
@@ -103,7 +103,7 @@ struct AddressProfileView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .secondaryAction) {
                     if let url = fetcher.result?.primaryURL {
                         ShareLink(item: url.content)
                     }

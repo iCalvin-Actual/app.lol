@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+#if canImport(AppKit)
+import AppKit
+#endif
+
 struct PURLView: View {
     @Environment(\.dismiss)
     var dismiss
@@ -89,13 +93,19 @@ struct PURLView: View {
 ////                        }
 ////                    }
 ////                }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .secondaryAction) {
                     if let purlURL = fetcher.result?.purlURL {
                         Menu {
                             ShareLink("share purl", item: purlURL)
                             Divider()
                             Button(action: {
+#if canImport(UIKit)
                                 UIPasteboard.general.string = purlURL.absoluteString
+#elseif canImport(AppKit)
+                                let pasteboard = NSPasteboard.general
+                                pasteboard.clearContents()
+                                pasteboard.setString(purlURL.absoluteString, forType: .string)
+#endif
                             }, label: {
                                 Label(
                                     title: { Text("copy purl") },
@@ -104,7 +114,13 @@ struct PURLView: View {
                             })
                             if let shareItem = fetcher.result?.content {
                                 Button(action: {
+#if canImport(UIKit)
                                     UIPasteboard.general.string = shareItem
+#elseif canImport(AppKit)
+                                    let pasteboard = NSPasteboard.general
+                                    pasteboard.clearContents()
+                                    pasteboard.setString(shareItem, forType: .string)
+#endif
                                 }, label: {
                                     Label(
                                         title: { Text("copy destination") },
@@ -172,7 +188,9 @@ struct PURLView: View {
     @ViewBuilder
     var preview: some View {
         if let content = fetcher.result?.content, let url = URL(string: content) {
+            #if canImport(UIKit)
             RemoteHTMLContentView(activeAddress: fetcher.address, startingURL: url, activeURL: $presented, scrollEnabled: .constant(true))
+            #endif
         } else {
             Spacer()
         }
@@ -218,3 +236,4 @@ struct PURLView: View {
     }
     .environment(sceneModel)
 }
+

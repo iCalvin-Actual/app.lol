@@ -146,7 +146,9 @@ extension Sharable where Self: Menuable {
         }
         if let option = primaryCopy {
             Button {
+                #if canImport(UIKit)
                 UIPasteboard.general.string = option.content
+                #endif
             } label: {
                 Label("copy \(option.name)", systemImage: "doc.on.clipboard")
             }
@@ -155,7 +157,13 @@ extension Sharable where Self: Menuable {
             Menu {
                 ForEach(copyText) { option in
                     Button(option.name) {
+                        #if canImport(UIKit)
                         UIPasteboard.general.string = option.content
+                        #elseif canImport(AppKit)
+                        let pasteboard = NSPasteboard.general
+                        pasteboard.clearContents()
+                        pasteboard.setString(option.content, forType: .string)
+                        #endif
                     }
                 }
             } label: {
@@ -246,6 +254,9 @@ extension StatusModel: Menuable {
 }
 
 struct ReportButton: View {
+    @Environment(\.openURL)
+    var openURL
+    
     let addressInQuestion: AddressName?
     
     let overrideAction: (() -> Void)?
@@ -263,10 +274,7 @@ struct ReportButton: View {
                 .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
 
             if let coded = coded, let emailURL = URL(string: coded) {
-                if UIApplication.shared.canOpenURL(emailURL)
-                {
-                    UIApplication.shared.open(emailURL)
-                }
+                openURL(emailURL)
             }
         }, label: {
             Label("report", systemImage: "exclamationmark.bubble")

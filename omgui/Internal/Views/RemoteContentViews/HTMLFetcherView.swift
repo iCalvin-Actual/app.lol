@@ -22,6 +22,7 @@ struct HTMLFetcherView: View {
     var presentedURL: URL? = nil
     
     var body: some View {
+        #if canImport(UIKit)
         HTMLContentView(
             activeAddress: activeAddress,
             htmlContent: htmlContent,
@@ -56,6 +57,9 @@ struct HTMLFetcherView: View {
             SafariView(url: url)
                 .ignoresSafeArea(.container, edges: .all)
         })
+        #else
+        EmptyView()
+        #endif
     }
 }
 

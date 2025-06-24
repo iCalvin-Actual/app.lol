@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TabBar: View {
     static func usingRegularTabBar(sizeClass: UserInterfaceSizeClass?, width: CGFloat? = nil) -> Bool {
+        #if canImport(UIKit)
         guard UIDevice.current.userInterfaceIdiom != .phone && (sizeClass ?? .regular) != .compact else {
             return false
         }
@@ -16,6 +17,7 @@ struct TabBar: View {
             print("Width: \(width)")
             return width >= 500
         }
+        #endif
         return true
     }
     
@@ -73,7 +75,9 @@ struct TabBar: View {
         }
         .searchable(text: $searchQuery)
         .searchFocused($searching)
+        #if canImport(UIKit)
         .tabBarMinimizeBehavior(.onScrollDown)
+        #endif
     }
     
     @ViewBuilder

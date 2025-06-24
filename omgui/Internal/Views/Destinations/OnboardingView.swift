@@ -224,7 +224,9 @@ struct OnboardingView: View {
                             }
                             .multilineTextAlignment(.leading)
                             .padding()
+                            #if canImport(UIKit)
                             .background(Color(uiColor: .systemBackground))
+                            #endif
                             .clipShape(RoundedRectangle(cornerSize: .init(width: 16, height: 16)))
                             .padding(.horizontal)
                             .padding(.bottom)

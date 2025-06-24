@@ -8,6 +8,7 @@
 import SafariServices
 import SwiftUI
 
+#if canImport(UIKit)
 struct SafariView: UIViewControllerRepresentable {
 
     let url: URL
@@ -25,3 +26,4 @@ struct SafariView: UIViewControllerRepresentable {
 #Preview {
     SafariView(url: URL(string: "www.apple.com")!)
 }
+#endif

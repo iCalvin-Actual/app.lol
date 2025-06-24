@@ -73,7 +73,9 @@ struct AddressSummaryView: View {
                 .bold()
                 .padding(8)
                 .frame(minWidth: 44, maxHeight: .infinity, alignment: .bottom)
+            #if canImport(UIKit)
                 .background(page == selectedPage ? Color(UIColor.systemBackground).opacity(0.42) : Color.clear)
+            #endif
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .padding(6)
                 .bold(page == selectedPage)
@@ -101,7 +103,11 @@ struct AddressSummaryView: View {
         let workingItem = item ?? .profile
         sceneModel.destinationConstructor.destination(workingItem.destination(addressSummaryFetcher.addressName))
             .background(Color.clear)
+        #if canImport(UIKit)
             .ignoresSafeArea(.container, edges: (horizontalSizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad) ? [.bottom] : [])
+        #else
+            .ignoresSafeArea(.container, edges: [.bottom])
+        #endif
             .navigationSplitViewColumnWidth(min: 250, ideal: 600)
     }
     
