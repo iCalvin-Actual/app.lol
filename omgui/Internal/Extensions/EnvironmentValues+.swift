@@ -25,3 +25,15 @@ struct ViewContextKey: EnvironmentKey {
         .column
     }
 }
+
+extension EnvironmentValues {
+    var searchActive: Bool {
+        get { self[SearchActiveKey.self] }
+        set { self[SearchActiveKey.self] = newValue }
+    }
+}
+struct SearchActiveKey: EnvironmentKey {
+    static var defaultValue: Bool {
+        false
+    }
+}

@@ -56,6 +56,12 @@ struct TabBar: View {
     }
     
     var body: some View {
+        appropriateBody
+            .environment(\.searchActive, searching)
+    }
+    
+    @ViewBuilder
+    var appropriateBody: some View {
         if !Self.usingRegularTabBar(sizeClass: horizontalSizeClass) {
             compactTabBar
                 .onAppear{

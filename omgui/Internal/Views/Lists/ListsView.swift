@@ -243,21 +243,16 @@ struct AddressCard: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 4) {
             AddressIconView(address: address, size: 55, showMenu: embedInMenu)
-                .padding(4)
-                .padding(.horizontal, 4)
             Text(address.addressDisplayString)
                 .font(.caption)
                 .fontDesign(.serif)
-            #if canImport(UIKit)
-                .foregroundStyle(Color(uiColor: UIColor.label))
-            #endif
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.trailing)
                 .lineLimit(3)
         }
-        .padding(8)
-        .cornerRadius(10)
+        .padding(12)
     }
 }
 
