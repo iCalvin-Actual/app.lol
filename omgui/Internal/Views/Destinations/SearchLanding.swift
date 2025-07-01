@@ -214,7 +214,7 @@ struct SearchNavigationButtonStyle: ButtonStyle {
     
     var glass: Glass {
         if selected {
-            return .regular.tint(Color.black)
+            return .regular.tint(Color.accentColor)
         }
         return .regular
     }

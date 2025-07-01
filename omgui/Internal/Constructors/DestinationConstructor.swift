@@ -19,6 +19,7 @@ struct DestinationConstructor {
         if let destination {
             viewContent(destination)
                 .background(destination.gradient)
+                .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
         } else {
             viewContent(destination)
         }

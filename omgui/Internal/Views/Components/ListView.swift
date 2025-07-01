@@ -85,7 +85,7 @@ struct ListView<T: Listable, H: View>: View {
     }
     
     var body: some View {
-        toolbarAwareBody
+        sizeAppropriateBody
             .task { @MainActor [dataFetcher] in
                 dataFetcher.fetchNextPageIfNeeded()
             }
@@ -134,16 +134,6 @@ struct ListView<T: Listable, H: View>: View {
                     }
                 }
             }
-    }
-    
-    @ViewBuilder
-    var toolbarAwareBody: some View {
-        if #available(iOS 18.0, visionOS 2.0,*) {
-            sizeAppropriateBody
-//                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
-        } else {
-            sizeAppropriateBody
-        }
     }
     
     @ViewBuilder
@@ -229,6 +219,9 @@ struct ListView<T: Listable, H: View>: View {
         #if canImport(UIKit) && !os(tvOS)
         .listRowSpacing(0)
         #endif
+        #if !os(tvOS)
+        .scrollContentBackground(.hidden)
+        #endif
         .onReceive(dataFetcher.$loaded, perform: { _ in
             var newSelection: T?
             switch (
@@ -274,7 +267,7 @@ struct ListView<T: Listable, H: View>: View {
         if dataFetcher.noContent {
             emptyRowView()
         } else if !items.isEmpty {
-            ForEach(items, content: { rowView($0, width: width) })
+            ForEach(items, content: { rowView($0, width: width).listRowBackground(Color.clear) })
         } else {
             EmptyView()
         }

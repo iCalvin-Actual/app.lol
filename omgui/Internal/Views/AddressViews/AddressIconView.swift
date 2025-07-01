@@ -13,18 +13,26 @@ struct AddressIconView: View {
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
     
-    init(address: AddressName, size: CGFloat = 42.0, showMenu: Bool = true) {
+    init(
+        address: AddressName,
+        size: CGFloat = 42.0,
+        showMenu: Bool = true
+    ) {
         self.address = address
         self.size = size
         self.showMenu = showMenu
     }
     
     var body: some View {
+        #if os(macOS)
+        iconView
+        #else
         if showMenu {
             menu
         } else {
             iconView
         }
+        #endif
     }
     
     @ViewBuilder
@@ -42,6 +50,8 @@ struct AddressIconView: View {
         let fallback = AsyncImage(url: address.addressIconURL) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
+                .frame(width: size, height: size)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
         } placeholder: {
             Color.lolRandom(address)
         }
@@ -65,7 +75,9 @@ struct AddressIconView: View {
                 .frame(width: size, height: size)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        else { fallback }
+        else {
+            fallback
+        }
         #endif
     }
 }
