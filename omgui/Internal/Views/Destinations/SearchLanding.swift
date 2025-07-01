@@ -190,7 +190,6 @@ struct SearchNavigationLabelStyle: LabelStyle {
             configuration.icon
                 .padding(4)
             configuration.title
-            Spacer()
         }
         .foregroundStyle(.secondary)
     }
@@ -201,12 +200,13 @@ struct SearchNavigationButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .lineLimit(1)
             .bold(selected)
             .padding(8)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundColor(selected ? .white : .primary)
             .frame(minHeight: 44)
-//            .background(Material.ultraThin, in: .rect(cornerRadius: .init(32), style: .continuous))
+            .contentShape(Capsule())
         #if !os(visionOS)
             .glassEffect(glass)
         #endif

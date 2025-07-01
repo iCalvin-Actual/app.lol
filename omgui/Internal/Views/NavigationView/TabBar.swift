@@ -60,6 +60,11 @@ struct TabBar: View {
     var body: some View {
         appropriateBody
             .environment(\.searchActive, searching)
+            .onChange(of: searching) { oldValue, newValue in
+                if newValue {
+                    selected = .search
+                }
+            }
     }
     
     @ViewBuilder
