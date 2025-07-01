@@ -19,8 +19,8 @@ struct SearchLanding: View {
         case photo
     }
 
-    var gridColumns: [GridItem] {
-        if horizontalSizeClass == .regular {
+    func gridColumns(_ width: CGFloat) -> [GridItem] {
+        if TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
             return Array(repeating: GridItem(.flexible()), count: 4)
         } else {
             return Array(repeating: GridItem(.flexible()), count: 2)
@@ -33,36 +33,66 @@ struct SearchLanding: View {
     @State
     var filter: SearchFilter? = nil
     
+    var usingCompact: Bool {
+        TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass)
+    }
+    
     init(sceneModel: SceneModel) {
         viewModel = .init(sceneModel: sceneModel)
     }
     
     var body: some View {
-        ScrollView {
-            LazyVStack(pinnedViews: [.sectionHeaders, .sectionFooters]) {
-                Section {
-                    ForEach(0..<64) { _ in
-                        HStack {
-                            Text("Some result")
-                                .frame(maxWidth: .infinity, alignment: .leading)
+        GeometryReader { proxy in
+            ScrollView {
+                LazyVStack(pinnedViews: [.sectionHeaders, .sectionFooters]) {
+                    Section {
+                        ForEach(0..<64) { _ in
+                            HStack {
+                                Text("Some result")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
+                    } header: {
+                        headerToUse(proxy.size.width)
+                    } footer: {
+                        footerToUse(proxy.size.width)
                     }
-                } header: {
-                    if !searching {
-                        pinnedItems
-                    }
-                } footer: {
-                    buttonGrid
-                        .padding(.horizontal, 8)
-                        .padding(.bottom, searchActive ? 78 : 0)
                 }
+                .padding(.horizontal, 8)
             }
-            .padding(.horizontal, 8)
+#if !os(tvOS)
+            .scrollContentBackground(.hidden)
+#endif
+            .animation(.default, value: viewModel.pinned)
         }
-        #if !os(tvOS)
-        .scrollContentBackground(.hidden)
-        #endif
-        .animation(.default, value: viewModel.pinned)
+    }
+    
+    @ViewBuilder
+    func headerToUse(_ width: CGFloat) -> some View {
+        if TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
+            buttonGrid(width)
+                .padding(.horizontal, 8)
+        } else {
+            if !searching {
+                pinnedItems
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func footerToUse(_ width: CGFloat) -> some View {
+        if !TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
+            buttonGrid(width)
+                .padding(.horizontal, 8)
+            #if canImport(UIKit)
+                .padding(.bottom, searchActive && UIDevice.current.userInterfaceIdiom == .phone ? 78 : 0)
+                .padding(.bottom, UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass == .compact ? 8 : 0)
+            #endif
+        } else {
+            if !searching {
+                pinnedItems
+            }
+        }
     }
     
     @ViewBuilder
@@ -97,8 +127,8 @@ struct SearchLanding: View {
     }
 
     @ViewBuilder
-    var buttonGrid: some View {
-        LazyVGrid(columns: gridColumns, spacing: 8) {
+    func buttonGrid(_ width: CGFloat) -> some View {
+        LazyVGrid(columns: gridColumns(width), spacing: 8) {
             Button(action : {
                 toggle(.address)
             }, label: {
@@ -160,9 +190,9 @@ struct SearchNavigationLabelStyle: LabelStyle {
             configuration.icon
                 .padding(4)
             configuration.title
+            Spacer()
         }
         .foregroundStyle(.secondary)
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

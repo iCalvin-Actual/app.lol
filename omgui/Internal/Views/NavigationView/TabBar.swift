@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct TabBar: View {
+    static private let minimumRegularWidth: CGFloat = 665
     static func usingRegularTabBar(sizeClass: UserInterfaceSizeClass?, width: CGFloat? = nil) -> Bool {
+        let width = width ?? minimumRegularWidth
         #if canImport(UIKit)
         switch UIDevice.current.userInterfaceIdiom {
         case .vision,
@@ -16,7 +18,7 @@ struct TabBar: View {
                  .tv:
             return true
         case .pad:
-            return (sizeClass ?? .regular) != .compact && width ?? 500 >= 500
+            return (sizeClass ?? .regular) != .compact && width >= minimumRegularWidth
         default:
             return false
         }
