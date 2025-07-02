@@ -219,6 +219,7 @@ struct ListView<T: Listable, H: View>: View {
         #if canImport(UIKit) && !os(tvOS)
         .listRowSpacing(0)
         #endif
+        .scrollEdgeEffectStyle(.soft, for: .top)
         #if !os(tvOS)
         .scrollContentBackground(.hidden)
         #endif

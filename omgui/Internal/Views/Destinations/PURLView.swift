@@ -94,7 +94,7 @@ struct PURLView: View {
 ////                    }
 ////                }
                 #if !os(tvOS)
-                ToolbarItem(placement: .secondaryAction) {
+                ToolbarItem(placement: .primaryAction) {
                     if let purlURL = fetcher.result?.purlURL {
                         Menu {
                             ShareLink("share purl", item: purlURL)

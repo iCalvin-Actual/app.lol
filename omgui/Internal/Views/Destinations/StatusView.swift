@@ -86,7 +86,7 @@ struct StatusView: View {
         .environment(\.viewContext, ViewContext.detail)
         #if !os(tvOS)
         .toolbar {
-            ToolbarItem(placement: .secondaryAction) {
+            ToolbarItem(placement: .primaryAction) {
                 if let url = fetcher.result?.shareURLs.first?.content {
                     ShareLink(item: url)
                 }

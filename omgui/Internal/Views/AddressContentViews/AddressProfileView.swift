@@ -104,7 +104,7 @@ struct AddressProfileView: View {
                     }
                 }
                 #if !os(tvOS)
-                ToolbarItem(placement: .secondaryAction) {
+                ToolbarItem(placement: .primaryAction) {
                     if let url = fetcher.result?.primaryURL {
                         ShareLink(item: url.content)
                     }
