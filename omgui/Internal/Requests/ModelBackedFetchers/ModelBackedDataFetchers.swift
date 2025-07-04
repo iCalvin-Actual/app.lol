@@ -9,31 +9,6 @@ import Blackbird
 import Foundation
 
 
-class AddressProfileHTMLDataFetcher: ModelBackedDataFetcher<AddressProfilePage> {
-    
-    let addressName: AddressName
-    let credential: APICredential?
-    
-    init(name: AddressName, credential: APICredential? = nil, interface: DataInterface, db: Blackbird.Database) {
-        self.addressName = name
-        self.credential = credential
-        super.init(interface: interface, db: db)
-    }
-    
-    @MainActor
-    override func fetchModels() async throws {
-        self.result = try await AddressProfilePage.read(from: db, id: addressName)
-    }
-    
-    override func fetchRemote() async throws -> Int {
-        guard !addressName.isEmpty else {
-            return 0
-        }
-        let profile = try await interface.fetchAddressProfile(addressName)
-        try await profile?.write(to: db)
-        return profile?.content.hashValue ?? 0
-    }
-}
 class ProfileMarkdownDataFetcher: ModelBackedDataFetcher<ProfileMarkdown> {
     
     let addressName: AddressName

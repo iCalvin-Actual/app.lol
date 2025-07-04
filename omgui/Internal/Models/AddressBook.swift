@@ -9,6 +9,7 @@ import SwiftUI
 import Foundation
 
 @Observable
+@MainActor
 final class AddressBook {
     
     let apiKey: APICredential

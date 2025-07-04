@@ -8,6 +8,63 @@
 import Blackbird
 import Combine
 import Foundation
+import _WebKit_SwiftUI
+
+typealias AddressProfilePageDataFetcher = WebPageDataFetcher<AddressProfilePage>
+typealias AddressNowPageDataFetcher = WebPageDataFetcher<NowModel>
+
+@MainActor
+final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFetcher<M>, Sendable {
+    let addressName: AddressName
+    
+    var html: String?
+    
+    @Published
+    var page = WebPage()
+    
+    nonisolated
+    var baseURL: URL {
+        var url = URL(string: "https://\(addressName).omg.lol")!
+        if M.self is NowModel.Type {
+            url.append(path: "now")
+        }
+        return url
+    }
+    
+    init(addressName: AddressName, html: String? = nil, interface: DataInterface, db: Blackbird.Database) {
+        self.addressName = addressName
+        self.html = html
+        super.init(interface: interface, db: db)
+        if let html {
+            page.load(html: html, baseURL: baseURL)
+        }
+    }
+    
+    override func fetchModels() async throws {
+        self.result = try await M.read(from: db, id: addressName)
+        if let resultContent = result?.htmlContent, html != resultContent {
+            self.html = resultContent
+            page.load(html: resultContent, baseURL: baseURL)
+        }
+        
+    }
+    
+    nonisolated override func fetchRemote() async throws -> Int {
+        guard baseURL.scheme?.contains("http") ?? false else {
+            return 0
+        }
+        let (data, _) = try await URLSession.shared.data(from: baseURL)
+        let html = await MainActor.run { [weak self] in
+            let html = self?.html ?? ""
+            guard let url = self?.baseURL else { return html }
+            self?.page.load(URLRequest(url: url))
+            let htmlData = String(data: data, encoding: .utf8)
+            self?.html = htmlData
+            return htmlData ?? ""
+        }
+        return html.hashValue
+    }
+}
 
 class URLContentDataFetcher: DataFetcher {
     let url: URL

@@ -9,11 +9,11 @@ import SwiftUI
 
 struct AddressNowView: View {
     @ObservedObject
-    var fetcher: AddressNowDataFetcher
+    var fetcher: AddressNowPageDataFetcher
     
     var body: some View {
         htmlBody
-            .onChange(of: fetcher.address, {
+            .onChange(of: fetcher.addressName, {
                 Task { [fetcher] in
                     await fetcher.updateIfNeeded(forceReload: true)
                 }
@@ -36,29 +36,12 @@ struct AddressNowView: View {
     
     @ViewBuilder
     var htmlBody: some View {
-        if let html = fetcher.result?.html {
-            HTMLFetcherView(
-                fetcher: fetcher,
-                activeAddress: fetcher.address,
-                htmlContent: html,
-                baseURL: nil
-            )
-        } else {
-            VStack {
-                if fetcher.loading {
-                    LoadingView()
-                        .padding()
-                } else if fetcher.noContent {
-                    ThemedTextView(text: "no /now page")
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                } else {
-                    LoadingView()
-                        .padding()
-                }
-                Spacer()
-            }
-        }
+        AddressNowPageView(
+            fetcher: fetcher,
+            activeAddress: fetcher.addressName,
+            htmlContent: fetcher.result?.html,
+            baseURL: nil
+        )
     }
 }
 

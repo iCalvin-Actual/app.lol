@@ -127,12 +127,14 @@ struct AddressIconModel: BlackbirdModel {
     }
 }
 
-public struct AddressProfilePage: BlackbirdModel, Sendable {
+public struct AddressProfilePage: RemoteBackedBlackbirdModel, Sendable {
     var owner: AddressName { id }
     @BlackbirdColumn
     public var id: AddressName
     @BlackbirdColumn
     var content: String
+    
+    var htmlContent: String? { content }
     
     enum CodingKeys: String, BlackbirdCodingKey {
         case id
@@ -183,7 +185,12 @@ public struct ProfileMarkdown: BlackbirdModel, Sendable {
     }
 }
 
-public struct NowModel: BlackbirdModel, Sendable {
+protocol RemoteBackedBlackbirdModel: BlackbirdModel {
+    var id: AddressName { get }
+    var htmlContent: String? { get }
+}
+
+public struct NowModel: RemoteBackedBlackbirdModel, Sendable {
     public static var sortingKey: BlackbirdColumnKeyPath { ownerKey }
     public static var ownerKey: BlackbirdColumnKeyPath { \.$id }
     public static var dateKey: BlackbirdColumnKeyPath { \.$date }
@@ -198,6 +205,8 @@ public struct NowModel: BlackbirdModel, Sendable {
     var date: Date
     @BlackbirdColumn
     var listed: Bool?
+    
+    var htmlContent: String? { html }
     
     var owner: AddressName { id }
     

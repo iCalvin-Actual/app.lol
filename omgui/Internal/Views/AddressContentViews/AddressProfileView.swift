@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import _WebKit_SwiftUI
 
 struct AddressProfileView: View {
     
@@ -18,7 +19,7 @@ struct AddressProfileView: View {
     var showDrafts: Bool = false
     
     @ObservedObject
-    var fetcher: AddressProfileHTMLDataFetcher
+    var fetcher: AddressProfilePageDataFetcher
     @ObservedObject
     var mdFetcher: ProfileMarkdownDataFetcher
     @ObservedObject
@@ -29,7 +30,7 @@ struct AddressProfileView: View {
     @State
     var selectedDraft: ProfileMarkdown.Draft?
     
-    init(fetcher: AddressProfileHTMLDataFetcher, mdFetcher: ProfileMarkdownDataFetcher, draftFetcher: DraftFetcher<ProfileMarkdown>) {
+    init(fetcher: AddressProfilePageDataFetcher, mdFetcher: ProfileMarkdownDataFetcher, draftFetcher: DraftFetcher<ProfileMarkdown>) {
         self.fetcher = fetcher
         self.mdFetcher = mdFetcher
         self.draftFetcher = draftFetcher
@@ -53,44 +54,17 @@ struct AddressProfileView: View {
     
     @ViewBuilder
     var htmlBody: some View {
-        if let result = fetcher.result {
-            HTMLFetcherView(
-                fetcher: fetcher,
-                activeAddress: fetcher.addressName,
-                htmlContent: result.content,
-                baseURL: nil
-            )
-            .toolbar {
-                if let markdown = mdFetcher.result, sceneModel.addressBook.myAddresses.contains(fetcher.addressName) {
-                    ToolbarItem(placement: .primaryAction) {
-                        if let draft = draftFetcher.results.first {
-                            Menu {
-                                Button {
-                                    createPoster(markdown.asDraft)
-                                } label: {
-                                    Label(title: {
-                                        Text("edit")
-                                    }, icon: {
-                                        Image(systemName: "pencil")
-                                    })
-                                }
-                                Button {
-                                    createPoster(draft)
-                                } label: {
-                                    Label(title: {
-                                        Text("resume draft")
-                                    }, icon: {
-                                        Image(systemName: "arrow.up.bin.fill")
-                                    })
-                                }
-                            } label: {
-                                Label(title: {
-                                    Text("edit")
-                                }, icon: {
-                                    Image(systemName: "pencil")
-                                })
-                            }
-                        } else {
+        AddressProfilePageView(
+            fetcher: fetcher,
+            activeAddress: fetcher.addressName,
+            htmlContent: fetcher.result?.content,
+            baseURL: nil
+        )
+        .toolbar {
+            if let markdown = mdFetcher.result, sceneModel.addressBook.myAddresses.contains(fetcher.addressName) {
+                ToolbarItem(placement: .primaryAction) {
+                    if let draft = draftFetcher.results.first {
+                        Menu {
                             Button {
                                 createPoster(markdown.asDraft)
                             } label: {
@@ -100,48 +74,61 @@ struct AddressProfileView: View {
                                     Image(systemName: "pencil")
                                 })
                             }
+                            Button {
+                                createPoster(draft)
+                            } label: {
+                                Label(title: {
+                                    Text("resume draft")
+                                }, icon: {
+                                    Image(systemName: "arrow.up.bin.fill")
+                                })
+                            }
+                        } label: {
+                            Label(title: {
+                                Text("edit")
+                            }, icon: {
+                                Image(systemName: "pencil")
+                            })
+                        }
+                    } else {
+                        Button {
+                            createPoster(markdown.asDraft)
+                        } label: {
+                            Label(title: {
+                                Text("edit")
+                            }, icon: {
+                                Image(systemName: "pencil")
+                            })
                         }
                     }
                 }
-                #if !os(tvOS)
-                ToolbarItem(placement: .primaryAction) {
-                    if let url = fetcher.result?.primaryURL {
-                        ShareLink(item: url.content)
-                    }
-                }
-                #endif
             }
-            .sheet(item: $draftPoster, onDismiss: {
-                Task { @MainActor [fetcher] in
-                    await fetcher.updateIfNeeded(forceReload: true)
-                    await draftPoster?.updateIfNeeded(forceReload: true)
+            #if !os(tvOS)
+            ToolbarItem(placement: .primaryAction) {
+                if let url = fetcher.result?.primaryURL {
+                    ShareLink(item: url.content)
                 }
-            }, content: { poster in
-                if #available(iOS 18.0, *) {
-                    NavigationStack {
-                        AddressProfileEditorView(poster, basedOn: selectedDraft)
-                    }
-                    .presentationDetents([.medium, .large])
-                }
-            })
-            .sheet(isPresented: $showDrafts, content: {
-                draftsView(draftFetcher)
-                    .presentationDetents([.medium])
-                    .environment(\.horizontalSizeClass, .compact)
-            })
-
-        } else {
-            VStack {
-                if fetcher.loading {
-                    LoadingView()
-                        .padding()
-                } else if fetcher.error?.localizedDescription.lowercased().contains("not found") ?? false {
-                    ThemedTextView(text: "no profile")
-                        .padding()
-                }
-                Spacer()
             }
+            #endif
         }
+        .sheet(item: $draftPoster, onDismiss: {
+            Task { @MainActor [fetcher] in
+                await fetcher.updateIfNeeded(forceReload: true)
+                await draftPoster?.updateIfNeeded(forceReload: true)
+            }
+        }, content: { poster in
+            if #available(iOS 18.0, *) {
+                NavigationStack {
+                    AddressProfileEditorView(poster, basedOn: selectedDraft)
+                }
+                .presentationDetents([.medium, .large])
+            }
+        })
+        .sheet(isPresented: $showDrafts, content: {
+            draftsView(draftFetcher)
+                .presentationDetents([.medium])
+                .environment(\.horizontalSizeClass, .compact)
+        })
     }
     
     func createPoster(_ item: ProfileMarkdown.Draft) {

@@ -213,6 +213,7 @@ extension Array<FilterOption> {
 }
 
 extension Array<FilterOption> {
+    @MainActor
     func asQuery<M: ModelBackedListable>(matchingAgainst addressBook: AddressBook) -> BlackbirdModelColumnExpression<M>? {
         var addressSet: Set<AddressName> = []
         var filters: [BlackbirdModelColumnExpression<M>] = reduce([]) { result, next in
@@ -242,6 +243,7 @@ extension Array<FilterOption> {
 }
 
 extension FilterOption {
+    @MainActor
     func asQuery<M: ModelBackedListable>(_ adderessBook: AddressBook) -> BlackbirdModelColumnExpression<M>? {
         switch self {
         case .mine:

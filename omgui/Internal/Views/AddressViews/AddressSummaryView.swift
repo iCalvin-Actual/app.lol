@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import _WebKit_SwiftUI
 
 struct AddressSummaryView: View {
     @State
@@ -84,18 +85,20 @@ struct AddressSummaryView: View {
     
     @ViewBuilder
     var sizeAppropriateBody: some View {
-        VStack(spacing: 0) {
-            AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: addressSummaryFetcher.bioFetcher)
-                .padding()
-                .onAppear {
-                    Task { @MainActor [addressSummaryFetcher] in
-                        await addressSummaryFetcher.updateIfNeeded()
-                    }
+        destination(selectedPage)
+            .safeAreaInset(edge: .top, content: {
+                VStack(spacing: 0) {
+                    AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: addressSummaryFetcher.bioFetcher)
+                        .padding()
+                        .onAppear {
+                            Task { @MainActor [addressSummaryFetcher] in
+                                await addressSummaryFetcher.updateIfNeeded()
+                            }
+                        }
+                    destinationPicker
                 }
-            destinationPicker
-            destination(selectedPage)
-                .frame(maxHeight: expandBio ? 0 : .infinity)
-        }
+            })
+            .frame(maxHeight: expandBio ? 0 : .infinity)
     }
     
     @ViewBuilder
@@ -103,11 +106,6 @@ struct AddressSummaryView: View {
         let workingItem = item ?? .profile
         sceneModel.destinationConstructor.destination(workingItem.destination(addressSummaryFetcher.addressName))
             .background(Color.clear)
-        #if canImport(UIKit)
-            .ignoresSafeArea(.container, edges: (horizontalSizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad) ? [.bottom] : [])
-        #else
-            .ignoresSafeArea(.container, edges: [.bottom])
-        #endif
             .navigationSplitViewColumnWidth(min: 250, ideal: 600)
     }
     

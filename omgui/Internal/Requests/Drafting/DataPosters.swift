@@ -20,7 +20,8 @@ class DraftFetcher<D: SomeDraftable>: ModelBackedListDataFetcher<D.Draft> {
     }
 }
 
-class DraftPoster<D: SomeDraftable>: Request, Identifiable {
+@MainActor
+class DraftPoster<D: SomeDraftable>: Request, @MainActor Identifiable {
     
     var id: D.Draft.ID {
         draft.id

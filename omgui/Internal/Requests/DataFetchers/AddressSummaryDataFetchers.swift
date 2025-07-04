@@ -30,8 +30,8 @@ class AddressSummaryDataFetcher: DataFetcher {
     var pastes: [String: AddressPasteDataFetcher] = [:]
     
     var iconFetcher: AddressIconDataFetcher
-    var profileFetcher: AddressProfileHTMLDataFetcher
-    var nowFetcher: AddressNowDataFetcher
+    var profileFetcher: AddressProfilePageDataFetcher
+    var nowFetcher: AddressNowPageDataFetcher
     var purlFetcher: AddressPURLsDataFetcher
     var pasteFetcher: AddressPasteBinDataFetcher
     var statusFetcher: StatusLogDataFetcher
@@ -57,8 +57,8 @@ class AddressSummaryDataFetcher: DataFetcher {
         let isMine = addressBook.myAddresses.contains(name)
         let credential: APICredential? = isMine ? addressBook.apiKey : nil
         self.iconFetcher = .init(address: name, interface: interface, db: database)
-        self.profileFetcher = .init(name: name, credential: nil, interface: interface, db: database)
-        self.nowFetcher = .init(name: name, interface: interface, db: database)
+        self.profileFetcher = .init(addressName: name, interface: interface, db: database)
+        self.nowFetcher = .init(addressName: name, interface: interface, db: database)
         self.purlFetcher = .init(name: name, credential: credential, addressBook: addressBook, interface: interface, db: database)
         self.pasteFetcher = .init(name: name, credential: credential, addressBook: addressBook, interface: interface, db: database)
         self.statusFetcher = .init(addresses: [name], addressBook: addressBook, interface: interface, db: database)
@@ -79,8 +79,8 @@ class AddressSummaryDataFetcher: DataFetcher {
         
         let credential: APICredential? = addressBook.apiKey
         self.iconFetcher = .init(address: name, interface: interface, db: database)
-        self.profileFetcher = .init(name: name, credential: credential, interface: interface, db: database)
-        self.nowFetcher = .init(name: name, interface: interface, db: database)
+        self.profileFetcher = .init(addressName: name, interface: interface, db: database)
+        self.nowFetcher = .init(addressName: name, interface: interface, db: database)
         self.purlFetcher = .init(name: name, credential: credential, addressBook: addressBook, interface: interface, db: database)
         self.pasteFetcher = .init(name: name, credential: credential, addressBook: addressBook, interface: interface, db: database)
         self.statusFetcher = .init(addresses: [name], addressBook: addressBook, interface: interface, db: database)
@@ -180,7 +180,7 @@ class AddressPrivateSummaryDataFetcher: AddressSummaryDataFetcher {
         
         super.init(name: name, addressBook: addressBook, interface: interface, database: database)
         
-        self.profileFetcher = .init(name: addressName, credential: nil, interface: interface, db: database)
+        self.profileFetcher = .init(addressName: addressName, interface: interface, db: database)
         self.followingFetcher = .init(address: addressName, credential: addressBook.apiKey, interface: interface)
         
         self.purlFetcher = .init(name: addressName, credential: addressBook.apiKey, addressBook: addressBook, interface: interface, db: database)

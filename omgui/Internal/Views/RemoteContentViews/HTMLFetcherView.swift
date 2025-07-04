@@ -6,9 +6,55 @@
 //
 
 import SwiftUI
-#if canImport(WebKit)
-import WebKit
-#endif
+import _WebKit_SwiftUI
+
+
+struct AddressProfilePageView: View {
+    
+    @ObservedObject
+    var fetcher: AddressProfilePageDataFetcher
+    
+    let activeAddress: AddressName?
+    let htmlContent: String?
+    let baseURL: URL?
+    
+    @State
+    var presentedURL: URL? = nil
+    
+    var body: some View {
+        WebView(url: fetcher.baseURL)
+            #if !os(tvOS)
+            .sheet(item: $presentedURL, content: { url in
+                SafariView(url: url)
+                    .ignoresSafeArea(.container, edges: .all)
+            })
+            #endif
+    }
+}
+
+
+struct AddressNowPageView: View {
+    
+    @ObservedObject
+    var fetcher: AddressNowPageDataFetcher
+    
+    let activeAddress: AddressName?
+    let htmlContent: String?
+    let baseURL: URL?
+    
+    @State
+    var presentedURL: URL? = nil
+    
+    var body: some View {
+        WebView(url: fetcher.baseURL)
+            #if !os(tvOS)
+            .sheet(item: $presentedURL, content: { url in
+                SafariView(url: url)
+                    .ignoresSafeArea(.container, edges: .all)
+            })
+            #endif
+    }
+}
 
 struct HTMLFetcherView: View {
     @Environment(\.horizontalSizeClass)
