@@ -22,6 +22,9 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
     @Published
     var page = WebPage()
     
+    @Published
+    var theme: ThemeModel?
+    
     nonisolated
     var baseURL: URL {
         var url = URL(string: "https://\(addressName).omg.lol")!
@@ -36,15 +39,62 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
         self.html = html
         super.init(interface: interface, db: db)
         if let html {
-            page.load(html: html, baseURL: baseURL)
+            let id = page.load(html: html, baseURL: baseURL)
+            Task {
+                await setObservers(id)
+            }
         }
     }
+    
+    private func setObservers(_ navigationID: WebPage.NavigationID?) async {
+        
+        // Temporary: Fake observation by calling getTheme() after a short delay
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+            let theme = await self?.getTheme()
+            self?.theme = theme
+        }
+        
+//        let event = Observations { page.currentNavigationEvent }
+//
+//        for await event in where event?.navigationID == navigationID {
+//            switch event?.kind {
+//            case .finished:
+//
+//            default:
+//                break
+//            }
+//        }
+    }
+    
+    private func getTheme() async -> ThemeModel? {
+        let jsResult = try? await page.callJavaScript(#"""
+                const links = Array.from(
+                    document.querySelectorAll('link[rel~="stylesheet"]')
+                );
+
+                // Walk from the *end* so the first match we hit is actually the last one in source order.
+                const rx = /\/css\/(?:themes\/)?([a-z0-9_-]+)\.css/i;
+
+                for (let i = links.length - 1; i >= 0; i--) {
+                    const m = rx.exec(links[i].href);
+                    if (m) return m[1];   // "default", "dracula", …
+                }
+                return null;
+            """#)
+        guard let themeId = jsResult as? String else {
+            return nil
+        }
+        let themes = try? await interface.fetchThemes()
+        return themes?.first(where: { $0.id == themeId })
+}
     
     override func fetchModels() async throws {
         self.result = try await M.read(from: db, id: addressName)
         if let resultContent = result?.htmlContent, html != resultContent {
             self.html = resultContent
-            page.load(html: resultContent, baseURL: baseURL)
+            let id = page.load(html: resultContent, baseURL: baseURL)
+            await setObservers(id)
         }
         
     }
@@ -54,10 +104,10 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
             return 0
         }
         let (data, _) = try await URLSession.shared.data(from: baseURL)
+        let url = self.baseURL
+        let id = await page.load(URLRequest(url: url))
+        await setObservers(id)
         let html = await MainActor.run { [weak self] in
-            let html = self?.html ?? ""
-            guard let url = self?.baseURL else { return html }
-            self?.page.load(URLRequest(url: url))
             let htmlData = String(data: data, encoding: .utf8)
             self?.html = htmlData
             return htmlData ?? ""
@@ -79,7 +129,6 @@ class URLContentDataFetcher: DataFetcher {
     }
     
     override func throwingRequest() async throws {
-        
         guard url.scheme?.contains("http") ?? false else {
             return
         }
@@ -139,3 +188,17 @@ class AddressIconDataFetcher: ModelBackedDataFetcher<AddressIconModel> {
         return model.hashValue
     }
 }
+
+extension Optional<ThemeModel> {
+    var backgroundBehavior: Bool {
+        switch self?.id {
+        case "default", "gradient", "neonknight", "seamless-future":
+            return false
+        case nil:
+            return false
+        default:
+            return true
+        }
+    }
+}
+

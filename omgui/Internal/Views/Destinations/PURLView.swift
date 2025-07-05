@@ -5,11 +5,11 @@
 //  Created by Calvin Chestnut on 4/26/23.
 //
 
-import SwiftUI
-
 #if canImport(AppKit)
 import AppKit
 #endif
+import SwiftUI
+import _WebKit_SwiftUI
 
 struct PURLView: View {
     @Environment(\.dismiss)
@@ -36,7 +36,7 @@ struct PURLView: View {
     var presented: URL? = nil
     
     var body: some View {
-        content
+        preview
             .onChange(of: fetcher.address, {
                 Task { [fetcher] in
                     await fetcher.updateIfNeeded(forceReload: true)
@@ -177,25 +177,14 @@ struct PURLView: View {
 //    }
     
     @ViewBuilder
-    var content: some View {
-        preview
-            .safeAreaInset(edge: .top) {
+    var preview: some View {
+        WebView(fetcher.page)
+            .safeAreaInset(edge: .bottom) {
                 if let model = fetcher.result {
                     PURLRowView(model: model, cardColor: .lolRandom(model.listTitle), cardPadding: 8, cardradius: 16, showSelection: true)
                         .padding()
                 }
             }
-    }
-    
-    @ViewBuilder
-    var preview: some View {
-        if let content = fetcher.result?.content, let url = URL(string: content) {
-            #if os(visionOS) || os(iOS)
-            RemoteHTMLContentView(activeAddress: fetcher.address, startingURL: url, activeURL: $presented, scrollEnabled: .constant(true))
-            #endif
-        } else {
-            Spacer()
-        }
     }
     
     @ViewBuilder

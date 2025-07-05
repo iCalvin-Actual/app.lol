@@ -7,6 +7,7 @@
 
 import Blackbird
 import Foundation
+import _WebKit_SwiftUI
 
 
 class ProfileMarkdownDataFetcher: ModelBackedDataFetcher<ProfileMarkdown> {
@@ -153,6 +154,8 @@ class AddressPURLDataFetcher: ModelBackedDataFetcher<PURLModel> {
     let title: String
     let credential: APICredential?
     
+    let page = WebPage()
+    
     init(name: AddressName, title: String, credential: APICredential? = nil, interface: any DataInterface, db: Blackbird.Database) {
         self.address = name
         self.title = title
@@ -185,6 +188,9 @@ class AddressPURLDataFetcher: ModelBackedDataFetcher<PURLModel> {
     @MainActor
     override func fetchModels() async throws {
         self.result = try await PURLModel.read(from: db, multicolumnPrimaryKey: [address, title])
+        if let url = result?.url {
+            page.load(URLRequest(url: url))
+        }
     }
     
     override func fetchRemote() async throws -> Int {
@@ -192,6 +198,9 @@ class AddressPURLDataFetcher: ModelBackedDataFetcher<PURLModel> {
             return 0
         }
         let purl = try await interface.fetchPURL(title, from: address, credential: credential)
+        if let url = result?.url {
+            page.load(URLRequest(url: url))
+        }
         try await purl?.write(to: db)
         return purl?.hashValue ?? 0
     }

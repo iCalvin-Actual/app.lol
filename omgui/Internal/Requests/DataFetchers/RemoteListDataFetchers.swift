@@ -9,8 +9,7 @@ import Blackbird
 import Foundation
 
 class AddressBioDataFetcher: DataFetcher {
-    @Published
-    var address: AddressName
+    let address: AddressName
     
     @Published
     var bio: AddressSummaryModel?

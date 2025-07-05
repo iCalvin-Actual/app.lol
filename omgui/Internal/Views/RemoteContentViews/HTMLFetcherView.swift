@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if canImport(WebKit)
+import WebKit
+#endif
 import _WebKit_SwiftUI
 
 
@@ -23,7 +26,8 @@ struct AddressProfilePageView: View {
     
     var body: some View {
         WebView(url: fetcher.baseURL)
-            #if !os(tvOS)
+            .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
+            #if os(iOS)
             .sheet(item: $presentedURL, content: { url in
                 SafariView(url: url)
                     .ignoresSafeArea(.container, edges: .all)
@@ -47,7 +51,8 @@ struct AddressNowPageView: View {
     
     var body: some View {
         WebView(url: fetcher.baseURL)
-            #if !os(tvOS)
+            .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
+            #if os(iOS)
             .sheet(item: $presentedURL, content: { url in
                 SafariView(url: url)
                     .ignoresSafeArea(.container, edges: .all)

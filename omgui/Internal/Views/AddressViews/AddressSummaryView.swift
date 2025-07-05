@@ -86,7 +86,7 @@ struct AddressSummaryView: View {
     @ViewBuilder
     var sizeAppropriateBody: some View {
         destination(selectedPage)
-            .safeAreaInset(edge: .top, content: {
+            .safeAreaInset(edge: .bottom, content: {
                 VStack(spacing: 0) {
                     AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: addressSummaryFetcher.bioFetcher)
                         .padding()
