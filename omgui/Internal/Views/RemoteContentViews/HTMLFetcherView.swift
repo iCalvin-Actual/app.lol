@@ -26,6 +26,7 @@ struct AddressProfilePageView: View {
     
     var body: some View {
         WebView(url: fetcher.baseURL)
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
             #if os(iOS)
             .sheet(item: $presentedURL, content: { url in

@@ -189,10 +189,11 @@ struct AddressSummaryHeader: View {
     var body: some View {
         HStack(alignment: .top) {
             AddressIconView(address: addressBioFetcher.address)
+            Spacer()
             
-            AddressBioLabel(expanded: $expandBio, addressBioFetcher: addressBioFetcher)
-                .multilineTextAlignment(.trailing)
-                .frame(maxWidth: .infinity, alignment: .trailing)
+//            AddressBioLabel(expanded: $expandBio, addressBioFetcher: addressBioFetcher)
+//                .multilineTextAlignment(.trailing)
+//                .frame(maxWidth: .infinity, alignment: .trailing)
         }
     }
 }

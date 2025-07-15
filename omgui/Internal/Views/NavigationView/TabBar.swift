@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import _WebKit_SwiftUI
 
 struct TabBar: View {
     static private let minimumRegularWidth: CGFloat = 665
@@ -130,7 +131,7 @@ struct TabBar: View {
             }
         } detail: {
             if let selected {
-                tabContent(selected.destination)
+                navigationContent(selected.destination)
             }
         }
         .searchable(text: $searchQuery)
@@ -142,9 +143,14 @@ struct TabBar: View {
     @ViewBuilder
     func tabContent(_ destination: NavigationDestination) -> some View {
         NavigationStack {
-            sceneModel.destinationConstructor.destination(destination)
-                .navigationDestination(for: NavigationDestination.self, destination: sceneModel.destinationConstructor.destination(_:))
+            navigationContent(destination)
         }
+    }
+    
+    @ViewBuilder
+    func navigationContent(_ destination: NavigationDestination) -> some View {
+        sceneModel.destinationConstructor.destination(destination)
+            .navigationDestination(for: NavigationDestination.self, destination: sceneModel.destinationConstructor.destination(_:))
     }
 }
 
