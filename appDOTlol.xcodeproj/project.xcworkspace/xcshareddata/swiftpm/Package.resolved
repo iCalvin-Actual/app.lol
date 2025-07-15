@@ -42,8 +42,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgui",
       "state" : {
-        "branch" : "develop",
-        "revision" : "d12c66da3bf389f52ec08c87b7f1dc240971bf03"
+        "revision" : "a56f17fa766a2a5c565c960c1c35ee31a567d209"
       }
     },
     {

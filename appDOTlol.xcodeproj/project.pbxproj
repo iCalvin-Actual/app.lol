@@ -333,7 +333,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 2024.4.0;
+				MARKETING_VERSION = 2025.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -381,7 +381,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 2024.4.0;
+				MARKETING_VERSION = 2025.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -424,8 +424,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/iCalvin-Actual/omgui";
 			requirement = {
-				branch = develop;
-				kind = branch;
+				kind = revision;
+				revision = a56f17fa766a2a5c565c960c1c35ee31a567d209;
 			};
 		};
 		3E7C162129C35777007C85EC /* XCRemoteSwiftPackageReference "omgapi" */ = {
