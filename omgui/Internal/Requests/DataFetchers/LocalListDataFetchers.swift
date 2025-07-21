@@ -39,7 +39,6 @@ class PinnedListDataFetcher: DataBackedListDataFetcher<AddressModel> {
     
     @MainActor
     override func throwingRequest() async throws {
-        
         results = pinnedAddresses.map({ AddressModel.init(name: $0) })
     }
     
@@ -85,7 +84,6 @@ class LocalBlockListDataFetcher: DataBackedListDataFetcher<AddressModel> {
     
     @MainActor
     override func throwingRequest() async throws {
-        
         self.results = blockedAddresses.map({ AddressModel.init(name: $0) })
     }
     

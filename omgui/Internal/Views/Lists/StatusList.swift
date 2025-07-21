@@ -9,14 +9,11 @@ import Combine
 import SwiftUI
 
 struct StatusList: View {
-    @ObservedObject
-    var fetcher: StatusLogDataFetcher
-    
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
     @Environment(\.horizontalSizeClass)
     var sizeClass
     
+    @ObservedObject
+    var fetcher: StatusLogDataFetcher
     let filters: [FilterOption]
     
     var menuBuilder: ContextMenuBuilder<StatusModel>?
@@ -42,11 +39,4 @@ struct StatusList: View {
         .toolbarRole(.editor)
         #endif
     }
-}
-
-#Preview {
-    let sceneModel = SceneModel.sample
-    
-    StatusList(fetcher: .init(addressBook: sceneModel.addressBook, interface: sceneModel.interface, db: sceneModel.database), filters: .everyone)
-        .environment(sceneModel)
 }

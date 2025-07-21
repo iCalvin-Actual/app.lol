@@ -16,10 +16,8 @@ struct ListView<T: Listable, H: View>: View {
     var horizontalSize
     @Environment(\.verticalSizeClass)
     var verticalSize
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
-    @Environment(AccountAuthDataFetcher.self)
-    var authFetcher: AccountAuthDataFetcher
+    @Environment(\.addressBook)
+    var addressBook
     
     @Environment(\.viewContext)
     var context: ViewContext
@@ -33,8 +31,14 @@ struct ListView<T: Listable, H: View>: View {
     @ViewBuilder
     let headerBuilder: (() -> H)?
     
+    @FocusState
+    var focusList: Bool
     @State
-    var selected: T?
+    var selected: T? {
+        willSet {
+            focusList = true
+        }
+    }
     @State
     var queryString: String = ""
     @State
@@ -69,19 +73,20 @@ struct ListView<T: Listable, H: View>: View {
     var items: [T] {
         if T.self is any BlackbirdListable.Type {
             return dataFetcher.results
-        } else {
+        } else if let addressBook {
             var filters = filters
             if !queryString.isEmpty {
                 filters.append(.query(queryString))
             }
             return filters
-                .applyFilters(to: dataFetcher.results, in: sceneModel)
+                .applyFilters(to: dataFetcher.results, with: addressBook)
                 .sorted(with: sort)
         }
+        return dataFetcher.results.sorted(with: sort)
     }
     
     var applicableFilters: [FilterOption] {
-        sceneModel.addressBook.signedIn ? T.filterOptions : []
+        addressBook?.signedIn ?? false ? T.filterOptions : []
     }
     
     var body: some View {
@@ -154,17 +159,9 @@ struct ListView<T: Listable, H: View>: View {
     
     @ViewBuilder
     func compactBody(width: CGFloat) -> some View {
-        let body: some View = {
-            list(width: width)
-                .animation(.easeInOut(duration: 0.3), value: dataFetcher.loaded)
-                .listRowBackground(Color.clear)
-        }()
-        if #available(iOS 18.0, visionOS 2.0, *) {
-            body
-//                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
-        } else {
-            body
-        }
+        list(width: width)
+            .animation(.easeInOut(duration: 0.3), value: dataFetcher.loaded)
+            .listRowBackground(Color.clear)
     }
     
     @ViewBuilder
@@ -188,7 +185,7 @@ struct ListView<T: Listable, H: View>: View {
     @ViewBuilder
     func regularBodyContent(_ actingWidth: CGFloat) -> some View {
         if let selected = selected {
-            sceneModel.destinationConstructor.destination(destination(for: selected))
+            addressBook?.destinationConstructor.destination(destination(for: selected))
         } else {
             ThemedTextView(text: "no selection")
                 .padding()
@@ -294,16 +291,17 @@ struct ListView<T: Listable, H: View>: View {
     func rowView(_ item: T, width: CGFloat) -> some View {
         rowBody(item, width: width)
             .tag(item)
-#if !os(tvOS)
-        .listRowSeparator(.hidden, edges: .all)
+            .focused($focusList)
+        #if !os(tvOS)
+            .listRowSeparator(.hidden, edges: .all)
         #endif
             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
             .contextMenu(menuItems: {
-                self.menuBuilder.contextMenu(for: item, fetcher: dataFetcher, sceneModel: sceneModel)
+                if let addressBook {
+                    menuBuilder.contextMenu(for: item, fetcher: dataFetcher, addressBook: addressBook)
+                }
             }) {
                 AddressCard(item.addressName)
-                    .environment(sceneModel)
-                    .environment(authFetcher)
             }
     }
     

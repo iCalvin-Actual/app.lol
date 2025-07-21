@@ -2,25 +2,28 @@
 import SwiftUI
 
 
-struct AddressIconView: View {
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
+struct AddressIconView<S: Shape>: View {
+    @Environment(\.addressBook)
+    var addressBook
     
     let address: AddressName
     let size: CGFloat
     
     let showMenu: Bool
+    let contentShape: S
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
     
     init(
         address: AddressName,
         size: CGFloat = 42.0,
-        showMenu: Bool = true
+        showMenu: Bool = true,
+        contentShape: S = RoundedRectangle(cornerRadius: 12)
     ) {
         self.address = address
         self.size = size
         self.showMenu = showMenu
+        self.contentShape = contentShape
     }
     
     var body: some View {
@@ -37,26 +40,28 @@ struct AddressIconView: View {
     
     @ViewBuilder
     var menu: some View {
-        Menu {
-            menuBuilder.contextMenu(for: .init(name: address), sceneModel: sceneModel)
-        } label: {
-            iconView
+        if let addressBook {
+            Menu {
+                menuBuilder.contextMenu(for: .init(name: address), addressBook: addressBook)
+            } label: {
+                iconView
+            }
         }
     }
     
     @ViewBuilder
     var iconView: some View {
-        let data = sceneModel.appropriateFetcher(for: address).iconFetcher.result?.data
+        let data = addressBook?.appropriateFetcher(for: address).iconFetcher.result?.data
         let fallback = AsyncImage(url: address.addressIconURL) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: size, height: size)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(contentShape)
         } placeholder: {
             Color.lolRandom(address)
         }
         .frame(width: size, height: size)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(contentShape)
         
         #if canImport(UIKit)
         if let data = data, let dataImage = UIImage(data: data) {
@@ -64,7 +69,7 @@ struct AddressIconView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: size, height: size)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(contentShape)
         }
         else { fallback }
         #else
@@ -73,7 +78,7 @@ struct AddressIconView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: size, height: size)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(contentShape)
         }
         else {
             fallback

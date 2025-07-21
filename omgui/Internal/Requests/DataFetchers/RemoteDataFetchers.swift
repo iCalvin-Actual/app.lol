@@ -8,14 +8,17 @@
 import Blackbird
 import Combine
 import Foundation
-import _WebKit_SwiftUI
+import WebKit
 
 typealias AddressProfilePageDataFetcher = WebPageDataFetcher<AddressProfilePage>
 typealias AddressNowPageDataFetcher = WebPageDataFetcher<NowModel>
 
 @MainActor
 final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFetcher<M>, Sendable {
-    let addressName: AddressName
+    @Published
+    var addressName: AddressName
+    
+    var address: AddressName { addressName }
     
     var html: String?
     
@@ -25,9 +28,9 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
     @Published
     var theme: ThemeModel?
     
-    nonisolated
+    @MainActor
     var baseURL: URL {
-        var url = URL(string: "https://\(addressName).omg.lol")!
+        var url = URL(string: "https://\(address).omg.lol")!
         if M.self is NowModel.Type {
             url.append(path: "now")
         }
@@ -39,32 +42,35 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
         self.html = html
         super.init(interface: interface, db: db)
         if let html {
-            let id = page.load(html: html, baseURL: baseURL)
             Task {
-                await setObservers(id)
+                await loadPage(html)
             }
         }
     }
     
-    private func setObservers(_ navigationID: WebPage.NavigationID?) async {
-        
-        // Temporary: Fake observation by calling getTheme() after a short delay
-        Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
-            let theme = await self?.getTheme()
-            self?.theme = theme
+    private func setObservers() async {
+        do {
+            for try await navigation in page.navigations {
+                switch navigation {
+                case .finished:
+                    theme = await getTheme()
+                default:
+                    break
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
         }
-        
-//        let event = Observations { page.currentNavigationEvent }
-//
-//        for await event in where event?.navigationID == navigationID {
-//            switch event?.kind {
-//            case .finished:
-//
-//            default:
-//                break
-//            }
-//        }
+    }
+    
+    private func loadPage(_ html: String? = nil) async {
+        page.load(html: html ?? "", baseURL: baseURL)
+        await setObservers()
+    }
+    
+    private func loadPage(_ request: URLRequest) async {
+        page.load(request)
+        await setObservers()
     }
     
     private func getTheme() async -> ThemeModel? {
@@ -93,26 +99,25 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
         self.result = try await M.read(from: db, id: addressName)
         if let resultContent = result?.htmlContent, html != resultContent {
             self.html = resultContent
-            let id = page.load(html: resultContent, baseURL: baseURL)
-            await setObservers(id)
+            await loadPage(resultContent)
         }
-        
     }
     
     nonisolated override func fetchRemote() async throws -> Int {
-        guard baseURL.scheme?.contains("http") ?? false else {
-            return 0
-        }
         let (data, _) = try await URLSession.shared.data(from: baseURL)
-        let url = self.baseURL
-        let id = await page.load(URLRequest(url: url))
-        await setObservers(id)
+        await loadPage(URLRequest(url: baseURL))
         let html = await MainActor.run { [weak self] in
             let htmlData = String(data: data, encoding: .utf8)
             self?.html = htmlData
             return htmlData ?? ""
         }
         return html.hashValue
+    }
+    
+    @MainActor
+    func configure(_ name: AddressName, _ automation: AutomationPreferences = .init()) {
+        addressName = name
+        super.configure(automation)
     }
 }
 

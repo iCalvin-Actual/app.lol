@@ -56,14 +56,23 @@ class ModelBackedDataFetcher<M: BlackbirdModel>: BackedDataFetcher {
 
 typealias ModelBackedListable = BlackbirdListable & Listable
 
+class GlobalListDataFetcher<T: ModelBackedListable>: ListFetcher<T> {
+    let db: Blackbird.Database
+    
+    init(interface: DataInterface, db: Blackbird.Database, automation: AutomationPreferences = .init()) {
+        self.db = db
+        super.init(items: [], interface: interface, limit: 42, filters: [], sort: T.defaultSort, automation: automation)
+    }
+}
+
 class ModelBackedListDataFetcher<T: ModelBackedListable>: ListFetcher<T> {
     
-    let addressBook: AddressBook?
+    var addressBook: AddressBook.Scribbled?
     let db: Blackbird.Database
     
     var lastHash: Int?
     
-    init(addressBook: AddressBook?, interface: DataInterface, db: Blackbird.Database, limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
+    init(addressBook: AddressBook.Scribbled?, interface: DataInterface, db: Blackbird.Database, limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
         self.addressBook = addressBook
         self.db = db
         super.init(items: [], interface: interface, limit: limit, filters: filters, sort: sort, automation: automation)

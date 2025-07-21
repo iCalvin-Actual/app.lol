@@ -10,7 +10,8 @@ import Foundation
 import SwiftUI
 
 @MainActor
-class SidebarModel: ObservableObject {
+@Observable
+class SidebarModel {
     enum Section: String, Identifiable {
         var id: String { rawValue }
         
@@ -44,7 +45,7 @@ class SidebarModel: ObservableObject {
     var tabs: [NavigationItem] {
         [
             .community,
-            .lists,
+            .nowGarden,
             .search
         ]
     }
@@ -57,15 +58,10 @@ class SidebarModel: ObservableObject {
         [.app]
     }
     
-    let sceneModel: SceneModel
-    var addressBook: AddressBook { sceneModel.addressBook }
+    var pinnedFetcher: PinnedListDataFetcher?
     
-    @Published
-    var pinnedFetcher: PinnedListDataFetcher
-    
-    init(sceneModel: SceneModel) {
-        self.sceneModel = sceneModel
-        self.pinnedFetcher = sceneModel.addressBook.pinnedAddressFetcher
+    init(pinnedFetcher: PinnedListDataFetcher?) {
+        self.pinnedFetcher = pinnedFetcher
     }
     
     func items(for section: Section, sizeClass: UserInterfaceSizeClass?, context: ViewContext) -> [NavigationItem] {
@@ -77,7 +73,7 @@ class SidebarModel: ObservableObject {
                 destinations.append(.search)
             }
             destinations.append(
-                contentsOf: addressBook.pinnedAddresses.sorted().map({ .pinnedAddress($0) })
+                contentsOf: pinnedFetcher?.results.map(({ $0.addressName })).sorted().map({ .pinnedAddress($0) }) ?? []
             )
             return destinations
             
@@ -95,21 +91,13 @@ class SidebarModel: ObservableObject {
             
         case .app:
             if context == .detail {
-                var destinations: [NavigationItem] = [.appSupport, .safety, .appLatest]
-                if #unavailable(iOS 18.0) {
-                    destinations.insert(.account, at: 0)
-                }
-                return destinations
+                #if !canImport(UIKit)
+                return [.appLatest, .appSupport, .safety]
+                #else
+                return []
+                #endif
             } else {
-                var destinations: [NavigationItem] = [.appSupport, .appLatest]
-                if #available(iOS 18.0, *) {
-                    if TabBar.usingRegularTabBar(sizeClass: sizeClass) {
-                        destinations.insert(.account, at: 0)
-                    }
-                } else {
-                    destinations.insert(.account, at: 0)
-                }
-                return destinations
+                return [.account, .appLatest, .appSupport, .safety]
             }
             
         case .more:

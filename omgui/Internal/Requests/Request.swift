@@ -18,7 +18,6 @@ struct AutomationPreferences {
     }
 }
 
-@MainActor
 class Request: ObservableObject {
     
     let interface: DataInterface

@@ -6,16 +6,20 @@
 //
 
 import SwiftUI
-import _WebKit_SwiftUI
+import WebKit
 
 struct AddressSummaryView: View {
-    @State
-    var selectedPage: AddressContent = .profile
     
     @Environment(\.horizontalSizeClass)
     var horizontalSizeClass
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
+    @Environment(\.visibleAddressPage)
+    var addressPage
+    @Environment(\.destinationConstructor)
+    var destinationConstructor
+    @Environment(\.apiInterface)
+    var apiInterface
+    @Environment(\.blackbird)
+    var database
     
     @State
     var expandBio: Bool = false
@@ -36,75 +40,35 @@ struct AddressSummaryView: View {
     var body: some View {
         sizeAppropriateBody
             .environment(\.viewContext, .profile)
-            .onChange(of: sceneModel.addressBook.actingAddress.wrappedValue) { oldValue, newValue in
-                if addressSummaryFetcher.addressName.isEmpty {
-                    addressSummaryFetcher.configure(name: newValue)
-                }
-            }
             .task { @MainActor [addressSummaryFetcher] in
                 await addressSummaryFetcher.updateIfNeeded()
             }
     }
     
     @ViewBuilder
-    var destinationPicker: some View {
-        HStack(alignment: .top) {
-            ScrollView(.horizontal) {
-                HStack(alignment: .bottom, spacing: 0) {
-                    ForEach(allPages) { page in
-                        destinationButton(page)
-                    }
-                }
-            }
-        }
-        .frame(maxHeight: 44)
-        .padding(.vertical, 4)
-    }
-    
-    @ViewBuilder
-    func destinationButton(_ page: AddressContent) -> some View {
-        Button(action: {
-            withAnimation {
-                expandBio = false
-                selectedPage = page
-            }
-        }) {
-            Text(page.displayString)
-                .font(.callout)
-                .bold()
-                .padding(8)
-                .frame(minWidth: 44, maxHeight: .infinity, alignment: .bottom)
-            #if canImport(UIKit) && !os(tvOS)
-                .background(page == selectedPage ? Color(UIColor.systemBackground).opacity(0.42) : Color.clear)
-            #endif
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding(6)
-                .bold(page == selectedPage)
-        }
-    }
-    
-    @ViewBuilder
     var sizeAppropriateBody: some View {
-        destination(selectedPage)
-            .safeAreaInset(edge: .bottom, content: {
-                VStack(spacing: 0) {
-                    AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: addressSummaryFetcher.bioFetcher)
-                        .padding()
-                        .onAppear {
-                            Task { @MainActor [addressSummaryFetcher] in
-                                await addressSummaryFetcher.updateIfNeeded()
+        if horizontalSizeClass == .regular {
+            destination(addressPage)
+                .safeAreaInset(edge: .bottom, content: {
+                    VStack(spacing: 0) {
+                        AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: addressSummaryFetcher.bioFetcher, allPages: allPages)
+                            .padding()
+                            .onAppear {
+                                Task { @MainActor [addressSummaryFetcher] in
+                                    await addressSummaryFetcher.updateIfNeeded()
+                                }
                             }
-                        }
-                    destinationPicker
-                }
-            })
-            .frame(maxHeight: expandBio ? 0 : .infinity)
+                    }
+                })
+        } else {
+            destination(addressPage)
+        }
     }
     
     @ViewBuilder
     func destination(_ item: AddressContent? = nil) -> some View {
         let workingItem = item ?? .profile
-        sceneModel.destinationConstructor.destination(workingItem.destination(addressSummaryFetcher.addressName))
+        destinationConstructor?.destination(workingItem.destination(addressSummaryFetcher.addressName))
             .background(Color.clear)
             .navigationSplitViewColumnWidth(min: 250, ideal: 600)
     }
@@ -112,13 +76,13 @@ struct AddressSummaryView: View {
     func fetcherForContent(_ content: AddressContent) -> Request {
         switch content {
         case .now:
-            return addressSummaryFetcher.nowFetcher
+            return addressSummaryFetcher.nowFetcher ?? .init(addressName: addressSummaryFetcher.nowFetcher?.addressName ?? "", interface: apiInterface, db: database)
         case .pastebin:
             return addressSummaryFetcher.pasteFetcher
         case .purl:
             return addressSummaryFetcher.purlFetcher
         case .profile:
-            return addressSummaryFetcher.profileFetcher
+            return addressSummaryFetcher.profileFetcher ?? .init(addressName: addressSummaryFetcher.nowFetcher?.addressName ?? "", interface: apiInterface, db: database)
         case .statuslog:
             return addressSummaryFetcher.statusFetcher
         }
@@ -177,23 +141,49 @@ struct AddressBioLabel: View {
 struct AddressSummaryHeader: View {
     @Environment(\.horizontalSizeClass)
     var horizontalSizeClass
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
+    @Environment(\.visibleAddressPage)
+    var addressPage
+    @Environment(\.showAddressPage)
+    var showPage
     
-    @Binding
-    var expandBio: Bool
+    var expandBio: Binding<Bool>
     
     @ObservedObject
     var addressBioFetcher: AddressBioDataFetcher
     
+    let allPages: [AddressContent]
+    
+    init(expandBio: Binding<Bool>, addressBioFetcher: AddressBioDataFetcher, allPages: [AddressContent] = [], selection: Binding<AddressContent>? = nil) {
+        self.expandBio = expandBio
+        self.addressBioFetcher = addressBioFetcher
+        self.allPages = allPages
+    }
+    
     var body: some View {
-        HStack(alignment: .top) {
-            AddressIconView(address: addressBioFetcher.address)
+        HStack {
+            AddressIconView(address: addressBioFetcher.address, showMenu: false, contentShape: Circle())
+            AddressNameView(addressBioFetcher.address)
             Spacer()
-            
-//            AddressBioLabel(expanded: $expandBio, addressBioFetcher: addressBioFetcher)
-//                .multilineTextAlignment(.trailing)
-//                .frame(maxWidth: .infinity, alignment: .trailing)
+            destinationPicker
         }
+        .padding(.leading, 4)
+        .padding(.trailing, 8)
+        .glassEffect(.regular)
+    }
+    
+    @ViewBuilder
+    var destinationPicker: some View {
+        Picker("Page", selection: .init(get: {
+            addressPage
+        }, set: { newValue in
+            showPage(newValue)
+        })) {
+            ForEach(allPages) { page in
+                Text(page.displayString)
+                    .tag(page)
+            }
+        }
+        .pickerStyle(.menu)
+        .frame(maxHeight: 44)
     }
 }

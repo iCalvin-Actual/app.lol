@@ -9,29 +9,27 @@ import SwiftUI
 
 struct Sidebar: View {
     
-    let actingAddress: AddressName
-    
     @Environment(\.horizontalSizeClass)
     var horizontalSize
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
+    @Environment(\.addressBook)
+    var addressBook
+    @Environment(\.setAddress)
+    var setAddress
+    @Environment(\.destinationConstructor)
+    var destinationConstructor
+    
+    @SceneStorage("app.tab.selected")
+    var selected: NavigationItem?
     
     @State
     var expandAddresses: Bool = false
     
-    @Binding
-    var selected: NavigationItem?
-    
-    let sidebarModel: SidebarModel
-    
-    private var myAddresses: [AddressName] {
-        sceneModel.addressBook.myAddresses
+    var sidebarModel: SidebarModel {
+        .init(pinnedFetcher: addressBook?.pinnedAddressFetcher)
     }
     
-    init(selected: Binding<NavigationItem?>, model: SidebarModel, acting: AddressName) {
-        self.actingAddress = acting
-        self._selected = selected
-        self.sidebarModel = model
+    private var myAddresses: [AddressName] {
+        addressBook?.myAddresses ?? []
     }
     
     var body: some View {
@@ -43,7 +41,11 @@ struct Sidebar: View {
                 ThemedTextView(text: "app.lol", font: .title)
                 Spacer()
             }
-            List(selection: $selected) {
+            List(selection: .init(get: {
+                selected
+            }, set: { newValue in
+                selected = newValue
+            })) {
                 ForEach(sidebarModel.sections) { section in
                     let items = sidebarModel.items(for: section, sizeClass: horizontalSize, context: .column)
                     if !items.isEmpty {
@@ -70,19 +72,21 @@ struct Sidebar: View {
     }
     
     private func isActingAddress(_ address: AddressName) -> Bool {
-        actingAddress == address
+        guard !address.isEmpty else {
+            return false
+        }
+        return addressBook?.actingAddress == address
     }
     
     @ViewBuilder
     private func contextMenu(for item: NavigationItem) -> some View {
         switch item {
         case .pinnedAddress(let address):
-            let addressBook = sceneModel.addressBook
             let pinnedAddressFetcher = sidebarModel.pinnedFetcher
             Button(action: {
+                addressBook?.removePin(address)
                 Task { @MainActor in
-                    await addressBook.removePin(address)
-                    await pinnedAddressFetcher.updateIfNeeded(forceReload: true)
+                    await pinnedAddressFetcher?.updateIfNeeded(forceReload: true)
                 }
             }, label: {
                 Label("Un-Pin \(address.addressDisplayString)", systemImage: "pin.slash")
@@ -98,9 +102,7 @@ struct Sidebar: View {
             Section {
                 ForEach(myAddresses) { address in
                     Button {
-                        Task {
-                            sceneModel.addressBook.actingAddress.wrappedValue = address
-                        }
+                        setAddress(address)
                     } label: {
                         addressOption(address)
                     }
@@ -122,6 +124,6 @@ struct Sidebar: View {
     
     @ViewBuilder
     func destinationView(_ destination: NavigationDestination? = .webpage("app")) -> some View {
-        sceneModel.destinationConstructor.destination(destination)
+        destinationConstructor?.destination(destination)
     }
 }

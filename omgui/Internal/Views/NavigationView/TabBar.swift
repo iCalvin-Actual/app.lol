@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
-import _WebKit_SwiftUI
+import WebKit
 
 struct TabBar: View {
     static private let minimumRegularWidth: CGFloat = 665
+    
     static func usingRegularTabBar(sizeClass: UserInterfaceSizeClass?, width: CGFloat? = nil) -> Bool {
         let width = width ?? minimumRegularWidth
         #if canImport(UIKit)
@@ -28,8 +29,28 @@ struct TabBar: View {
         #endif
     }
     
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
+    @SceneStorage("app.tab.selected")
+    var selected: NavigationItem? {
+        willSet {
+            if newValue != .search {
+                searching = false
+            }
+        }
+    }
+    
+    @Environment(\.addressBook)
+    var addressBook
+    @Environment(\.destinationConstructor)
+    var destinationConstructor
+    @Environment(\.horizontalSizeClass)
+    var horizontalSizeClass
+    
+    @State
+    var visibleAddress: AddressName = ""
+    @State
+    var visibleAddressPage: AddressContent = .profile
+    @State
+    var presentAccount: Bool = false
     
     @FocusState
     var searching: Bool {
@@ -40,27 +61,19 @@ struct TabBar: View {
         }
     }
     
-    @Environment(\.horizontalSizeClass)
-    var horizontalSizeClass
-    
-    @SceneStorage("app.tab.selected")
-    var selected: NavigationItem? {
-        willSet {
-            if newValue != .search {
-                searching = false
-            }
-        }
-    }
-    
-    let tabModel: SidebarModel
-    
-    init(sceneModel: SceneModel) {
-        self.tabModel = .init(sceneModel: sceneModel)
+    var tabModel: SidebarModel {
+        .init(pinnedFetcher: addressBook?.pinnedAddressFetcher)
     }
     
     var body: some View {
         appropriateBody
+            .environment(\.presentAddress, { address in
+                activePath.wrappedValue.append(NavigationDestination.address(address))
+            })
+            .environment(\.destinationConstructor, addressBook?.destinationConstructor)
             .environment(\.searchActive, searching)
+            .environment(\.visibleAddressPage, visibleAddressPage)
+            .environment(\.visibleAddress, visibleAddress)
             .onChange(of: searching) { oldValue, newValue in
                 if newValue {
                     selected = .search
@@ -94,9 +107,9 @@ struct TabBar: View {
         TabView(selection: $selected) {
             ForEach(tabModel.tabs) { item in
                 Tab(item.displayString, systemImage: item.iconName, value: item, role: item == .search ? .search : nil) {
-                    tabContent(item.destination)
+                    tabContent(item)
                 }
-#if !os(tvOS)
+                #if !os(tvOS)
                 .hidden(Self.usingRegularTabBar(sizeClass: horizontalSizeClass))
                 #endif
             }
@@ -107,7 +120,60 @@ struct TabBar: View {
         #endif
         #if os(iOS)
         .tabBarMinimizeBehavior(.onScrollDown)
+        .tabViewBottomAccessory {
+            if !visibleAddress.isEmpty {
+                addressAccessory(visibleAddress)
+            } else if let addressBook {
+                Group {
+                    if !addressBook.actingAddress.isEmpty {
+                        addressAccessory(addressBook.actingAddress, showPicker: false)
+                    } else {
+                        addressAccessory(addressBook.actingAddress, showPicker: false)
+                    }
+                }
+                //                    .foregroundStyle(.primary)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    presentAccount.toggle()
+                }
+                .sheet(isPresented: $presentAccount) {
+                    NavigationStack {
+                        navigationContent(.account)
+                            .environment(\.destinationConstructor, addressBook.destinationConstructor)
+                            .environment(\.searchActive, searching)
+                            .environment(\.visibleAddressPage, visibleAddressPage)
+                            .environment(\.visibleAddress, visibleAddress)
+                    }
+                }
+            }
+        }
         #endif
+    }
+        
+    @ViewBuilder
+    func addressAccessory(_ address: AddressName, showPicker: Bool = true) -> some View {
+        HStack {
+            AddressIconView(address: address, contentShape: Circle())
+            AddressNameView(address)
+            Spacer()
+            if showPicker {
+                destinationPicker
+            }
+        }
+        .padding(.top, 2)
+        .padding(.horizontal, 2)
+    }
+    
+    @ViewBuilder
+    var destinationPicker: some View {
+        Picker("Destination", selection: .constant(AddressContent.profile)) {
+            ForEach(AddressContent.allCases) { page in
+                Text(page.displayString)
+                    .tag(page)
+            }
+        }
+        .pickerStyle(.menu)
+        .frame(maxHeight: 44)
     }
     
     @ViewBuilder
@@ -129,9 +195,14 @@ struct TabBar: View {
                     }
                 }
             }
+            .safeAreaInset(edge: .bottom, content: {
+                if !(addressBook?.signedIn ?? false) {
+                    AuthenticateButton()
+                }
+            })
         } detail: {
             if let selected {
-                navigationContent(selected.destination)
+                tabContent(selected)
             }
         }
         .searchable(text: $searchQuery)
@@ -140,23 +211,33 @@ struct TabBar: View {
         #endif
     }
     
+    @State
+    var paths: [NavigationItem: NavigationPath] = .init()
+    
     @ViewBuilder
-    func tabContent(_ destination: NavigationDestination) -> some View {
-        NavigationStack {
-            navigationContent(destination)
+    func tabContent(_ item: NavigationItem) -> some View {
+        NavigationStack(path: path(for: item)) {
+            navigationContent(item.destination)
+                .navigationDestination(for: NavigationDestination.self) { destination in
+                    destinationConstructor?.destination(destination)
+                }
         }
+    }
+    
+    private var activePath: Binding<NavigationPath> {
+        path(for: selected ?? .community)
+    }
+    private func path(for item: NavigationItem) -> Binding<NavigationPath> {
+        .init {
+            paths[item] ?? .init()
+        } set: { newValue in
+            paths.updateValue(newValue, forKey: item)
+        }
+
     }
     
     @ViewBuilder
     func navigationContent(_ destination: NavigationDestination) -> some View {
-        sceneModel.destinationConstructor.destination(destination)
-            .navigationDestination(for: NavigationDestination.self, destination: sceneModel.destinationConstructor.destination(_:))
+        destinationConstructor?.destination(destination)
     }
 }
-
-#Preview {
-    TabBar(sceneModel: .sample)
-        .environment(SceneModel.sample)
-        .environment(AccountAuthDataFetcher(authKey: nil, client: .sample, interface: SampleData()))
-}
-

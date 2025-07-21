@@ -11,6 +11,8 @@ import SwiftUI
 enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     var id: String { rawValue }
     
+    case loading
+    
     case account
     case safety
     case community
@@ -19,7 +21,6 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     case lists
     
     case search
-    case about
     case latest
     case support
     
@@ -47,6 +48,8 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     var rawValue: String {
         switch self {
             
+        case .loading:      return "loading"
+            
         case .account:      return "account"
         case .safety:       return "safety"
         case .community:    return "community"
@@ -54,7 +57,6 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
         case .nowGarden:    return "garden"
         case .lists:        return "lists"
         case .search:       return "search"
-        case .about:        return "about"
         case .latest:       return "latest"
         case .support:      return "support"
             
@@ -84,6 +86,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     init?(rawValue: String) {
         let splitString = rawValue.components(separatedBy: ".")
         switch splitString.first {
+        case "loading":     self = .loading
         case "account":     self = .account
         case "safety":      self = .safety
         case "community":   self = .community
@@ -91,7 +94,6 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
         case "garden":      self = .nowGarden
         case "lists":       self = .lists
         case "search":      self = .search
-        case "about":       self = .about
         case "latest":      self = .latest
         case "support":     self = .support
         case "following":
@@ -183,8 +185,6 @@ extension NavigationDestination {
             return .lolPink
         case .lists:
             return .lolPurple
-        case .about:
-            return .lolTeal.opacity(0.42)
         default:
             return .lolRandom(rawValue, not: .lolOrange)
         }

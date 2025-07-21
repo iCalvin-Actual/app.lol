@@ -44,8 +44,3 @@ struct AddressNowView: View {
         )
     }
 }
-
-#Preview {
-    let sceneModel = SceneModel.sample
-    AddressNowView(fetcher: sceneModel.addressSummary("app").nowFetcher)
-}

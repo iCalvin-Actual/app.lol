@@ -96,7 +96,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case .search:       return "/directory"
         case .lists:        return "/me"
         case .learn:        return "/about"
-        case .appLatest:    return "/now"
+        case .appLatest:    return "/latest"
         case .appSupport:   return "/support"
             
         case .newStatus:    return "/new"
@@ -153,7 +153,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case .account:
             return .account
         case .search:
-            return .directory
+            return .search
         case .nowGarden:
             return .nowGarden
         case .community:
@@ -168,8 +168,6 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
             return .editStatus(.autoUpdatingAddress, id: "")
         case .lists:
             return .lists
-        case .learn:
-            return .about
         case .appLatest:
             return .latest
         case .appSupport:

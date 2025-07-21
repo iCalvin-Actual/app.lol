@@ -16,16 +16,16 @@ protocol Menuable {
     associatedtype M: View
     
     @MainActor
-    func contextMenu(in scene: SceneModel, fetcher: Request?) -> M
+    func contextMenu(with book: AddressBook, fetcher: Request?) -> M
 }
 
 @MainActor
 extension Menuable {
     @ViewBuilder
-    func editingSection(in scene: SceneModel) -> some View {
-        if let editable = self as? Editable, scene.addressBook.myAddresses.contains(editable.owner) {
+    func editingSection(with addressBook: AddressBook) -> some View {
+        if let editable = self as? Editable, addressBook.myAddresses.contains(editable.owner) {
             NavigationLink {
-                scene.destinationConstructor.destination(editable.editingDestination)
+                addressBook.destinationConstructor.destination(editable.editingDestination)
             } label: {
                 Label("edit", systemImage: "pencil.line")
             }
@@ -37,17 +37,17 @@ extension Menuable {
 @MainActor
 struct ContextMenuBuilder<T: Menuable> {
     @ViewBuilder
-    func contextMenu(for item: T, fetcher: Request? = nil, sceneModel: SceneModel) -> some View {
-        item.contextMenu(in: sceneModel, fetcher: fetcher)
+    func contextMenu(for item: T, fetcher: Request? = nil, addressBook: AddressBook) -> some View {
+        item.contextMenu(with: addressBook, fetcher: fetcher)
     }
 }
 
 extension AddressManagable where Self: Menuable {
+    
     @MainActor
     @ViewBuilder
-    func manageSection(_ scene: SceneModel, fetcher: Request?) -> some View {
+    func manageSection(_ book: AddressBook, fetcher: Request?) -> some View {
         let name = owner
-        let book = scene.addressBook
         let isBlocked = book.isBlocked(name)
         let isPinned = book.isPinned(name)
         let canFollow = book.canFollow(name)
@@ -78,8 +78,8 @@ extension AddressManagable where Self: Menuable {
             
             if isPinned {
                 Button(action: {
-                    Task { [book, fetcher] in
-                        await book.removePin(name)
+                    book.removePin(name)
+                    Task { [fetcher] in
                         await fetcher?.updateIfNeeded(forceReload: true)
                     }
                 }, label: {
@@ -87,8 +87,8 @@ extension AddressManagable where Self: Menuable {
                 })
             } else {
                 Button(action: {
-                    Task { [book, fetcher] in
-                        await book.pin(name)
+                    book.pin(name)
+                    Task { [fetcher] in
                         await fetcher?.updateIfNeeded(forceReload: true)
                     }
                 }, label: {
@@ -190,7 +190,7 @@ extension Sharable where Self: Menuable {
 }
 
 extension Listable where Self: Menuable {
-    func contextMenu(in scene: SceneModel) -> some View {
+    func contextMenu(for book: AddressBook) -> some View {
         EmptyView()
     }
 }
@@ -198,9 +198,9 @@ extension Listable where Self: Menuable {
 extension ProfileMarkdown.Draft: Menuable {
     @ViewBuilder
     @MainActor
-    func contextMenu(in scene: SceneModel, fetcher: Request?) -> some View {
+    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
         Group {
-            self.editingSection(in: scene)
+            self.editingSection(with: book)
         }
     }
 }
@@ -208,10 +208,10 @@ extension ProfileMarkdown.Draft: Menuable {
 extension AddressModel: Menuable {
     @ViewBuilder
     @MainActor
-    func contextMenu(in scene: SceneModel, fetcher: Request?) -> some View {
+    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
         Group {
-            self.manageSection(scene, fetcher: fetcher)
-            self.editingSection(in: scene)
+            self.manageSection(book, fetcher: fetcher)
+            self.editingSection(with: book)
             self.shareSection()
         }
     }
@@ -219,10 +219,10 @@ extension AddressModel: Menuable {
 
 extension NowListing: Menuable {
     @ViewBuilder
-    func contextMenu(in scene: SceneModel, fetcher: Request?) -> some View {
+    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
         Group {
-            self.manageSection(scene, fetcher: fetcher)
-            self.editingSection(in: scene)
+            self.manageSection(book, fetcher: fetcher)
+            self.editingSection(with: book)
             self.shareSection()
         }
     }
@@ -230,10 +230,10 @@ extension NowListing: Menuable {
 
 extension PURLModel: Menuable {
     @ViewBuilder
-    func contextMenu(in scene: SceneModel, fetcher: Request?) -> some View {
+    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
         Group {
-            self.manageSection(scene, fetcher: fetcher)
-            self.editingSection(in: scene)
+            self.manageSection(book, fetcher: fetcher)
+            self.editingSection(with: book)
             self.shareSection()
         }
     }
@@ -241,10 +241,10 @@ extension PURLModel: Menuable {
 
 extension PasteModel: Menuable {
     @ViewBuilder
-    func contextMenu(in scene: SceneModel, fetcher: Request?) -> some View {
+    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
         Group {
-            self.manageSection(scene, fetcher: fetcher)
-            self.editingSection(in: scene)
+            self.manageSection(book, fetcher: fetcher)
+            self.editingSection(with: book)
             self.shareSection()
         }
     }
@@ -252,10 +252,10 @@ extension PasteModel: Menuable {
 
 extension StatusModel: Menuable {
     @ViewBuilder
-    func contextMenu(in scene: SceneModel, fetcher: Request?) -> some View {
+    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
         Group {
-            self.manageSection(scene, fetcher: fetcher)
-            self.editingSection(in: scene)
+            self.manageSection(book, fetcher: fetcher)
+            self.editingSection(with: book)
             self.shareSection()
         }
     }

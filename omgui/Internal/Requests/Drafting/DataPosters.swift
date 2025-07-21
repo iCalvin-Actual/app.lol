@@ -14,7 +14,7 @@ class DraftFetcher<D: SomeDraftable>: ModelBackedListDataFetcher<D.Draft> {
     
     var address: AddressName
     
-    init(_ address: AddressName, interface: DataInterface, addressBook: AddressBook, db: Blackbird.Database) {
+    init(_ address: AddressName, interface: DataInterface, addressBook: AddressBook.Scribbled, db: Blackbird.Database) {
         self.address = address
         super.init(addressBook: addressBook, interface: interface, db: db)
     }

@@ -9,7 +9,7 @@
 import AppKit
 #endif
 import SwiftUI
-import _WebKit_SwiftUI
+import WebKit
 
 struct PURLView: View {
     @Environment(\.dismiss)
@@ -21,8 +21,6 @@ struct PURLView: View {
     
     @Environment(\.viewContext)
     var context: ViewContext
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
     
     @ObservedObject
     var fetcher: AddressPURLDataFetcher

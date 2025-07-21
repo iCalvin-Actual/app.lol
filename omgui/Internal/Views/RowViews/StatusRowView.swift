@@ -9,16 +9,12 @@ import MarkdownUI
 import SwiftUI
 
 struct StatusRowView: View {
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
     @State
     var showURLs: Bool = false
     @State
     var presentUrl: URL?
     
-    @State
-    var destination: NavigationDestination?
-    @GestureState 
+    @GestureState
     private var zoom = 1.0
     
     let model: StatusModel
@@ -51,11 +47,6 @@ struct StatusRowView: View {
                 .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
         }
         .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection || context == .detail)
-        .sheet(item: $destination, content: { destination in
-            NavigationStack {
-                sceneModel.destinationConstructor.destination(destination)
-            }
-        })
         .confirmationDialog("Open Image", isPresented: $showURLs, actions: {
             ForEach(model.imageLinks) { link in
                 Button {

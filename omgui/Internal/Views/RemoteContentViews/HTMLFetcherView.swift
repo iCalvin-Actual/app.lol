@@ -9,7 +9,7 @@ import SwiftUI
 #if canImport(WebKit)
 import WebKit
 #endif
-import _WebKit_SwiftUI
+import WebKit
 
 
 struct AddressProfilePageView: View {

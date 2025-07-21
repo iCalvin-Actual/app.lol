@@ -12,7 +12,7 @@ import SwiftUI
 
 class AddressSummaryDataFetcher: DataFetcher {
     
-    let addressBook: AddressBook
+    let addressBook: AddressBook.Scribbled
     let database: Blackbird.Database
     
     var addressName: AddressName
@@ -29,9 +29,16 @@ class AddressSummaryDataFetcher: DataFetcher {
     var purls: [String: AddressPURLDataFetcher] = [:]
     var pastes: [String: AddressPasteDataFetcher] = [:]
     
+    @MainActor
+    lazy var profileFetcher: AddressProfilePageDataFetcher? = {
+        .init(addressName: addressName, interface: interface, db: database)
+    }()
+    @MainActor
+    lazy var nowFetcher: AddressNowPageDataFetcher? = {
+        .init(addressName: addressName, interface: interface, db: database)
+    }()
+    
     var iconFetcher: AddressIconDataFetcher
-    var profileFetcher: AddressProfilePageDataFetcher
-    var nowFetcher: AddressNowPageDataFetcher
     var purlFetcher: AddressPURLsDataFetcher
     var pasteFetcher: AddressPasteBinDataFetcher
     var statusFetcher: StatusLogDataFetcher
@@ -47,18 +54,16 @@ class AddressSummaryDataFetcher: DataFetcher {
     
     init(
         name: AddressName,
-        addressBook: AddressBook,
+        addressBook: AddressBook.Scribbled,
         interface: DataInterface,
         database: Blackbird.Database
     ) {
         self.addressBook = addressBook
         self.database = database
         self.addressName = name
-        let isMine = addressBook.myAddresses.contains(name)
-        let credential: APICredential? = isMine ? addressBook.apiKey : nil
+        let isMine = addressBook.mine.contains(name)
+        let credential: APICredential? = isMine ? addressBook.auth : nil
         self.iconFetcher = .init(address: name, interface: interface, db: database)
-        self.profileFetcher = .init(addressName: name, interface: interface, db: database)
-        self.nowFetcher = .init(addressName: name, interface: interface, db: database)
         self.purlFetcher = .init(name: name, credential: credential, addressBook: addressBook, interface: interface, db: database)
         self.pasteFetcher = .init(name: name, credential: credential, addressBook: addressBook, interface: interface, db: database)
         self.statusFetcher = .init(addresses: [name], addressBook: addressBook, interface: interface, db: database)
@@ -74,20 +79,22 @@ class AddressSummaryDataFetcher: DataFetcher {
         super.init(interface: interface)
     }
     
+    @MainActor
     func configure(name: AddressName, _ automation: AutomationPreferences = .init()) {
         self.addressName = name
+        let credential: APICredential? = addressBook.auth
         
-        let credential: APICredential? = addressBook.apiKey
+        profileFetcher?.configure(name)
+        nowFetcher?.configure(name)
+        
         self.iconFetcher = .init(address: name, interface: interface, db: database)
-        self.profileFetcher = .init(addressName: name, interface: interface, db: database)
-        self.nowFetcher = .init(addressName: name, interface: interface, db: database)
         self.purlFetcher = .init(name: name, credential: credential, addressBook: addressBook, interface: interface, db: database)
         self.pasteFetcher = .init(name: name, credential: credential, addressBook: addressBook, interface: interface, db: database)
         self.statusFetcher = .init(addresses: [name], addressBook: addressBook, interface: interface, db: database)
         self.bioFetcher = .init(address: name, interface: interface)
         self.followingFetcher = .init(address: name, credential: credential, interface: interface)
         self.followersFetcher = .init(address: name, credential: credential, interface: interface)
-        self.markdownFetcher = .init(name: name, credential: addressBook.apiKey, interface: interface, db: database)
+        self.markdownFetcher = .init(name: name, credential: addressBook.auth, interface: interface, db: database)
         
         super.configure(automation)
     }
@@ -98,19 +105,16 @@ class AddressSummaryDataFetcher: DataFetcher {
             return
         }
         
-        Task { @MainActor [iconFetcher, profileFetcher, nowFetcher, purlFetcher, pasteFetcher, statusFetcher, bioFetcher, followingFetcher] in
-            await iconFetcher.updateIfNeeded()
-            await bioFetcher.updateIfNeeded()
-            await profileFetcher.updateIfNeeded()
-            await markdownFetcher.updateIfNeeded()
-            await nowFetcher.updateIfNeeded()
-            await purlFetcher.updateIfNeeded()
-            await pasteFetcher.updateIfNeeded()
-            await statusFetcher.updateIfNeeded()
-            await followingFetcher.updateIfNeeded()
-            await followersFetcher.updateIfNeeded()
-        }
-        
+        await iconFetcher.updateIfNeeded()
+        await bioFetcher.updateIfNeeded()
+        await markdownFetcher.updateIfNeeded()
+        await purlFetcher.updateIfNeeded()
+        await pasteFetcher.updateIfNeeded()
+        await statusFetcher.updateIfNeeded()
+        await followingFetcher.updateIfNeeded()
+        await followersFetcher.updateIfNeeded()
+        await profileFetcher?.updateIfNeeded()
+        await nowFetcher?.updateIfNeeded()
         let info = try await interface.fetchAddressInfo(addressName)
         self.verified = false
         self.registered = info.date
@@ -151,11 +155,11 @@ class AddressPrivateSummaryDataFetcher: AddressSummaryDataFetcher {
     
     override init(
         name: AddressName,
-        addressBook: AddressBook,
+        addressBook: AddressBook.Scribbled,
         interface: DataInterface,
         database: Blackbird.Database
     ) {
-        self.blockedFetcher = .init(address: name, credential: addressBook.apiKey, interface: interface)
+        self.blockedFetcher = .init(address: name, credential: addressBook.auth, interface: interface)
         
 //        self.profilePoster = .init(
 //            name,
@@ -180,11 +184,8 @@ class AddressPrivateSummaryDataFetcher: AddressSummaryDataFetcher {
         
         super.init(name: name, addressBook: addressBook, interface: interface, database: database)
         
-        self.profileFetcher = .init(addressName: addressName, interface: interface, db: database)
-        self.followingFetcher = .init(address: addressName, credential: addressBook.apiKey, interface: interface)
-        
-        self.purlFetcher = .init(name: addressName, credential: addressBook.apiKey, addressBook: addressBook, interface: interface, db: database)
-        self.pasteFetcher = .init(name: addressName, credential: addressBook.apiKey, addressBook: addressBook, interface: interface, db: database)
+        self.purlFetcher = .init(name: addressName, credential: addressBook.auth, addressBook: addressBook, interface: interface, db: database)
+        self.pasteFetcher = .init(name: addressName, credential: addressBook.auth, addressBook: addressBook, interface: interface, db: database)
     }
     
     override func perform() async {

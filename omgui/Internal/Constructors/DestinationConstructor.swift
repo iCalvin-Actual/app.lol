@@ -9,10 +9,10 @@ import SwiftUI
 
 @MainActor
 struct DestinationConstructor {
-    @Environment(\.accessibilityReduceMotion)
-    var reduceAnimations
     
-    let sceneModel: SceneModel
+    let addressBook: AddressBook
+    let appSupportFetcher: AppSupportFetcher
+    let appLatestFetcher: AppLatestFetcher
 
     @ViewBuilder
     func destination(_ destination: NavigationDestination? = nil) -> some View {
@@ -31,52 +31,52 @@ struct DestinationConstructor {
     func viewContent(_ destination: NavigationDestination? = nil) -> some View {
         let destination = destination ?? .community
         switch destination {
-        case .directory:
-            SearchLanding(sceneModel: sceneModel)
-//            DirectoryView(fetcher: sceneModel.directoryFetcher)
         case .community:
-            CommunityView(sceneModel.statusFetcher)
+            CommunityView(addressBook.statusFetcher)
         case .address(let name):
-            AddressSummaryView(addressSummaryFetcher: sceneModel.addressSummary(name))
+            AddressSummaryView(addressSummaryFetcher: addressBook.addressSummary(name))
+                .environment(\.visibleAddress, name)
         case .webpage(let name):
-            AddressProfileView(fetcher: sceneModel.addressSummary(name).profileFetcher, mdFetcher: sceneModel.addressSummary(name).markdownFetcher, draftFetcher: sceneModel.profileDrafts)
+            if let profileFetcher = addressBook.addressSummary(name).profileFetcher {
+                AddressProfileView(fetcher: profileFetcher, mdFetcher: addressBook.addressSummary(name).markdownFetcher)
+            }
         case .now(let name):
-            AddressNowView(fetcher: sceneModel.addressSummary(name).nowFetcher)
+            if let nowFetcher = addressBook.addressSummary(name).nowFetcher {
+                AddressNowView(fetcher: nowFetcher)
+            }
         case .safety:
-            SafetyView(addressBook: sceneModel.addressBook)
+            SafetyView()
         case .nowGarden:
-            GardenView(fetcher: sceneModel.gardenFetcher)
+            GardenView(fetcher: addressBook.gardenFetcher)
         case .pastebin(let address):
-            AddressPastesView(fetcher: sceneModel.addressSummary(address).pasteFetcher)
+            AddressPastesView(fetcher: addressBook.addressSummary(address).pasteFetcher)
         case .paste(let address, id: let title):
             PasteView(
-                fetcher: sceneModel.appropriateFetcher(for: address).pasteFetcher(for: title)
+                fetcher: addressBook.appropriateFetcher(for: address).pasteFetcher(for: title)
             )
         case .purls(let address):
-            AddressPURLsView(fetcher: sceneModel.addressSummary(address).purlFetcher)
+            AddressPURLsView(fetcher: addressBook.addressSummary(address).purlFetcher)
         case .purl(let address, id: let title):
             PURLView(
-                fetcher: sceneModel.appropriateFetcher(for: address).purlFetcher(for: title)
+                fetcher: addressBook.appropriateFetcher(for: address).purlFetcher(for: title)
             )
         case .statusLog(let address):
             StatusList(
-                fetcher: sceneModel.appropriateFetcher(for: address).statusFetcher,
+                fetcher: addressBook.appropriateFetcher(for: address).statusFetcher,
                 filters: [FilterOption.fromOneOf([address])]
             )
         case .status(let address, id: let id):
-            StatusView(fetcher: sceneModel.appropriateFetcher(for: address).statusFetcher(for: id))
+            StatusView(fetcher: addressBook.appropriateFetcher(for: address).statusFetcher(for: id))
         case .account:
-            AccountView()
+            AccountView(viewModel: .init(scribble: addressBook.scribble))
         case .lists:
-            ListsView(sceneModel: sceneModel)
+            AccountView(viewModel: .init(scribble: addressBook.scribble))
         case .search:
-            SearchLanding(sceneModel: sceneModel)
-        case .about:
-            AboutView()
+            SearchLanding(viewModel: .init(scribble: addressBook.scribble))
         case .latest:
-            AddressNowView(fetcher: sceneModel.addressSummary("app").nowFetcher)
+            AddressNowView(fetcher: appLatestFetcher)
         case .support:
-            PasteView(fetcher: sceneModel.supportFetcher)
+            PasteView(fetcher: appSupportFetcher)
 //        case .following:
 //            FollowingView(addressBook)
 //        case .followingAddresses:

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ClientInfo {
+public struct ClientInfo: Sendable {
     let id: String
     let secret: String
     let urlScheme: String

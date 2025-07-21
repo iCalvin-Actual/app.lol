@@ -7,7 +7,7 @@
 
 import Blackbird
 import Foundation
-import _WebKit_SwiftUI
+import WebKit
 
 
 class ProfileMarkdownDataFetcher: ModelBackedDataFetcher<ProfileMarkdown> {
@@ -154,7 +154,8 @@ class AddressPURLDataFetcher: ModelBackedDataFetcher<PURLModel> {
     let title: String
     let credential: APICredential?
     
-    let page = WebPage()
+    @MainActor
+    lazy var page = { WebPage() }()
     
     init(name: AddressName, title: String, credential: APICredential? = nil, interface: any DataInterface, db: Blackbird.Database) {
         self.address = name

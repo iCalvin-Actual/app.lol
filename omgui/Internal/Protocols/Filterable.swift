@@ -31,6 +31,8 @@ enum FilterOption: Equatable, RawRepresentable, Identifiable {
             return "mine"
         case .following:
             return "following"
+        case .followers:
+            return "followers"
         }
     }
     
@@ -72,6 +74,8 @@ enum FilterOption: Equatable, RawRepresentable, Identifiable {
             self = .mine
         case "following":
             self = .following
+        case "followers":
+            self = .followers
         case "":
             self = .none
         default:
@@ -82,6 +86,7 @@ enum FilterOption: Equatable, RawRepresentable, Identifiable {
     case none
     case mine
     case following
+    case followers
     case blocked
     case notBlocked
     case from(AddressName)
@@ -105,7 +110,8 @@ enum FilterOption: Equatable, RawRepresentable, Identifiable {
     static var filterOptions: [FilterOption] {
         [
             .mine,
-            .following
+            .following,
+            .followers
         ]
     }
 }
@@ -129,14 +135,14 @@ protocol Filterable {
     var filterDate: Date? { get }
     
     @MainActor
-    func include(with filter: FilterOption, in scene: SceneModel) -> Bool
+    func include(with filter: FilterOption, with book: AddressBook) -> Bool
 }
 
 @MainActor
 extension Filterable {
-    func include(with filters: [FilterOption], in scene: SceneModel) -> Bool {
+    func include(with filters: [FilterOption], with book: AddressBook) -> Bool {
         for filter in filters {
-            if !include(with: filter, in: scene) {
+            if !include(with: filter, with: book) {
                 return false
             }
         }
@@ -169,14 +175,14 @@ extension QueryFilterable {
 
 extension Filterable {
     @MainActor
-    func include(with filter: FilterOption, in scene: SceneModel) -> Bool {
+    func include(with filter: FilterOption, with book: AddressBook) -> Bool {
         switch filter {
         case .none:
             return true
         case .notBlocked:
-            return !scene.addressBook.isBlocked(addressName)
+            return !book.isBlocked(addressName)
         case .blocked:
-            return scene.addressBook.isBlocked(addressName)
+            return book.isBlocked(addressName)
         case .from(let address):
             return addressName == address
         case .fromOneOf(let addresses):
@@ -196,9 +202,11 @@ extension Filterable {
                 return false
             }
         case .mine:
-            return scene.addressBook.myAddresses.contains(addressName)
+            return book.myAddresses.contains(addressName)
         case .following:
-            return scene.addressBook.following.contains(addressName)
+            return book.following.contains(addressName)
+        case .followers:
+            return book.followers.contains(addressName)
         }
         return true
     }
@@ -206,15 +214,15 @@ extension Filterable {
 
 extension Array<FilterOption> {
     @MainActor
-    func applyFilters<T: Filterable>(to inputModels: [T], in scene: SceneModel) -> [T] {
+    func applyFilters<T: Filterable>(to inputModels: [T], with book: AddressBook) -> [T] {
         inputModels
-            .filter({ $0.include(with: self, in: scene) })
+            .filter({ $0.include(with: self, with: book) })
     }
 }
 
 extension Array<FilterOption> {
     @MainActor
-    func asQuery<M: ModelBackedListable>(matchingAgainst addressBook: AddressBook) -> BlackbirdModelColumnExpression<M>? {
+    func asQuery<M: ModelBackedListable>(matchingAgainst addressBook: AddressBook.Scribbled) -> BlackbirdModelColumnExpression<M>? {
         var addressSet: Set<AddressName> = []
         var filters: [BlackbirdModelColumnExpression<M>] = reduce([]) { result, next in
             switch next {
@@ -222,7 +230,7 @@ extension Array<FilterOption> {
                 addressSet.formUnion(Set(addresses))
                 return result
             case .mine:
-                addressSet.formUnion(Set(addressBook.myAddresses))
+                addressSet.formUnion(Set(addressBook.mine))
                 return result
             case .following:
                 addressSet.formUnion(Set(addressBook.following))
@@ -244,15 +252,17 @@ extension Array<FilterOption> {
 
 extension FilterOption {
     @MainActor
-    func asQuery<M: ModelBackedListable>(_ adderessBook: AddressBook) -> BlackbirdModelColumnExpression<M>? {
+    func asQuery<M: ModelBackedListable>(_ adderessBook: AddressBook.Scribbled) -> BlackbirdModelColumnExpression<M>? {
         switch self {
         case .mine:
             return BlackbirdModelColumnExpression<M>
-                .valueIn(M.ownerKey, adderessBook.myAddresses)
+                .valueIn(M.ownerKey, adderessBook.mine)
         case .following:
             return .valueIn(M.ownerKey, adderessBook.following)
+        case .followers:
+            return .valueIn(M.ownerKey, adderessBook.followers)
         case .blocked:
-            return .valueIn(M.ownerKey, adderessBook.visibleBlocked)
+            return .valueIn(M.ownerKey, adderessBook.blocked)
         case .notBlocked:
             return .valueNotIn(M.ownerKey, adderessBook.appliedBlocked)
         case .from(let address):

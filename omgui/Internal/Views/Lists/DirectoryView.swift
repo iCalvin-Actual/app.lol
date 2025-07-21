@@ -19,11 +19,3 @@ struct DirectoryView: View {
         )
     }
 }
-
-#Preview {
-    let sceneModel = SceneModel.sample
-    let accountAuthFetcher = AccountAuthDataFetcher(authKey: nil, client: .sample, interface: SampleData())
-    DirectoryView(fetcher: .init(addressBook: sceneModel.addressBook, interface: sceneModel.interface, db: sceneModel.database))
-        .environment(sceneModel)
-        .environment(accountAuthFetcher)
-}

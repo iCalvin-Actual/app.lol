@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct GardenView: View {
-    
     @ObservedObject
     var fetcher: NowGardenDataFetcher
     

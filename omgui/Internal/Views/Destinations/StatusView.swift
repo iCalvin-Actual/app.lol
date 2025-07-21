@@ -11,8 +11,8 @@ struct StatusView: View {
     @ObservedObject
     var fetcher: StatusDataFetcher
     
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
+    @Environment(\.addressBook)
+    var addressBook
     @Environment(\.viewContext)
     var viewContext
     
@@ -37,8 +37,8 @@ struct StatusView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 32) {
-                if viewContext != .profile {
-                    AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: sceneModel.addressSummary(fetcher.address).bioFetcher)
+                if viewContext != .profile, let addressBook {
+                    AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: addressBook.addressSummary(fetcher.address).bioFetcher)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         .background(Material.thin)
@@ -178,10 +178,4 @@ struct StatusView: View {
             }
         }
     }
-}
-
-#Preview {
-    let sceneModel = SceneModel.sample
-    StatusView(fetcher: StatusDataFetcher(id: "", from: "app", interface: sceneModel.interface, db: sceneModel.database))
-        .environment(sceneModel)
 }

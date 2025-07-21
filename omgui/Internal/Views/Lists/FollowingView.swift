@@ -9,8 +9,8 @@ import Combine
 import SwiftUI
 
 struct FollowingView: View {
-    @Environment(SceneModel.self)
-    var scene
+    @Environment(\.addressBook)
+    var addressBook
     
     @State
     var needsRefresh: Bool = false
@@ -22,15 +22,15 @@ struct FollowingView: View {
     
     @ViewBuilder
     var followingView: some View {
-        if scene.addressBook.signedIn {
+        if let addressBook, addressBook.signedIn {
             StatusList(
                 fetcher: StatusLogDataFetcher(
-                    addresses: scene.addressBook.following,
-                    addressBook: scene.addressBook,
-                    interface: scene.interface,
-                    db: scene.database
+                    addresses: addressBook.following,
+                    addressBook: addressBook.scribble,
+                    interface: addressBook.interface,
+                    db: addressBook.database
                 ),
-                filters: [.fromOneOf(scene.addressBook.following)]
+                filters: [.fromOneOf(addressBook.following)]
             )
         } else {
             signedOutView

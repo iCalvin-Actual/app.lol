@@ -27,8 +27,7 @@ struct SearchLanding: View {
         }
     }
     
-    @ObservedObject
-    var viewModel: ListsViewModel
+    let viewModel: AccountViewModel
     
     @State
     var filter: SearchFilter? = nil
@@ -37,16 +36,12 @@ struct SearchLanding: View {
         TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass)
     }
     
-    init(sceneModel: SceneModel) {
-        viewModel = .init(sceneModel: sceneModel)
-    }
-    
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
                 LazyVStack(pinnedViews: [.sectionHeaders, .sectionFooters]) {
                     Section {
-                        ForEach(0..<64) { _ in
+                        ForEach(0..<128) { _ in
                             HStack {
                                 Text("Some result")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -73,22 +68,19 @@ struct SearchLanding: View {
             buttonGrid(width)
                 .padding(.horizontal, 8)
         } else {
-            if !searching {
-                pinnedItems
+            VStack {
+                if !searching {
+                    pinnedItems
+                }
+                buttonGrid(width)
+                    .padding(.horizontal, 8)
             }
         }
     }
     
     @ViewBuilder
     func footerToUse(_ width: CGFloat) -> some View {
-        if !TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
-            buttonGrid(width)
-                .padding(.horizontal, 8)
-            #if canImport(UIKit)
-                .padding(.bottom, searchActive && UIDevice.current.userInterfaceIdiom == .phone ? 78 : 0)
-                .padding(.bottom, UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass == .compact ? 8 : 0)
-            #endif
-        } else {
+        if TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
             if !searching {
                 pinnedItems
             }
@@ -121,7 +113,7 @@ struct SearchLanding: View {
                 .frame(maxWidth: .infinity)
             }
             .padding(.top, 16)
-            .background(Material.ultraThin, in: .rect(cornerRadius: .init(16), style: .continuous))
+            .background(Material.thin, in: .rect(cornerRadius: .init(16), style: .continuous))
             .padding(.horizontal, 12)
         }
     }
@@ -218,9 +210,4 @@ struct SearchNavigationButtonStyle: ButtonStyle {
         }
         return .regular
     }
-}
-
-#Preview {
-    SearchLanding(sceneModel: .sample)
-        .background(NavigationDestination.about.gradient)
 }

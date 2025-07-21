@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum AddressContent: String, Identifiable {
+enum AddressContent: String, Identifiable, CaseIterable {
     
     var id: String { displayString }
     
@@ -26,9 +26,9 @@ enum AddressContent: String, Identifiable {
         case .purl:
             return "PURLs"
         case .pastebin:
-            return "PasteBin"
+            return "Pastes"
         case .statuslog:
-            return "StatusLog"
+            return "Logs"
         }
     }
     var icon: String {

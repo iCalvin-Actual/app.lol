@@ -20,8 +20,8 @@ struct PasteView: View {
     
     @Environment(\.viewContext)
     var context: ViewContext
-    @Environment(SceneModel.self)
-    var sceneModel: SceneModel
+    @Environment(\.addressBook)
+    var addressBook
     
     @ObservedObject
     var fetcher: AddressPasteDataFetcher
@@ -128,22 +128,22 @@ struct PasteView: View {
                 }
                 #endif
             }
-            .onChange(of: fetcher.result, initial: false) { _, model in
+            .onReceive(fetcher.result.publisher, perform: { _ in
                 withAnimation {
-                    let address = model?.addressName ?? ""
-                    guard !address.isEmpty, sceneModel.addressBook.myAddresses.contains(address) else {
+                    let address = fetcher.result?.addressName ?? ""
+                    guard !address.isEmpty, (addressBook?.myAddresses ?? []).contains(address) else {
                         showDraft = false
                         return
                     }
-                    if model == nil && fetcher.title.isEmpty {
+                    if fetcher.result == nil && fetcher.title.isEmpty {
                         detent = .large
                         showDraft = true
-                    } else if model != nil {
+                    } else if fetcher.result != nil {
                         detent = .draftDrawer
                         showDraft = true
                     }
                 }
-            }
+            })
     }
     
     @ViewBuilder
