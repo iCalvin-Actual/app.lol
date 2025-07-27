@@ -7,6 +7,9 @@
 
 import Blackbird
 import Foundation
+import os
+
+private let logger = Logger(subsystem: "ViewModels", category: "model-errors")
 
 protocol BlackbirdListable: BlackbirdModel, Listable {
     static var sortingKey: BlackbirdColumnKeyPath { get }
@@ -328,6 +331,8 @@ public struct PasteModel: BlackbirdListable, Identifiable, RawRepresentable, Cod
 }
 
 public struct PURLModel: BlackbirdListable, Identifiable, RawRepresentable, Codable, Sendable {
+    var rowDestination: NavigationDestination { .purl(owner, id: name) }
+    
     public static var sortingKey: BlackbirdColumnKeyPath { \.$name }
     public static var ownerKey: BlackbirdColumnKeyPath { \.$owner }
     public static var primaryKey: [BlackbirdColumnKeyPath] { [\.$owner, \.$name] }
@@ -612,7 +617,7 @@ public struct StatusModel: BlackbirdListable, Identifiable, Sendable {
                     results.append(("", urlMatch))
                 })
             } catch {
-                print("Error while processing regex: \(error)")
+                logger.error("Error while processing regex: \(String(describing: error))")
             }
             
             return results
@@ -648,7 +653,7 @@ public struct StatusModel: BlackbirdListable, Identifiable, Sendable {
                     results.append((name, url))
                 }
             } catch {
-                print("Error while processing regex: \(error)")
+                logger.error("Error while processing regex: \(String(describing: error))")
             }
             
             return results
@@ -702,3 +707,4 @@ public struct AddressSummaryModel: BlackbirdModel, Sendable {
         self.bio = bio
     }
 }
+

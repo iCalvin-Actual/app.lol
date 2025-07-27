@@ -7,6 +7,9 @@
 
 import Combine
 import Foundation
+import os
+
+private let logger = Logger(subsystem: "Request", category: "lifecycle")
 
 struct AutomationPreferences {
     var autoLoad: Bool
@@ -43,9 +46,14 @@ class Request: ObservableObject {
         return Date().timeIntervalSince(loaded) < duration
     }
     
-    init(interface: DataInterface, automation: AutomationPreferences = .init()) {
-        self.interface = interface
+    deinit {
+        logger.debug("Deinit \(String(describing: self))")
+    }
+    
+    init(automation: AutomationPreferences = .init()) {
+        self.interface = AppClient.interface
         self.automation = automation
+        logger.debug("Init \(String(describing: self))")
     }
     
     func configure(_ automation: AutomationPreferences = .init()) {
@@ -60,10 +68,10 @@ class Request: ObservableObject {
         }
         loading = true
         guard forceReload || requestNeeded else {
-            print("Not performing on \(self)")
+            logger.debug("Not performing on \(String(describing: self))")
             return
         }
-        print("Performing on \(self)")
+        logger.debug("Performing on \(String(describing: self))")
         await perform()
     }
     
@@ -73,7 +81,7 @@ class Request: ObservableObject {
             try await throwingRequest()
             await fetchFinished()
         } catch {
-            print("🚨🚨🚨 Caught error: \(error) in \(self)")
+            logger.error("Caught error: \(String(describing: error)) in \(String(describing: self))")
             handle(error)
         }
     }
@@ -96,3 +104,4 @@ class Request: ObservableObject {
         error = incomingError
     }
 }
+

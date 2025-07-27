@@ -15,10 +15,10 @@ class ProfileMarkdownDataFetcher: ModelBackedDataFetcher<ProfileMarkdown> {
     let addressName: AddressName
     let credential: APICredential
     
-    init(name: AddressName, credential: APICredential, interface: DataInterface, db: Blackbird.Database) {
+    init(name: AddressName, credential: APICredential) {
         self.addressName = name
         self.credential = credential
-        super.init(interface: interface, db: db)
+        super.init()
     }
     
     @MainActor
@@ -39,9 +39,9 @@ class ProfileMarkdownDataFetcher: ModelBackedDataFetcher<ProfileMarkdown> {
 class AddressNowDataFetcher: ModelBackedDataFetcher<NowModel> {
     let addressName: AddressName
     
-    init(name: AddressName, interface: DataInterface, db: Blackbird.Database) {
+    init(name: AddressName) {
         self.addressName = name
-        super.init(interface: interface, db: db)
+        super.init()
     }
     
     @MainActor
@@ -79,10 +79,10 @@ class StatusDataFetcher: ModelBackedDataFetcher<StatusModel> {
         })
     }
     
-    init(id: String, from address: String, interface: DataInterface, db: Blackbird.Database) {
+    init(id: String, from address: String) {
         self.address = address
         self.id = id
-        super.init(interface: interface, db: db)
+        super.init()
     }
     
     @MainActor
@@ -90,7 +90,6 @@ class StatusDataFetcher: ModelBackedDataFetcher<StatusModel> {
         do {
             result = try await StatusModel.read(from: db, id: id)
         } catch {
-            print("Error")
             throw(error)
         }
     }
@@ -116,13 +115,18 @@ class StatusDataFetcher: ModelBackedDataFetcher<StatusModel> {
 class AddressPasteDataFetcher: ModelBackedDataFetcher<PasteModel> {
     let address: AddressName
     let title: String
-    let credential: APICredential?
+    var credential: APICredential?
     
-    init(name: AddressName, title: String, credential: APICredential? = nil, interface: any DataInterface, db: Blackbird.Database) {
+    init(name: AddressName, title: String, credential: APICredential? = nil) {
         self.address = name
         self.title = title
         self.credential = credential
-        super.init(interface: interface, db: db)
+        super.init()
+    }
+    
+    func configure(credential: APICredential?, _ automation: AutomationPreferences = .init()) {
+        self.credential = credential
+        super.configure(automation)
     }
     
     @MainActor
@@ -152,16 +156,21 @@ class AddressPasteDataFetcher: ModelBackedDataFetcher<PasteModel> {
 class AddressPURLDataFetcher: ModelBackedDataFetcher<PURLModel> {
     let address: AddressName
     let title: String
-    let credential: APICredential?
+    var credential: APICredential?
     
     @MainActor
     lazy var page = { WebPage() }()
     
-    init(name: AddressName, title: String, credential: APICredential? = nil, interface: any DataInterface, db: Blackbird.Database) {
+    init(name: AddressName, title: String, credential: APICredential? = nil) {
         self.address = name
         self.title = title
         self.credential = credential
-        super.init(interface: interface, db: db)
+        super.init()
+    }
+    
+    func configure(credential: APICredential?, _ automation: AutomationPreferences = .init()) {
+        self.credential = credential
+        super.configure(automation)
     }
     
 //    var draftPoster: PURLDraftPoster? {

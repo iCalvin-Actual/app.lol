@@ -14,9 +14,9 @@ class DraftFetcher<D: SomeDraftable>: ModelBackedListDataFetcher<D.Draft> {
     
     var address: AddressName
     
-    init(_ address: AddressName, interface: DataInterface, addressBook: AddressBook.Scribbled, db: Blackbird.Database) {
+    init(_ address: AddressName, addressBook: AddressBook) {
         self.address = address
-        super.init(addressBook: addressBook, interface: interface, db: db)
+        super.init(addressBook: addressBook)
     }
 }
 
@@ -36,20 +36,19 @@ class DraftPoster<D: SomeDraftable>: Request, @MainActor Identifiable {
     
     @Published
     var result: D?
-    
-    let db: Blackbird.Database
+    @Environment(\.blackbird)
+    var db: Blackbird.Database
     
     var navigationTitle: String {
         "New"
     }
     
-    init(_ address: AddressName, draft: D.Draft, interface: DataInterface, credential: APICredential, addressBook: AddressBook, db: Blackbird.Database) {
+    init(_ address: AddressName, draft: D.Draft, credential: APICredential, addressBook: AddressBook) {
         self.address = address
         self.credential = credential
         self.draft = draft
         self.originalDraft = draft
-        self.db = db
-        super.init(interface: interface)
+        super.init()
     }
     
     @MainActor
@@ -107,7 +106,7 @@ class MDDraftPoster<D: MDDraftable>: DraftPoster<D> {
     
     init(_ address: AddressName, draftItem: D.MDDraftItem, interface: DataInterface, credential: APICredential, addressBook: AddressBook, db: Blackbird.Database) {
         self.mdDraft = draftItem
-        super.init(address, draft: draftItem as! D.Draft, interface: interface, credential: credential, addressBook: addressBook, db: db)
+        super.init(address, draft: draftItem as! D.Draft, credential: credential, addressBook: addressBook)
     }
 }
 

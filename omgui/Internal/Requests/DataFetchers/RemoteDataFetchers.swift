@@ -9,16 +9,16 @@ import Blackbird
 import Combine
 import Foundation
 import WebKit
+import os
+
+private let logger = Logger(subsystem: "RemoteDataFetchers", category: "webpage")
 
 typealias AddressProfilePageDataFetcher = WebPageDataFetcher<AddressProfilePage>
 typealias AddressNowPageDataFetcher = WebPageDataFetcher<NowModel>
 
 @MainActor
 final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFetcher<M>, Sendable {
-    @Published
-    var addressName: AddressName
-    
-    var address: AddressName { addressName }
+    let address: AddressName
     
     var html: String?
     
@@ -37,10 +37,10 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
         return url
     }
     
-    init(addressName: AddressName, html: String? = nil, interface: DataInterface, db: Blackbird.Database) {
-        self.addressName = addressName
+    init(addressName: AddressName, html: String? = nil) {
+        self.address = addressName
         self.html = html
-        super.init(interface: interface, db: db)
+        super.init()
         if let html {
             Task {
                 await loadPage(html)
@@ -59,7 +59,7 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
                 }
             }
         } catch {
-            print(error.localizedDescription)
+            logger.error("WebPageDataFetcher navigation error: \(String(describing: error))")
         }
     }
     
@@ -93,10 +93,10 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
         }
         let themes = try? await interface.fetchThemes()
         return themes?.first(where: { $0.id == themeId })
-}
+    }
     
     override func fetchModels() async throws {
-        self.result = try await M.read(from: db, id: addressName)
+        self.result = try await M.read(from: db, id: address)
         if let resultContent = result?.htmlContent, html != resultContent {
             self.html = resultContent
             await loadPage(resultContent)
@@ -113,12 +113,6 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
         }
         return html.hashValue
     }
-    
-    @MainActor
-    func configure(_ name: AddressName, _ automation: AutomationPreferences = .init()) {
-        addressName = name
-        super.configure(automation)
-    }
 }
 
 class URLContentDataFetcher: DataFetcher {
@@ -130,7 +124,7 @@ class URLContentDataFetcher: DataFetcher {
     init(url: URL, html: String? = nil, interface: DataInterface) {
         self.url = url
         self.html = html
-        super.init(interface: interface)
+        super.init()
     }
     
     override func throwingRequest() async throws {
@@ -151,7 +145,7 @@ class AddressAvailabilityDataFetcher: DataFetcher {
     
     init(address: AddressName, interface: DataInterface) {
         self.address = address
-        super.init(interface: interface)
+        super.init()
     }
     
     func fetchAddress(_ address: AddressName) async throws {
@@ -174,9 +168,9 @@ class AddressAvailabilityDataFetcher: DataFetcher {
 class AddressIconDataFetcher: ModelBackedDataFetcher<AddressIconModel> {
     let address: AddressName
     
-    init(address: AddressName, interface: DataInterface, db: Blackbird.Database) {
+    init(address: AddressName) {
         self.address = address
-        super.init(interface: interface, db: db)
+        super.init()
     }
     
     override func fetchModels() async throws {
@@ -206,4 +200,3 @@ extension Optional<ThemeModel> {
         }
     }
 }
-

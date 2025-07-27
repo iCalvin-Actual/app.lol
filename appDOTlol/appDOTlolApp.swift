@@ -10,6 +10,12 @@ import omgapi
 import SwiftUI
 
 struct AppClient {
+    enum Error: String, Swift.Error {
+        case notYourAddress
+    }
+    static let interface = APIDataInterface()
+    /*SampleData()*/
+    /* static let interface = SampleData() */
     static var info: ClientInfo {
         ClientInfo(
             id: "5e171c460ba4b7a7ceaf86295ac169d2",
@@ -18,12 +24,7 @@ struct AppClient {
             callback: "://oauth"
         )
     }
-    static let interface = APIDataInterface() /*SampleData()*/
-}
-
-@main
-struct appDOTlolApp: App {
-    static var database: Blackbird.Database = {
+    static let database: Blackbird.Database = {
         do {
             return try .init(path:
                         FileManager.default
@@ -35,63 +36,23 @@ struct appDOTlolApp: App {
             return try! .inMemoryDatabase()
         }
     }()
+}
+
+@main
+struct appDOTlolApp: App {
     
-    @StateObject
-    var accountAddressesFetcher: AccountAddressDataFetcher
-    @StateObject
-    var globalBlocklistFetcher: AddressBlockListDataFetcher
-    @StateObject
-    var localBlocklistFetcher: LocalBlockListDataFetcher
-    @StateObject
-    var pinnedFetcher: PinnedListDataFetcher
+    static let termsUpdated: Date = .init(timeIntervalSince1970: 1727921377)
     
-    @StateObject
-    var directoryFetcher: GlobalAddressDirectoryFetcher
-    @StateObject
-    var gardenFetcher: GlobalNowGardenFetcher
-    @StateObject
-    var statusFetcher: GlobalStatusLogFetcher
-    @StateObject
-    var supportFetcher: AppSupportFetcher
-    @StateObject
-    var appLatestFetcher: AppLatestFetcher
+    let profileCache: ProfileCache = .init()
+    let privateCache: PrivateCache = .init()
     
-    init() {
-        self._accountAddressesFetcher = StateObject(wrappedValue: AccountAddressDataFetcher(credential: "", interface: AppClient.interface))
-        self._globalBlocklistFetcher = StateObject(wrappedValue: .init(address: "app", credential: nil, interface: AppClient.interface))
-        self._localBlocklistFetcher = StateObject(wrappedValue: .init(interface: AppClient.interface))
-        self._pinnedFetcher = StateObject(wrappedValue: .init(interface: AppClient.interface))
-        self._directoryFetcher = StateObject(wrappedValue: .init(interface: AppClient.interface, db: Self.database))
-        self._gardenFetcher = StateObject(wrappedValue: .init(interface: AppClient.interface, db: Self.database))
-        self._statusFetcher = StateObject(wrappedValue: .init(interface: AppClient.interface, db: Self.database))
-        self._supportFetcher = StateObject(wrappedValue: .init(interface: AppClient.interface, db: Self.database))
-        self._appLatestFetcher = StateObject(wrappedValue: .`init`(interface: AppClient.interface, db: Self.database))
-    }
+    init() { }
     
     var body: some Scene {
         WindowGroup {
-            OMGScene(
-                client: AppClient.info,
-                interface: AppClient.interface,
-                db: Self.database
-            )
-            .environment(\.apiInterface, AppClient.interface)
-            .environment(\.omgClient, AppClient.info)
-            .environment(\.blackbird, Self.database)
-            .environment(\.addressFetcher, accountAddressesFetcher)
-            .environment(\.globalBlocklist, globalBlocklistFetcher)
-            .environment(\.localBlocklist, localBlocklistFetcher)
-            .environment(\.pinnedFetcher, pinnedFetcher)
-            .environment(\.globalDirectoryFetcher, directoryFetcher)
-            .environment(\.globalGardenFetcher, gardenFetcher)
-            .environment(\.globalStatusLogFetcher, statusFetcher)
-            .environment(\.appSupportFetcher, supportFetcher)
-            .environment(\.appLatestFetcher, appLatestFetcher)
-            .task { [directoryFetcher, gardenFetcher, statusFetcher] in
-                async let _ = directoryFetcher.updateIfNeeded(forceReload: true)
-                async let _ = gardenFetcher.updateIfNeeded(forceReload: true)
-                async let _ = statusFetcher.updateIfNeeded(forceReload: true)
-            }
+            OMGScene(AppClient.interface)
+                .environment(\.profileCache, profileCache)
+                .environment(\.privateCache, privateCache)
         }
     }
 }

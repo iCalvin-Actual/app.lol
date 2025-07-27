@@ -11,6 +11,7 @@ struct SearchLanding: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.isSearching) var searching
     @Environment(\.searchActive) var searchActive
+    @Environment(\.addressBook) var addressBook
     
     enum SearchFilter {
         case address
@@ -26,8 +27,6 @@ struct SearchLanding: View {
             return Array(repeating: GridItem(.flexible()), count: 2)
         }
     }
-    
-    let viewModel: AccountViewModel
     
     @State
     var filter: SearchFilter? = nil
@@ -49,8 +48,6 @@ struct SearchLanding: View {
                         }
                     } header: {
                         headerToUse(proxy.size.width)
-                    } footer: {
-                        footerToUse(proxy.size.width)
                     }
                 }
                 .padding(.horizontal, 8)
@@ -58,7 +55,6 @@ struct SearchLanding: View {
 #if !os(tvOS)
             .scrollContentBackground(.hidden)
 #endif
-            .animation(.default, value: viewModel.pinned)
         }
     }
     
@@ -69,9 +65,6 @@ struct SearchLanding: View {
                 .padding(.horizontal, 8)
         } else {
             VStack {
-                if !searching {
-                    pinnedItems
-                }
                 buttonGrid(width)
                     .padding(.horizontal, 8)
             }
@@ -79,17 +72,8 @@ struct SearchLanding: View {
     }
     
     @ViewBuilder
-    func footerToUse(_ width: CGFloat) -> some View {
-        if TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
-            if !searching {
-                pinnedItems
-            }
-        }
-    }
-    
-    @ViewBuilder
     var pinnedItems: some View {
-        if viewModel.showPinned && filter == nil {
+        if !addressBook.pinned.isEmpty && filter == nil {
             VStack(spacing: 0) {
                 Label {
                     Text("Pinned")
@@ -103,7 +87,7 @@ struct SearchLanding: View {
                 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 0) {
-                        ForEach(viewModel.pinned) { address in
+                        ForEach(addressBook.pinned) { address in
                             AddressCard(address, embedInMenu: true)
                                 .frame(maxWidth: 88)
                         }

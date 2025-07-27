@@ -13,7 +13,7 @@ struct OnboardingView: View {
     @Namespace
     var namespace
     
-    @AppStorage("app.lol.terms")
+    @AppStorage("lol.terms")
     var acceptedTerms: TimeInterval = 0
     
     @Environment(\.dismiss)

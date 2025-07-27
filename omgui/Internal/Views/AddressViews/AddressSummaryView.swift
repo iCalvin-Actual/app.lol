@@ -21,11 +21,14 @@ struct AddressSummaryView: View {
     @Environment(\.blackbird)
     var database
     
+    @StateObject
+    var addressSummaryFetcher: AddressSummaryDataFetcher
+    
     @State
     var expandBio: Bool = false
     
-    @ObservedObject
-    var addressSummaryFetcher: AddressSummaryDataFetcher
+    let address: AddressName
+    let addressBook: AddressBook
     
     private var allPages: [AddressContent] {
         [
@@ -37,11 +40,17 @@ struct AddressSummaryView: View {
         ]
     }
     
+    init(_ addressName: AddressName, addressBook: AddressBook) {
+        self.address = addressName
+        self.addressBook = addressBook
+        self._addressSummaryFetcher = .init(wrappedValue: .init(name: addressName, addressBook: .init(), interface: AppClient.interface))
+    }
+    
     var body: some View {
         sizeAppropriateBody
             .environment(\.viewContext, .profile)
-            .task { @MainActor [addressSummaryFetcher] in
-                await addressSummaryFetcher.updateIfNeeded()
+            .task { @MainActor [weak addressSummaryFetcher] in
+                await addressSummaryFetcher?.updateIfNeeded()
             }
     }
     
@@ -76,13 +85,13 @@ struct AddressSummaryView: View {
     func fetcherForContent(_ content: AddressContent) -> Request {
         switch content {
         case .now:
-            return addressSummaryFetcher.nowFetcher ?? .init(addressName: addressSummaryFetcher.nowFetcher?.addressName ?? "", interface: apiInterface, db: database)
+            return addressSummaryFetcher.nowFetcher ?? .init(addressName: addressSummaryFetcher.nowFetcher?.address ?? "")
         case .pastebin:
             return addressSummaryFetcher.pasteFetcher
         case .purl:
             return addressSummaryFetcher.purlFetcher
         case .profile:
-            return addressSummaryFetcher.profileFetcher ?? .init(addressName: addressSummaryFetcher.nowFetcher?.addressName ?? "", interface: apiInterface, db: database)
+            return addressSummaryFetcher.profileFetcher ?? .init(addressName: addressSummaryFetcher.profileFetcher?.address ?? "")
         case .statuslog:
             return addressSummaryFetcher.statusFetcher
         }

@@ -40,6 +40,15 @@ class SidebarModel {
             case .app:          return "app.lol"
             }
         }
+        
+        var collapsible: Bool {
+            switch self {
+            case .directory:
+                return true
+            default:
+                return false
+            }
+        }
     }
     
     var tabs: [NavigationItem] {
@@ -58,36 +67,23 @@ class SidebarModel {
         [.app]
     }
     
-    var pinnedFetcher: PinnedListDataFetcher?
+    var addressBook: AddressBook
     
-    init(pinnedFetcher: PinnedListDataFetcher?) {
-        self.pinnedFetcher = pinnedFetcher
+    init(addressBook: AddressBook) {
+        self.addressBook = addressBook
     }
     
     func items(for section: Section, sizeClass: UserInterfaceSizeClass?, context: ViewContext) -> [NavigationItem] {
         switch section {
             
         case .directory:
-            var destinations: [NavigationItem] = []
-            if #unavailable(iOS 18.0) {
-                destinations.append(.search)
-            }
-            destinations.append(
-                contentsOf: pinnedFetcher?.results.map(({ $0.addressName })).sorted().map({ .pinnedAddress($0) }) ?? []
-            )
-            return destinations
+            return addressBook.pinned.sorted().map({ .pinnedAddress($0) })
             
         case .now:
-            let destinations = [
-                NavigationItem.nowGarden
-            ]
-            return destinations
+            return [.nowGarden]
             
         case .status:
-            let destinations = [
-                NavigationItem.community
-            ]
-            return destinations
+            return [.community]
             
         case .app:
             if context == .detail {

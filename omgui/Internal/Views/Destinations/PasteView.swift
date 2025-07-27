@@ -22,23 +22,30 @@ struct PasteView: View {
     var context: ViewContext
     @Environment(\.addressBook)
     var addressBook
-    
-    @ObservedObject
-    var fetcher: AddressPasteDataFetcher
+    @Environment(\.credentialFetcher)
+    var credential
     
     @State
     var showDraft: Bool = false
     @State
     var detent: PresentationDetent = .draftDrawer
     
+    @StateObject
+    var fetcher: AddressPasteDataFetcher
+    
+    init(_ id: String, from address: AddressName) {
+        _fetcher = .init(wrappedValue: .init(name: address, title: id))
+    }
+    
     var body: some View {
         mainContent
-            .onChange(of: fetcher.address, {
-                Task { [fetcher] in
-                    await fetcher.updateIfNeeded(forceReload: true)
+            .task {
+                let addressCredential = credential(fetcher.address)
+                if fetcher.credential != addressCredential {
+                    fetcher.configure(credential: addressCredential)
                 }
-            })
-            .onChange(of: fetcher.title, {
+            }
+            .onChange(of: fetcher.credential, {
                 Task { [fetcher] in
                     await fetcher.updateIfNeeded(forceReload: true)
                     
@@ -131,7 +138,7 @@ struct PasteView: View {
             .onReceive(fetcher.result.publisher, perform: { _ in
                 withAnimation {
                     let address = fetcher.result?.addressName ?? ""
-                    guard !address.isEmpty, (addressBook?.myAddresses ?? []).contains(address) else {
+                    guard !address.isEmpty, addressBook.mine.contains(address) else {
                         showDraft = false
                         return
                     }

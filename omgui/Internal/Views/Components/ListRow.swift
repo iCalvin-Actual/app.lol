@@ -51,6 +51,7 @@ struct ListRow<T: Listable>: View {
     }
     
     @Environment(\.isSearching) var isSearching
+    @Environment(\.presentListable) var present
     
     var verticalPadding: CGFloat {
         switch activeStyle {
@@ -72,6 +73,10 @@ struct ListRow<T: Listable>: View {
             .foregroundStyle(Color.primary)
             .padding(2)
             .animation(.easeInOut(duration: 0.42), value: selected.wrappedValue)
+            .contentShape(RoundedRectangle(cornerRadius: 12))
+            .onTapGesture {
+                present?(model)
+            }
     }
     
     @ViewBuilder

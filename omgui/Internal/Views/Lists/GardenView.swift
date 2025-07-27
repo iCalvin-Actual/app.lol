@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct GardenView: View {
-    @ObservedObject
-    var fetcher: NowGardenDataFetcher
+    @Environment(\.nowGardenFetcher)
+    var fetcher
     
     var body: some View {
-        ListView<NowListing, EmptyView>(dataFetcher: fetcher)
+        if let fetcher {
+            ListView<NowListing, EmptyView>(dataFetcher: fetcher)
+        }
     }
 }
 

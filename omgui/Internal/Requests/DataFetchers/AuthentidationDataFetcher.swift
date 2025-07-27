@@ -8,18 +8,18 @@
 import AuthenticationServices
 import Combine
 import SwiftUI
+import os
+
+private let logger = Logger(subsystem: "AccountAuthDataFetcher", category: "auth")
 
 @Observable
-final class AccountAuthDataFetcher: NSObject, Sendable {
+final class AccountAuthDataFetcher: Sendable {
     
     private let webSession: WebAuthenticationSession
     
     private var url: URL? {
         interface.authURL()
     }
-    
-//    var loaded = false
-//    var loading = false
     
     let authKey: Binding<APICredential>?
     
@@ -31,7 +31,6 @@ final class AccountAuthDataFetcher: NSObject, Sendable {
         self.client = client
         self.interface = interface
         self.authKey = authKey
-        super.init()
     }
     
     private func authenticate() async throws {
@@ -54,7 +53,7 @@ final class AccountAuthDataFetcher: NSObject, Sendable {
             )
             setToken(token)
         } catch {
-            print("Received error: \(error.localizedDescription)")
+            logger.error("Received error: \(String(describing: error))")
         }
     }
     
@@ -67,7 +66,7 @@ final class AccountAuthDataFetcher: NSObject, Sendable {
             do {
                 try await authenticate()
             } catch {
-                print("Authentication error: \(error.localizedDescription)")
+                logger.error("Authentication error: \(String(describing: error))")
             }
         }
     }

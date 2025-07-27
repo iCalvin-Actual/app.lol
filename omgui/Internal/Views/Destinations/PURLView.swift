@@ -17,13 +17,10 @@ struct PURLView: View {
     @Environment(\.horizontalSizeClass)
     var sizeClass
     @Environment(\.viewContext)
-    var viewContext
+    var context
     
-    @Environment(\.viewContext)
-    var context: ViewContext
-    
-    @ObservedObject
-    var fetcher: AddressPURLDataFetcher
+    @Environment(\.credentialFetcher)
+    var credential
     
     @State
     var showDraft: Bool = false
@@ -33,22 +30,19 @@ struct PURLView: View {
     @State
     var presented: URL? = nil
     
+    @StateObject
+    var fetcher: AddressPURLDataFetcher
+    
+    init(id: String, from address: AddressName) {
+        _fetcher = .init(wrappedValue: .init(name: address, title: id))
+    }
+    
     var body: some View {
         preview
-            .onChange(of: fetcher.address, {
-                Task { [fetcher] in
-                    await fetcher.updateIfNeeded(forceReload: true)
-                }
-            })
-            .onChange(of: fetcher.title, {
-                Task { [fetcher] in
-                    await fetcher.updateIfNeeded(forceReload: true)
-                }
-            })
-            .onAppear {
-                Task { [fetcher] in
-                    await fetcher.updateIfNeeded()
-                }
+            .task { [weak fetcher] in
+                guard let fetcher else { return }
+                fetcher.configure(credential: credential(fetcher.address))
+                await fetcher.updateIfNeeded()
             }
             .toolbar {
 ////                ToolbarItem(placement: .topBarTrailing) {
@@ -220,11 +214,7 @@ struct PURLView: View {
 }
 
 #Preview {
-    let sceneModel = SceneModel.sample
-    let purlFetcher = AddressPURLDataFetcher(name: "app", title: "privacy", interface: SampleData(), db: sceneModel.database)
     NavigationStack {
-        PURLView(fetcher: purlFetcher)
+        PURLView(id: "privacy", from: "app")
     }
-    .environment(sceneModel)
 }
-

@@ -14,9 +14,9 @@ class AddressBioDataFetcher: DataFetcher {
     @Published
     var bio: AddressSummaryModel?
     
-    init(address: AddressName, interface: DataInterface) {
+    init(address: AddressName) {
         self.address = address
-        super.init(interface: interface)
+        super.init()
     }
     
     @MainActor

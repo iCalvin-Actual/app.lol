@@ -11,23 +11,18 @@ import SwiftUI
 struct StatusList: View {
     @Environment(\.horizontalSizeClass)
     var sizeClass
+    @Environment(\.addressBook)
+    var addressBook
+    @Environment(\.credentialFetcher)
+    var credential
+    @Environment(\.addressSummaryFetcher)
+    var summary
     
-    @ObservedObject
+    @StateObject
     var fetcher: StatusLogDataFetcher
-    let filters: [FilterOption]
     
-    var menuBuilder: ContextMenuBuilder<StatusModel>?
-    
-    var usingRegular: Bool {
-        if #available(iOS 18.0, visionOS 2.0, *) {
-            return TabBar.usingRegularTabBar(sizeClass: sizeClass)
-        } else {
-            #if canImport(UIKit)
-            return sizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad
-            #else
-            return true
-            #endif
-        }
+    init(_ addresses: [AddressName], addressBook: AddressBook) {
+        _fetcher = .init(wrappedValue: .init(addresses: addresses, addressBook: addressBook))
     }
     
     var body: some View {
@@ -35,7 +30,12 @@ struct StatusList: View {
             filters: .everyone,
             dataFetcher: fetcher
         )
-#if !os(tvOS)
+        .task { [weak fetcher] in
+            guard let fetcher else { return }
+            fetcher.configure(addressBook: addressBook)
+            await fetcher.updateIfNeeded()
+        }
+        #if !os(tvOS)
         .toolbarRole(.editor)
         #endif
     }

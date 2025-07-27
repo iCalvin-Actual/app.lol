@@ -41,14 +41,14 @@ class GlobalStatusLogFetcher: GlobalListDataFetcher<StatusModel> {
     }
 }
 class AppSupportFetcher: AddressPasteDataFetcher {
-    init(interface: any DataInterface, db: Blackbird.Database) {
-        super.init(name: "app", title: "support", interface: interface, db: db)
+    init() {
+        super.init(name: "app", title: "support")
     }
 }
 typealias AppLatestFetcher = AddressNowPageDataFetcher
 extension AppLatestFetcher {
     static func `init`(interface: any DataInterface, db: Blackbird.Database) -> AppLatestFetcher {
-        .init(addressName: "app", interface: interface, db: db)
+        .init(addressName: "app")
     }
 }
 class AddressDirectoryDataFetcher: ModelBackedListDataFetcher<AddressModel> {
@@ -58,7 +58,7 @@ class AddressDirectoryDataFetcher: ModelBackedListDataFetcher<AddressModel> {
         items.hashValue
     }
     
-    func configure(addressBook: AddressBook.Scribbled?, _ automation: AutomationPreferences = .init()) {
+    func configure(addressBook: AddressBook, _ automation: AutomationPreferences = .init()) {
         if self.addressBook != addressBook {
             results = []
         }
@@ -72,7 +72,7 @@ class AccountAddressDataFetcher: DataBackedListDataFetcher<AddressModel> {
     }
     private var credential: String
     
-    @AppStorage("app.lol.cache.myAddresses")
+    @AppStorage("lol.cache.myAddresses")
     var localAddressesCache: String = ""
     
     var myAddresses: [AddressName] {
@@ -85,14 +85,16 @@ class AccountAddressDataFetcher: DataBackedListDataFetcher<AddressModel> {
         }
     }
     
-    init(credential: APICredential, interface: DataInterface) {
+    init(credential: APICredential) {
         self.credential = credential
-        super.init(interface: interface)
+        super.init()
     }
     
     func configure(credential: APICredential, _ automation: AutomationPreferences = .init()) {
-        self.credential = credential
-        super.configure(automation)
+        if self.credential != credential {
+            self.credential = credential
+            super.configure(automation)
+        }
     }
     
     @MainActor
@@ -122,10 +124,10 @@ class AddressFollowingDataFetcher: DataBackedListDataFetcher<AddressModel> {
         "following"
     }
     
-    init(address: AddressName, credential: APICredential?, interface: DataInterface) {
+    init(address: AddressName, credential: APICredential?) {
         self.address = address
         self.credential = credential
-        super.init(interface: interface)
+        super.init()
     }
     
     func configure(address: AddressName, credential: APICredential?, _ automation: AutomationPreferences = .init()) {
@@ -140,9 +142,11 @@ class AddressFollowingDataFetcher: DataBackedListDataFetcher<AddressModel> {
     @MainActor
     override func throwingRequest() async throws {
         guard !address.isEmpty else {
+            results = []
             return
         }
-        self.results = try await interface.fetchAddressFollowing(address).map({ AddressModel(name: $0) })
+        let fetched = try await interface.fetchAddressFollowing(address).map({ AddressModel(name: $0) })
+        self.results = fetched
     }
     
     @MainActor
@@ -175,13 +179,13 @@ class AddressFollowersDataFetcher: DataBackedListDataFetcher<AddressModel> {
     var credential: APICredential?
     
     override var title: String {
-        "following"
+        "followers"
     }
     
-    init(address: AddressName, credential: APICredential?, interface: DataInterface) {
+    init(address: AddressName, credential: APICredential?) {
         self.address = address
         self.credential = credential
-        super.init(interface: interface)
+        super.init()
     }
     
     func configure(address: AddressName, credential: APICredential?, _ automation: AutomationPreferences = .init()) {
@@ -199,9 +203,12 @@ class AddressFollowersDataFetcher: DataBackedListDataFetcher<AddressModel> {
             return
         }
         
-        let results = try await interface.fetchAddressFollowers(address).map({ AddressModel(name: $0) })
-        
-        self.results = results
+        do {
+            let results = try await interface.fetchAddressFollowers(address).map({ AddressModel(name: $0) })
+            self.results = results
+        } catch {
+            throw error
+        }
     }
 }
 
@@ -213,10 +220,10 @@ class AddressBlockListDataFetcher: DataBackedListDataFetcher<AddressModel> {
         "blocked from \(address)"
     }
     
-    init(address: AddressName, credential: APICredential?, interface: DataInterface, automation: AutomationPreferences = .init()) {
+    init(address: AddressName, credential: APICredential?, automation: AutomationPreferences = .init()) {
         self.address = address
         self.credential = credential
-        super.init(interface: interface)
+        super.init()
     }
     
     func configure(address: AddressName, credential: APICredential?, _ automation: AutomationPreferences = .init()) {
@@ -291,7 +298,7 @@ class NowGardenDataFetcher: ModelBackedListDataFetcher<NowListing> {
         items.hashValue
     }
     
-    func configure(addressBook: AddressBook.Scribbled?, automation: AutomationPreferences = .init()) {
+    func configure(addressBook: AddressBook, automation: AutomationPreferences = .init()) {
         if self.addressBook != addressBook {
             results = []
         }
@@ -302,12 +309,16 @@ class NowGardenDataFetcher: ModelBackedListDataFetcher<NowListing> {
 
 class AddressPasteBinDataFetcher: ModelBackedListDataFetcher<PasteModel> {
     let addressName: AddressName
-    let credential: APICredential?
+    var credential: APICredential?
     
-    init(name: AddressName, pastes: [PasteModel] = [], credential: APICredential?, addressBook: AddressBook.Scribbled, interface: DataInterface, db: Blackbird.Database) {
+    init(name: AddressName, credential: APICredential?, addressBook: AddressBook) {
         self.addressName = name
+        super.init(addressBook: addressBook, filters: [.from(name)])
+    }
+    
+    func configure(credential: APICredential?, _ automation: AutomationPreferences = .init()) {
         self.credential = credential
-        super.init(addressBook: addressBook, interface: interface, db: db, filters: [.from(name)])
+        super.configure(automation)
     }
     
     override func fetchRemote() async throws -> Int {
@@ -315,8 +326,7 @@ class AddressPasteBinDataFetcher: ModelBackedListDataFetcher<PasteModel> {
             return 0
         }
         let pastes = try await interface.fetchAddressPastes(addressName, credential: credential).filter {
-            print("Checking \($0.addressName) \($0.name)")
-            guard $0.addressName == "app" else {
+            guard $0.addressName == "app" && addressBook.mine.contains($0.addressName) else {
                 return true
             }
             return $0.name != "app.lol.blocked"
@@ -331,12 +341,19 @@ class AddressPasteBinDataFetcher: ModelBackedListDataFetcher<PasteModel> {
 
 class AddressPURLsDataFetcher: ModelBackedListDataFetcher<PURLModel> {
     let addressName: AddressName
-    let credential: APICredential?
+    var credential: APICredential?
     
-    init(name: AddressName, purls: [PURLModel] = [], credential: APICredential?, addressBook: AddressBook.Scribbled, interface: DataInterface, db: Blackbird.Database) {
+    init(name: AddressName, purls: [PURLModel] = [], credential: APICredential?, addressBook: AddressBook) {
         self.addressName = name
         self.credential = credential
-        super.init(addressBook: addressBook, interface: interface, db: db, filters: [.from(name)])
+        super.init(addressBook: addressBook, filters: [.from(name)])
+    }
+    
+    func configure(_ newValue: APICredential?, _ automation: AutomationPreferences = .init()) {
+        if credential != newValue {
+            credential = newValue
+        }
+        super.configure(automation)
     }
     
     override func fetchRemote() async throws -> Int {
@@ -358,7 +375,7 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
     
     override var title: String { displayTitle }
     
-    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook.Scribbled, interface: DataInterface, db: Blackbird.Database) {
+    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook) {
         self.displayTitle = title ?? {
             switch addresses.count {
             case 0:
@@ -370,7 +387,7 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
             }
         }()
         self.addresses = addresses
-        super.init(addressBook: addressBook, interface: interface, db: db, filters: addresses.isEmpty ? [] : [.fromOneOf(addresses)])
+        super.init(addressBook: addressBook, filters: addresses.isEmpty ? [] : [.fromOneOf(addresses)])
     }
     
     override func fetchRemote() async throws -> Int {
@@ -392,7 +409,7 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
         }
     }
     
-    func configure(addressBook: AddressBook.Scribbled?, _ automation: AutomationPreferences = .init()) {
+    func configure(addressBook: AddressBook, _ automation: AutomationPreferences = .init()) {
         if self.addressBook != addressBook {
             results = []
         }

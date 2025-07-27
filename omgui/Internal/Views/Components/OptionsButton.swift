@@ -16,8 +16,9 @@ struct OptionsButton: View {
     var accountFetcher
     
     var body: some View {
-        if addressBook?.signedIn ?? false {
+        if addressBook.signedIn {
             loggedInMenu
+                .tint(.accent)
         } else {
             loggedOutMenu
         }

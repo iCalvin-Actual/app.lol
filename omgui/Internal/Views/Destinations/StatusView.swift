@@ -8,14 +8,13 @@
 import SwiftUI
 
 struct StatusView: View {
-    @ObservedObject
-    var fetcher: StatusDataFetcher
     
     @Environment(\.addressBook)
     var addressBook
     @Environment(\.viewContext)
     var viewContext
-    
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetcher
     @Environment(\.openURL)
     var openUrl
     
@@ -27,25 +26,16 @@ struct StatusView: View {
     @State
     var expandBio: Bool = false
     
-    @State
-    var dummyValue: Bool = false
+    @StateObject
+    var fetcher: StatusDataFetcher
     
-    init(fetcher: StatusDataFetcher) {
-        self.fetcher = fetcher
+    init(address: AddressName, id: String) {
+        _fetcher = .init(wrappedValue: .init(id: id, from: address))
     }
     
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 32) {
-                if viewContext != .profile, let addressBook {
-                    AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: addressBook.addressSummary(fetcher.address).bioFetcher)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                        .background(Material.thin)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                        .background(Color.clear)
-                }
                 if let model = fetcher.result {
                     StatusRowView(model: model)
                         .environment(\.viewContext, ViewContext.detail)

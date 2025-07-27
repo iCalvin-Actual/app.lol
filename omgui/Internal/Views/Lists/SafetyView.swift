@@ -11,6 +11,11 @@ struct SafetyView: View {
     @Environment(\.addressBook)
     var addressBook
     
+    @Environment(\.addressFollowingFetcher) var following
+    @Environment(\.addressBlockListFetcher) var blocked
+    @Environment(\.localBlocklist) var localBlocked
+    @Environment(\.pinnedFetcher) var pinned
+    
     var menuBuilder: ContextMenuBuilder<AddressModel> = .init()
     
     @State
@@ -30,10 +35,10 @@ struct SafetyView: View {
             #endif
             
             Section("blocked") {
-                if (addressBook?.visibleBlocked ?? []).isEmpty {
+                if addressBook.blocked.isEmpty {
                     Text("If you wan't to stop seeing content from an address, Long Press the address or avatar and select Safety > Block")
-                } else if let addressBook {
-                    ForEach(addressBook.visibleBlocked.map({ AddressModel(name: $0) })) { item in
+                } else {
+                    ForEach(addressBook.blocked.map({ AddressModel(name: $0) })) { item in
                         ListRow(model: item)
                             .tag(item)
                         #if !os(tvOS)
@@ -41,7 +46,17 @@ struct SafetyView: View {
                         #endif
                             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                             .contextMenu(menuItems: {
-                                menuBuilder.contextMenu(for: item, fetcher: nil, addressBook: addressBook)
+                                menuBuilder.contextMenu(
+                                    for: item,
+                                    fetcher: nil,
+                                    addressBook: addressBook,
+                                    menuFetchers: (
+                                        following,
+                                        blocked,
+                                        localBlocked,
+                                        pinned
+                                    )
+                                )
                             })
                     }
                 }

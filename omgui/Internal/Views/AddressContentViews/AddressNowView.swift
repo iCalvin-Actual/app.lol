@@ -8,16 +8,15 @@
 import SwiftUI
 
 struct AddressNowView: View {
-    @ObservedObject
+    @StateObject
     var fetcher: AddressNowPageDataFetcher
+    
+    init(_ address: AddressName) {
+        _fetcher = .init(wrappedValue: .init(addressName: address))
+    }
     
     var body: some View {
         htmlBody
-            .onChange(of: fetcher.addressName, {
-                Task { [fetcher] in
-                    await fetcher.updateIfNeeded(forceReload: true)
-                }
-            })
             .onAppear {
                 Task { @MainActor [fetcher] in
                     await fetcher.updateIfNeeded()
@@ -38,7 +37,6 @@ struct AddressNowView: View {
     var htmlBody: some View {
         AddressNowPageView(
             fetcher: fetcher,
-            activeAddress: fetcher.addressName,
             htmlContent: fetcher.result?.html,
             baseURL: nil
         )

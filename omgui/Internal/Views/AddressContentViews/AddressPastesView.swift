@@ -8,13 +8,25 @@
 import SwiftUI
 
 struct AddressPastesView: View {
-    @ObservedObject
+    @Environment(\.credentialFetcher) var credential
+    @StateObject
     var fetcher: AddressPasteBinDataFetcher
+    
+    init(_ address: AddressName, addressBook: AddressBook) {
+        _fetcher = .init(wrappedValue: .init(name: address, credential: "", addressBook: addressBook))
+    }
     
     var body: some View {
         ListView<PasteModel, EmptyView>(
             filters: .everyone,
             dataFetcher: fetcher
         )
+        .task {
+            let auth = credential(fetcher.addressName)
+            Task { [weak fetcher] in
+                fetcher?.configure(credential: auth)
+                await fetcher?.updateIfNeeded()
+            }
+        }
     }
 }

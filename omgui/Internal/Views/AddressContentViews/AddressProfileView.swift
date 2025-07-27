@@ -18,32 +18,21 @@ struct AddressProfileView: View {
     @State
     var showDrafts: Bool = false
     
-    @ObservedObject
+    @StateObject
     var fetcher: AddressProfilePageDataFetcher
-    @ObservedObject
-    var mdFetcher: ProfileMarkdownDataFetcher
-    
     @State
     var draftPoster: ProfileMarkdownDraftPoster?
     @State
     var selectedDraft: ProfileMarkdown.Draft?
     
-    init(fetcher: AddressProfilePageDataFetcher, mdFetcher: ProfileMarkdownDataFetcher) {
-        self.fetcher = fetcher
-        self.mdFetcher = mdFetcher
+    init(_ name: AddressName) {
+        _fetcher = .init(wrappedValue: .init(addressName: name))
     }
     
     var body: some View {
         htmlBody
-            .onChange(of: fetcher.addressName) {
-                Task { [fetcher] in
-                    await fetcher.updateIfNeeded(forceReload: true)
-                }
-            }
-            .onAppear {
-                Task { @MainActor [fetcher] in
-                    await fetcher.updateIfNeeded(forceReload: true)
-                }
+            .task { [weak fetcher] in
+                await fetcher?.updateIfNeeded()
             }
     }
     
@@ -51,7 +40,6 @@ struct AddressProfileView: View {
     var htmlBody: some View {
         AddressProfilePageView(
             fetcher: fetcher,
-            activeAddress: fetcher.addressName,
             htmlContent: fetcher.result?.content,
             baseURL: nil
         )

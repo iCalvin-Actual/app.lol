@@ -17,6 +17,8 @@ struct Sidebar: View {
     var setAddress
     @Environment(\.destinationConstructor)
     var destinationConstructor
+    @Environment(\.pinnedFetcher)
+    var pinned
     
     @SceneStorage("app.tab.selected")
     var selected: NavigationItem?
@@ -25,11 +27,11 @@ struct Sidebar: View {
     var expandAddresses: Bool = false
     
     var sidebarModel: SidebarModel {
-        .init(pinnedFetcher: addressBook?.pinnedAddressFetcher)
+        .init(addressBook: addressBook)
     }
     
     private var myAddresses: [AddressName] {
-        addressBook?.myAddresses ?? []
+        addressBook.mine
     }
     
     var body: some View {
@@ -75,50 +77,22 @@ struct Sidebar: View {
         guard !address.isEmpty else {
             return false
         }
-        return addressBook?.actingAddress == address
+        return addressBook.me == address
     }
     
     @ViewBuilder
     private func contextMenu(for item: NavigationItem) -> some View {
         switch item {
         case .pinnedAddress(let address):
-            let pinnedAddressFetcher = sidebarModel.pinnedFetcher
             Button(action: {
-                addressBook?.removePin(address)
-                Task { @MainActor in
-                    await pinnedAddressFetcher?.updateIfNeeded(forceReload: true)
+                Task { [weak pinned] in
+                    await pinned?.removePin(address)
                 }
             }, label: {
                 Label("Un-Pin \(address.addressDisplayString)", systemImage: "pin.slash")
             })
         default:
             EmptyView()
-        }
-    }
-    
-    @ViewBuilder
-    private var addressPickerSection: some View {
-        if !myAddresses.isEmpty {
-            Section {
-                ForEach(myAddresses) { address in
-                    Button {
-                        setAddress(address)
-                    } label: {
-                        addressOption(address)
-                    }
-                }
-            } header: {
-                Text("Select active address")
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func addressOption(_ address: AddressName) -> some View {
-        if isActingAddress(address) {
-            Label(address, systemImage: "checkmark")
-        } else {
-            Label(title: { Text(address) }, icon: { EmptyView() })
         }
     }
     

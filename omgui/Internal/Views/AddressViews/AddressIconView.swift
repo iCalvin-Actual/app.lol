@@ -6,6 +6,11 @@ struct AddressIconView<S: Shape>: View {
     @Environment(\.addressBook)
     var addressBook
     
+    @Environment(\.addressFollowingFetcher) var following
+    @Environment(\.addressBlockListFetcher) var blocked
+    @Environment(\.localBlocklist) var localBlocked
+    @Environment(\.pinnedFetcher) var pinned
+    
     let address: AddressName
     let size: CGFloat
     
@@ -40,19 +45,25 @@ struct AddressIconView<S: Shape>: View {
     
     @ViewBuilder
     var menu: some View {
-        if let addressBook {
-            Menu {
-                menuBuilder.contextMenu(for: .init(name: address), addressBook: addressBook)
-            } label: {
-                iconView
-            }
+        Menu {
+            menuBuilder.contextMenu(
+                for: .init(name: address),
+                addressBook: addressBook,
+                menuFetchers: (
+                    following,
+                    blocked,
+                    localBlocked,
+                    pinned
+                )
+            )
+        } label: {
+            iconView
         }
     }
     
     @ViewBuilder
     var iconView: some View {
-        let data = addressBook?.appropriateFetcher(for: address).iconFetcher.result?.data
-        let fallback = AsyncImage(url: address.addressIconURL) { image in
+        AsyncImage(url: address.addressIconURL) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: size, height: size)
@@ -62,27 +73,5 @@ struct AddressIconView<S: Shape>: View {
         }
         .frame(width: size, height: size)
         .clipShape(contentShape)
-        
-        #if canImport(UIKit)
-        if let data = data, let dataImage = UIImage(data: data) {
-            Image(uiImage: dataImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: size, height: size)
-                .clipShape(contentShape)
-        }
-        else { fallback }
-        #else
-        if let data = data, let dataImage = NSImage(data: data) {
-            Image(nsImage: dataImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: size, height: size)
-                .clipShape(contentShape)
-        }
-        else {
-            fallback
-        }
-        #endif
     }
 }

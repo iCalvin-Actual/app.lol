@@ -12,33 +12,39 @@ protocol AddressManagable {
     var owner: AddressName { get }
 }
 
+typealias ContextMenuFetchers = (
+    following: AddressFollowingDataFetcher?,
+    blocked: AddressBlockListDataFetcher?,
+    localBlocked: LocalBlockListDataFetcher?,
+    pinned: PinnedListDataFetcher?
+)
 protocol Menuable {
     associatedtype M: View
     
     @MainActor
-    func contextMenu(with book: AddressBook, fetcher: Request?) -> M
+    func contextMenu(
+        with book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuFetchers
+    ) -> M
 }
 
 @MainActor
 extension Menuable {
     @ViewBuilder
-    func editingSection(with addressBook: AddressBook) -> some View {
-        if let editable = self as? Editable, addressBook.myAddresses.contains(editable.owner) {
-            NavigationLink {
-                addressBook.destinationConstructor.destination(editable.editingDestination)
-            } label: {
-                Label("edit", systemImage: "pencil.line")
-            }
-            Divider()
-        }
-    }
+    func editingSection(with addressBook: AddressBook) -> some View { }
 }
 
 @MainActor
 struct ContextMenuBuilder<T: Menuable> {
     @ViewBuilder
-    func contextMenu(for item: T, fetcher: Request? = nil, addressBook: AddressBook) -> some View {
-        item.contextMenu(with: addressBook, fetcher: fetcher)
+    func contextMenu(
+        for item: T,
+        fetcher: Request? = nil,
+        addressBook: AddressBook,
+        menuFetchers: ContextMenuFetchers
+    ) -> some View {
+        item.contextMenu(with: addressBook, fetcher: fetcher, menuFetchers: menuFetchers)
     }
 }
 
@@ -46,20 +52,24 @@ extension AddressManagable where Self: Menuable {
     
     @MainActor
     @ViewBuilder
-    func manageSection(_ book: AddressBook, fetcher: Request?) -> some View {
+    func manageSection(
+        _ book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuFetchers
+    ) -> some View {
         let name = owner
-        let isBlocked = book.isBlocked(name)
-        let isPinned = book.isPinned(name)
-        let canFollow = book.canFollow(name)
-        let canUnfollow = book.canUnFollow(name)
+        let isBlocked = book.appliedBlocked.contains(name)
+        let isPinned = book.pinned.contains(name)
+        let canFollow = !book.followers.contains(name)
+        let canUnfollow = book.followers.contains(name)
         NavigationLink(value: NavigationDestination.address(name)) {
             Label("view profile", systemImage: "person.fill")
         }
         if !isBlocked {
             if canFollow {
                 Button(action: {
-                    Task {
-                        await book.follow(name)
+                    Task { [weak followingFetcher = menuFetchers.following, weak fetcher] in
+                        await followingFetcher?.follow(name, credential: book.auth)
                         await fetcher?.updateIfNeeded(forceReload: true)
                     }
                 }, label: {
@@ -67,8 +77,8 @@ extension AddressManagable where Self: Menuable {
                 })
             } else if canUnfollow {
                 Button(action: {
-                    Task {
-                        await book.unFollow(name)
+                    Task { [weak followingFetcher = menuFetchers.following, weak fetcher] in
+                        await followingFetcher?.unFollow(name, credential: book.auth)
                         await fetcher?.updateIfNeeded(forceReload: true)
                     }
                 }, label: {
@@ -78,8 +88,8 @@ extension AddressManagable where Self: Menuable {
             
             if isPinned {
                 Button(action: {
-                    book.removePin(name)
-                    Task { [fetcher] in
+                    Task { [weak pinnedFetcher = menuFetchers.pinned, weak fetcher] in
+                        await pinnedFetcher?.removePin(name)
                         await fetcher?.updateIfNeeded(forceReload: true)
                     }
                 }, label: {
@@ -87,8 +97,8 @@ extension AddressManagable where Self: Menuable {
                 })
             } else {
                 Button(action: {
-                    book.pin(name)
-                    Task { [fetcher] in
+                    Task { [weak pinnedFetcher = menuFetchers.pinned, weak fetcher] in
+                        await pinnedFetcher?.pin(name)
                         await fetcher?.updateIfNeeded(forceReload: true)
                     }
                 }, label: {
@@ -99,8 +109,9 @@ extension AddressManagable where Self: Menuable {
             Divider()
             Menu {
                 Button(role: .destructive, action: {
-                    Task {
-                        await book.block(name)
+                    Task { [weak fetcher, weak addressBlockedFetcher = menuFetchers.blocked, weak localBlockedFetcher = menuFetchers.localBlocked] in
+                        await addressBlockedFetcher?.block(name, credential: book.auth)
+                        await localBlockedFetcher?.insert(name)
                         await fetcher?.updateIfNeeded(forceReload: true)
                     }
                 }, label: {
@@ -113,10 +124,11 @@ extension AddressManagable where Self: Menuable {
             }
             Divider()
         } else {
-            if book.canUnblock(name) {
+            if book.blocked.contains(name) {
                 Button(action: {
-                    Task { [book, fetcher] in
-                        await book.unblock(name)
+                    Task { [weak fetcher, weak addressBlockedFetcher = menuFetchers.blocked, weak localBlockedFetcher = menuFetchers.localBlocked] in
+                        await addressBlockedFetcher?.unBlock(name, credential: book.auth)
+                        await localBlockedFetcher?.remove(name)
                         await fetcher?.updateIfNeeded(forceReload: true)
                     }
                 }, label: {
@@ -198,7 +210,11 @@ extension Listable where Self: Menuable {
 extension ProfileMarkdown.Draft: Menuable {
     @ViewBuilder
     @MainActor
-    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
+    func contextMenu(
+        with book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuFetchers
+    ) -> some View {
         Group {
             self.editingSection(with: book)
         }
@@ -208,9 +224,13 @@ extension ProfileMarkdown.Draft: Menuable {
 extension AddressModel: Menuable {
     @ViewBuilder
     @MainActor
-    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
+    func contextMenu(
+        with book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuFetchers
+    ) -> some View {
         Group {
-            self.manageSection(book, fetcher: fetcher)
+            self.manageSection(book, fetcher: fetcher, menuFetchers: menuFetchers)
             self.editingSection(with: book)
             self.shareSection()
         }
@@ -219,9 +239,13 @@ extension AddressModel: Menuable {
 
 extension NowListing: Menuable {
     @ViewBuilder
-    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
+    func contextMenu(
+        with book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuFetchers
+    ) -> some View {
         Group {
-            self.manageSection(book, fetcher: fetcher)
+            self.manageSection(book, fetcher: fetcher, menuFetchers: menuFetchers)
             self.editingSection(with: book)
             self.shareSection()
         }
@@ -230,9 +254,13 @@ extension NowListing: Menuable {
 
 extension PURLModel: Menuable {
     @ViewBuilder
-    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
+    func contextMenu(
+        with book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuFetchers
+    ) -> some View {
         Group {
-            self.manageSection(book, fetcher: fetcher)
+            self.manageSection(book, fetcher: fetcher, menuFetchers: menuFetchers)
             self.editingSection(with: book)
             self.shareSection()
         }
@@ -241,9 +269,13 @@ extension PURLModel: Menuable {
 
 extension PasteModel: Menuable {
     @ViewBuilder
-    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
+    func contextMenu(
+        with book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuFetchers
+    ) -> some View {
         Group {
-            self.manageSection(book, fetcher: fetcher)
+            self.manageSection(book, fetcher: fetcher, menuFetchers: menuFetchers)
             self.editingSection(with: book)
             self.shareSection()
         }
@@ -252,9 +284,13 @@ extension PasteModel: Menuable {
 
 extension StatusModel: Menuable {
     @ViewBuilder
-    func contextMenu(with book: AddressBook, fetcher: Request?) -> some View {
+    func contextMenu(
+        with book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuFetchers
+    ) -> some View {
         Group {
-            self.manageSection(book, fetcher: fetcher)
+            self.manageSection(book, fetcher: fetcher, menuFetchers: menuFetchers)
             self.editingSection(with: book)
             self.shareSection()
         }

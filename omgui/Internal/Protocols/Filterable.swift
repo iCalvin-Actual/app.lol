@@ -180,9 +180,9 @@ extension Filterable {
         case .none:
             return true
         case .notBlocked:
-            return !book.isBlocked(addressName)
+            return !book.appliedBlocked.contains(addressName)
         case .blocked:
-            return book.isBlocked(addressName)
+            return book.appliedBlocked.contains(addressName)
         case .from(let address):
             return addressName == address
         case .fromOneOf(let addresses):
@@ -202,7 +202,7 @@ extension Filterable {
                 return false
             }
         case .mine:
-            return book.myAddresses.contains(addressName)
+            return book.mine.contains(addressName)
         case .following:
             return book.following.contains(addressName)
         case .followers:
@@ -222,7 +222,7 @@ extension Array<FilterOption> {
 
 extension Array<FilterOption> {
     @MainActor
-    func asQuery<M: ModelBackedListable>(matchingAgainst addressBook: AddressBook.Scribbled) -> BlackbirdModelColumnExpression<M>? {
+    func asQuery<M: ModelBackedListable>(matchingAgainst addressBook: AddressBook) -> BlackbirdModelColumnExpression<M>? {
         var addressSet: Set<AddressName> = []
         var filters: [BlackbirdModelColumnExpression<M>] = reduce([]) { result, next in
             switch next {
@@ -252,7 +252,7 @@ extension Array<FilterOption> {
 
 extension FilterOption {
     @MainActor
-    func asQuery<M: ModelBackedListable>(_ adderessBook: AddressBook.Scribbled) -> BlackbirdModelColumnExpression<M>? {
+    func asQuery<M: ModelBackedListable>(_ adderessBook: AddressBook) -> BlackbirdModelColumnExpression<M>? {
         switch self {
         case .mine:
             return BlackbirdModelColumnExpression<M>

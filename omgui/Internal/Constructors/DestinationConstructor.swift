@@ -11,11 +11,15 @@ import SwiftUI
 struct DestinationConstructor {
     
     let addressBook: AddressBook
-    let appSupportFetcher: AppSupportFetcher
-    let appLatestFetcher: AppLatestFetcher
-
+    
     @ViewBuilder
     func destination(_ destination: NavigationDestination? = nil) -> some View {
+        destinationBuilder(destination)
+    }
+    
+
+    @ViewBuilder
+    func destinationBuilder(_ destination: NavigationDestination?) -> some View {
         if let destination {
             viewContent(destination)
                 .background(destination.gradient)
@@ -28,55 +32,44 @@ struct DestinationConstructor {
     }
         
     @ViewBuilder
-    func viewContent(_ destination: NavigationDestination? = nil) -> some View {
+    func viewContent(_ destination: NavigationDestination?) -> some View {
         let destination = destination ?? .community
         switch destination {
         case .community:
-            CommunityView(addressBook.statusFetcher)
+            CommunityView()
         case .address(let name):
-            AddressSummaryView(addressSummaryFetcher: addressBook.addressSummary(name))
+            AddressSummaryView(name, addressBook: addressBook)
                 .environment(\.visibleAddress, name)
         case .webpage(let name):
-            if let profileFetcher = addressBook.addressSummary(name).profileFetcher {
-                AddressProfileView(fetcher: profileFetcher, mdFetcher: addressBook.addressSummary(name).markdownFetcher)
-            }
+            AddressProfileView(name)
         case .now(let name):
-            if let nowFetcher = addressBook.addressSummary(name).nowFetcher {
-                AddressNowView(fetcher: nowFetcher)
-            }
+            AddressNowView(name)
         case .safety:
             SafetyView()
         case .nowGarden:
-            GardenView(fetcher: addressBook.gardenFetcher)
+            GardenView()
         case .pastebin(let address):
-            AddressPastesView(fetcher: addressBook.addressSummary(address).pasteFetcher)
+            AddressPastesView(address, addressBook: addressBook)
         case .paste(let address, id: let title):
-            PasteView(
-                fetcher: addressBook.appropriateFetcher(for: address).pasteFetcher(for: title)
-            )
+            PasteView(title, from: address)
         case .purls(let address):
-            AddressPURLsView(fetcher: addressBook.addressSummary(address).purlFetcher)
+            AddressPURLsView(address, addressBook: addressBook)
         case .purl(let address, id: let title):
-            PURLView(
-                fetcher: addressBook.appropriateFetcher(for: address).purlFetcher(for: title)
-            )
+            PURLView(id: title, from: address)
         case .statusLog(let address):
-            StatusList(
-                fetcher: addressBook.appropriateFetcher(for: address).statusFetcher,
-                filters: [FilterOption.fromOneOf([address])]
-            )
+            StatusList([address], addressBook: addressBook)
         case .status(let address, id: let id):
-            StatusView(fetcher: addressBook.appropriateFetcher(for: address).statusFetcher(for: id))
+            StatusView(address: address, id: id)
         case .account:
-            AccountView(viewModel: .init(scribble: addressBook.scribble))
+            AccountView()
         case .lists:
-            AccountView(viewModel: .init(scribble: addressBook.scribble))
+            AccountView()
         case .search:
-            SearchLanding(viewModel: .init(scribble: addressBook.scribble))
+            SearchLanding()
         case .latest:
-            AddressNowView(fetcher: appLatestFetcher)
+            AddressNowView("app")
         case .support:
-            PasteView(fetcher: appSupportFetcher)
+            PasteView("support", from: "app")
 //        case .following:
 //            FollowingView(addressBook)
 //        case .followingAddresses:

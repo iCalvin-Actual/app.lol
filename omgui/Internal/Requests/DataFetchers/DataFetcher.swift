@@ -10,6 +10,9 @@ import Blackbird
 import Combine
 import SwiftUI
 import Foundation
+import os
+
+private let logger = Logger(subsystem: "DataFetcher", category: "fetcher")
 
 class DataFetcher: Request {
     var summaryString: String? {
@@ -47,12 +50,12 @@ class ListFetcher<T: Listable>: Request {
         }
     }
     
-    init(items: [T] = [], interface: DataInterface, limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
+    init(items: [T] = [], limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
         self.results = items
         self.limit = limit
         self.filters = filters
         self.sort = sort
-        super.init(interface: interface, automation: automation)
+        super.init(automation: automation)
         self.loaded = items.isEmpty ? nil : .init()
     }
     
@@ -62,13 +65,14 @@ class ListFetcher<T: Listable>: Request {
     
     override func updateIfNeeded(forceReload: Bool = false) async {
         guard !loading else {
+            logger.debug("Not set up for fetching: \(String(describing: self))")
             return
         }
         guard forceReload || requestNeeded else {
-            print("Not performing on \(self)")
+            logger.debug("Not performing on: \(String(describing: self))")
             return
         }
-        print("Performing on \(self)")
+        logger.debug("Performing on: \(String(describing: self))")
         nextPage = Self.nextPage
         await perform()
     }
@@ -91,9 +95,9 @@ class ListFetcher<T: Listable>: Request {
 
 class DataBackedListDataFetcher<T: Listable>: ListFetcher<T> {
     
-    init(items: [T] = [], interface: DataInterface, automation: AutomationPreferences = .init()) {
+    init(items: [T] = [], automation: AutomationPreferences = .init()) {
         
-        super.init(items: items, interface: interface, automation: automation)
+        super.init(items: items, automation: automation)
         
         self.results = items
         self.loaded = items.isEmpty ? nil : .init()
@@ -121,10 +125,10 @@ class AccountInfoDataFetcher: DataFetcher {
         accountName == nil && super.requestNeeded
     }
     
-    init(address: AddressName, interface: DataInterface, credential: APICredential) {
+    init(address: AddressName, credential: APICredential) {
         self.name = address
         self.credential = credential
-        super.init(interface: interface)
+        super.init()
     }
     
     func configure(_ name: AddressName, credential: APICredential) {
@@ -149,3 +153,4 @@ class AccountInfoDataFetcher: DataFetcher {
         return loaded != nil && name.isEmpty
     }
 }
+

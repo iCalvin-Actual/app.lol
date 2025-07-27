@@ -13,11 +13,11 @@ import WebKit
 
 
 struct AddressProfilePageView: View {
-    
+    @Environment(\.visibleAddress)
+    var visibleAddress
     @ObservedObject
     var fetcher: AddressProfilePageDataFetcher
     
-    let activeAddress: AddressName?
     let htmlContent: String?
     let baseURL: URL?
     
@@ -26,6 +26,9 @@ struct AddressProfilePageView: View {
     
     var body: some View {
         WebView(url: fetcher.baseURL)
+            .onChange(of: visibleAddress, { oldValue, newValue in
+                print("Do a thing")
+            })
             .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
             #if os(iOS)
@@ -39,11 +42,9 @@ struct AddressProfilePageView: View {
 
 
 struct AddressNowPageView: View {
-    
     @ObservedObject
     var fetcher: AddressNowPageDataFetcher
     
-    let activeAddress: AddressName?
     let htmlContent: String?
     let baseURL: URL?
     

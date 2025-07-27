@@ -8,10 +8,13 @@
 import SwiftUI
 
 struct AddressesRow: View {
-    let addresses: [AddressName]
-    var selection: Binding<AddressName>?
-    
-    @Environment(\.presentAddress)
+    @Environment(\.setAddress)
+    var setAddress
+    @Environment(\.addressBook)
+    var addressBook
+    @Environment(\.dismiss)
+    var dismiss
+    @Environment(\.presentListable)
     var present
     
     var color: Color {
@@ -22,14 +25,22 @@ struct AddressesRow: View {
     #endif
     }
     
+    let addresses: [AddressName]
+    let selection: Bool
+    
+    init(addresses: [AddressName], selection: Bool = false) {
+        self.addresses = addresses
+        self.selection = selection
+    }
+    
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 0) {
                 ForEach(addresses, id: \.self) { address in
-                    if address == selection?.wrappedValue {
+                    if address == addressBook.me {
                         standardCard(address, color)
                     } else {
-                        if selection != nil {
+                        if selection {
                             addressSelectionCard(address)
                         } else {
                             standardCard(address)
@@ -39,6 +50,7 @@ struct AddressesRow: View {
                 Spacer()
             }
         }
+        .animation(.default, value: addresses)
         .background(Material.regular)
         .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
     }
@@ -47,7 +59,7 @@ struct AddressesRow: View {
     func addressSelectionCard(_ address: AddressName) -> some View {
         Button {
             withAnimation {
-                selection?.wrappedValue = address
+                setAddress(address)
             }
         } label: {
             card(address, nil)
@@ -59,7 +71,8 @@ struct AddressesRow: View {
     func standardCard(_ address: AddressName, _ colorToUse: Color? = nil) -> some View {
         if let present {
             Button {
-                present(address)
+                dismiss()
+                present(AddressModel(name: address))
             } label: {
                 card(address, colorToUse)
             }
@@ -79,36 +92,19 @@ struct AddressesRow: View {
 }
 
 struct AccountView: View {
-    @Environment(\.login) var login
-    @Environment(\.logout) var logout
+    @Environment(\.authenticate)
+    var authenticate
     
-    @SceneStorage("app.lol.address")
+    @SceneStorage("lol.address")
     var actingAddress: AddressName = ""
-    
-    let viewModel: AccountViewModel
     
     @Environment(\.addressBook)
     var addressBook
-    
-    @State
-    var selected: NavigationItem?
     
     @Environment(\.horizontalSizeClass)
     var sizeClass
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
-    
-    var selectedAddress: Binding<AddressName>? {
-        let address = addressBook?.actingAddress ?? ""
-        guard !address.isEmpty else {
-            return nil
-        }
-        return .init(get: {
-            address
-        }, set: { new in
-            actingAddress = new
-        })
-    }
     
     var body: some View {
         if sizeClass == .compact {
@@ -120,7 +116,7 @@ struct AccountView: View {
     
     @ViewBuilder
     var coreBody: some View {
-        if addressBook?.signedIn ?? false {
+        if addressBook.signedIn {
             authenticatedBody
         } else {
             Text("Benefits of an account!")
@@ -130,12 +126,12 @@ struct AccountView: View {
     
     @ViewBuilder
     var authenticatedBody: some View {
-        List(selection: $selected) {
+        List {
             Section("Lists") {
                 // Mine addresses horizontal scroll section
-                if !viewModel.mine.isEmpty {
+                if !addressBook.mine.isEmpty {
                     Section {
-                        AddressesRow(addresses: viewModel.mine, selection: selectedAddress)
+                        AddressesRow(addresses: addressBook.mine, selection: true)
                     } header: {
                         Label {
                             Text("mine")
@@ -156,9 +152,9 @@ struct AccountView: View {
                 }
                 
                 // Following horizontal scroll section
-                if !viewModel.following.isEmpty {
+                if !addressBook.following.isEmpty {
                     Section {
-                        AddressesRow(addresses: viewModel.following, selection: nil)
+                        AddressesRow(addresses: addressBook.following)
                     } header: {
                         Label {
                             Text("following")
@@ -179,9 +175,9 @@ struct AccountView: View {
                 }
                 
                 // Followers horizontal scroll section
-                if !viewModel.followers.isEmpty {
+                if !addressBook.followers.isEmpty {
                     Section {
-                        AddressesRow(addresses: viewModel.followers, selection: nil)
+                        AddressesRow(addresses: addressBook.followers)
                     } header: {
                         Label {
                             Text("followers")
@@ -203,10 +199,12 @@ struct AccountView: View {
             }
             
             // Logout button row as non-selectable content
-            if addressBook?.signedIn ?? false && sizeClass == .compact {
+            if addressBook.signedIn && sizeClass == .compact {
                 // Wrap in a Group to avoid affecting List selection
                 Group {
-                    Button(role: .destructive, action: logout) {
+                    Button(role: .destructive, action: {
+                        authenticate("")
+                    }) {
                         Label {
                             Text("log out")
                         } icon: {
@@ -221,16 +219,16 @@ struct AccountView: View {
                 }
             }
         }
-        .animation(.default, value: addressBook?.signedIn ?? false)
-        .animation(.default, value: viewModel.following)
-        .animation(.default, value: viewModel.followers)
-        .animation(.default, value: viewModel.pinned)
-        .animation(.default, value: viewModel.mine)
+        .animation(.default, value: addressBook.signedIn)
+        .animation(.default, value: addressBook.following)
+        .animation(.default, value: addressBook.followers)
+        .animation(.default, value: addressBook.pinned)
+        .animation(.default, value: addressBook.mine)
         .frame(maxWidth: 800)
         .frame(maxWidth: .infinity)
         .environment(\.defaultMinListRowHeight, 0)
         .safeAreaInset(edge: .bottom, content: {
-            if !(addressBook?.signedIn ?? true) || sizeClass == .regular {
+            if !addressBook.signedIn || sizeClass == .regular {
                 AuthenticateButton()
             }
         })
@@ -241,14 +239,14 @@ struct AccountView: View {
 }
 
 struct AuthenticateButton: View {
-    @Environment(\.login) var login
-    @Environment(\.logout) var logout
+    @Environment(AccountAuthDataFetcher.self)
+    var accountFetcher
     @Environment(\.addressBook) var addressBook
     
     var body: some View {
-        if !(addressBook?.signedIn ?? true) {
+        if !addressBook.signedIn {
             Button(action: {
-                login()
+                accountFetcher.perform()
             }) {
                 Text("sign in with omg.lol")
                     .bold()
@@ -262,7 +260,9 @@ struct AuthenticateButton: View {
             .buttonBorderShape(.roundedRectangle(radius: 6))
             .padding()
         } else {
-            Button(action: logout) {
+            Button(action: {
+                accountFetcher.logout()
+            }) {
                 Label {
                     Text("log out")
                 } icon: {
@@ -302,34 +302,5 @@ struct AddressCard: View {
                 .lineLimit(3)
         }
         .padding(12)
-    }
-}
-
-@MainActor
-struct AccountViewModel {
-    let scribble: AddressBook.Scribbled
-    
-    var showPinned: Bool { !pinned.isEmpty }
-    var showFollowing: Bool { !following.isEmpty }
-    var showFollowers: Bool { !followers.isEmpty }
-    var showBlocked: Bool { !blocked.isEmpty }
-
-    var pinned: [AddressName] {
-        scribble.pinned
-    }
-    
-    var mine: [AddressName] {
-        scribble.mine
-    }
-    
-    var following: [AddressName] {
-        scribble.following
-    }
-    var followers: [AddressName] {
-        scribble.followers
-    }
-    
-    var blocked: [AddressName] {
-        scribble.blocked
     }
 }

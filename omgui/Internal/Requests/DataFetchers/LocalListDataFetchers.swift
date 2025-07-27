@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 class PinnedListDataFetcher: DataBackedListDataFetcher<AddressModel> {
-    @AppStorage("app.lol.cache.pinned.history", store: .standard)
+    @AppStorage("lol.cache.pinned.history", store: .standard)
     private var pinnedAddressesHistory: String = "app"
     var previouslyPinnedAddresses: Set<AddressName> {
         get {
@@ -21,7 +21,7 @@ class PinnedListDataFetcher: DataBackedListDataFetcher<AddressModel> {
         }
     }
     
-    @AppStorage("app.lol.cache.pinned", store: .standard)
+    @AppStorage("lol.cache.pinned", store: .standard)
     private var currentlyPinnedAddresses: String = "app&&&adam&&&prami"
     var pinnedAddresses: [AddressName] {
         get {
@@ -61,7 +61,7 @@ class PinnedListDataFetcher: DataBackedListDataFetcher<AddressModel> {
 class LocalBlockListDataFetcher: DataBackedListDataFetcher<AddressModel> {
     
     // MARK: No-Account Blocklist
-    @AppStorage("app.lol.cache.blocked", store: .standard)
+    @AppStorage("lol.cache.blocked", store: .standard)
     private var cachedBlockList: String = ""
     var blockedAddresses: [AddressName] {
         get {
@@ -73,8 +73,8 @@ class LocalBlockListDataFetcher: DataBackedListDataFetcher<AddressModel> {
         }
     }
     
-    init(interface: DataInterface, automation: AutomationPreferences = .init()) {
-        super.init(interface: interface, automation: automation)
+    init(automation: AutomationPreferences = .init()) {
+        super.init(automation: automation)
         self.results = blockedAddresses.map({ AddressModel.init(name: $0) })
         
     }

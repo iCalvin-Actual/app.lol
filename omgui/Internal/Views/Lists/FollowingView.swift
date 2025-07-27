@@ -22,15 +22,10 @@ struct FollowingView: View {
     
     @ViewBuilder
     var followingView: some View {
-        if let addressBook, addressBook.signedIn {
+        if addressBook.signedIn {
             StatusList(
-                fetcher: StatusLogDataFetcher(
-                    addresses: addressBook.following,
-                    addressBook: addressBook.scribble,
-                    interface: addressBook.interface,
-                    db: addressBook.database
-                ),
-                filters: [.fromOneOf(addressBook.following)]
+                addressBook.following,
+                addressBook: addressBook
             )
         } else {
             signedOutView

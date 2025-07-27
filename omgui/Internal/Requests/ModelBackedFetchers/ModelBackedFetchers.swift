@@ -13,9 +13,9 @@ class BackedDataFetcher: Request {
     
     var lastHash: Int?
     
-    init(interface: DataInterface, db: Blackbird.Database, automation: AutomationPreferences = .init()) {
-        self.db = db
-        super.init(interface: interface, automation: automation)
+    override init(automation: AutomationPreferences = .init()) {
+        self.db = AppClient.database
+        super.init(automation: automation)
     }
     
     override func throwingRequest() async throws {
@@ -59,23 +59,23 @@ typealias ModelBackedListable = BlackbirdListable & Listable
 class GlobalListDataFetcher<T: ModelBackedListable>: ListFetcher<T> {
     let db: Blackbird.Database
     
-    init(interface: DataInterface, db: Blackbird.Database, automation: AutomationPreferences = .init()) {
-        self.db = db
-        super.init(items: [], interface: interface, limit: 42, filters: [], sort: T.defaultSort, automation: automation)
+    init(automation: AutomationPreferences = .init()) {
+        self.db = AppClient.database
+        super.init(items: [], limit: 42, filters: [], sort: T.defaultSort, automation: automation)
     }
 }
 
 class ModelBackedListDataFetcher<T: ModelBackedListable>: ListFetcher<T> {
     
-    var addressBook: AddressBook.Scribbled?
+    var addressBook: AddressBook
     let db: Blackbird.Database
     
     var lastHash: Int?
     
-    init(addressBook: AddressBook.Scribbled?, interface: DataInterface, db: Blackbird.Database, limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
+    init(addressBook: AddressBook, limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
         self.addressBook = addressBook
-        self.db = db
-        super.init(items: [], interface: interface, limit: limit, filters: filters, sort: sort, automation: automation)
+        self.db = AppClient.database
+        super.init(items: [], limit: limit, filters: filters, sort: sort, automation: automation)
     }
     
     @MainActor
@@ -111,7 +111,7 @@ class ModelBackedListDataFetcher<T: ModelBackedListable>: ListFetcher<T> {
     
     @MainActor
     func fetchModels() async throws {
-        guard let nextPage, let addressBook else {
+        guard let nextPage else {
             return
         }
         var nextResults = try await T.read(

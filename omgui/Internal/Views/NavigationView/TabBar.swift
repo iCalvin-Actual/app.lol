@@ -30,13 +30,7 @@ struct TabBar: View {
     }
     
     @SceneStorage("app.tab.selected")
-    var selected: NavigationItem? {
-        willSet {
-            if newValue != .search {
-                searching = false
-            }
-        }
-    }
+    var selected: NavigationItem?
     
     @Environment(\.addressBook)
     var addressBook
@@ -44,6 +38,8 @@ struct TabBar: View {
     var destinationConstructor
     @Environment(\.horizontalSizeClass)
     var horizontalSizeClass
+    @Environment(\.setAddress)
+    var setAddress
     
     @State
     var visibleAddress: AddressName = ""
@@ -62,23 +58,25 @@ struct TabBar: View {
     }
     
     var tabModel: SidebarModel {
-        .init(pinnedFetcher: addressBook?.pinnedAddressFetcher)
+        .init(addressBook: addressBook)
     }
     
     var body: some View {
         appropriateBody
-            .environment(\.presentAddress, { address in
-                activePath.wrappedValue.append(NavigationDestination.address(address))
+            .onReceive(selected.publisher, perform: { newValue in
+                if searching && selected != .search {
+                    searching = false
+                }
             })
-            .environment(\.destinationConstructor, addressBook?.destinationConstructor)
+            .environment(\.presentListable, { item in
+                path.append(item.rowDestination)
+            })
+            .environment(\.setVisibleAddress, { visible in
+                visibleAddress = visible ?? ""
+            })
             .environment(\.searchActive, searching)
             .environment(\.visibleAddressPage, visibleAddressPage)
             .environment(\.visibleAddress, visibleAddress)
-            .onChange(of: searching) { oldValue, newValue in
-                if newValue {
-                    selected = .search
-                }
-            }
     }
     
     @ViewBuilder
@@ -139,10 +137,11 @@ struct TabBar: View {
                 .sheet(isPresented: $presentAccount) {
                     NavigationStack {
                         navigationContent(.account)
-                            .environment(\.destinationConstructor, addressBook.destinationConstructor)
-                            .environment(\.searchActive, searching)
-                            .environment(\.visibleAddressPage, visibleAddressPage)
-                            .environment(\.visibleAddress, visibleAddress)
+                            .environment(\.setAddress, setAddress)
+                            .environment(\.presentListable, { listItem in
+                                print("Do a thing")
+                            })
+                            .environment(\.addressBook, addressBook)
                     }
                 }
             }
@@ -176,33 +175,46 @@ struct TabBar: View {
         .frame(maxHeight: 44)
     }
     
+    @State
+    var collapsed: Set<SidebarModel.Section> = .init()
+    
+    func isExpanded(_ section: SidebarModel.Section) -> Binding<Bool> {
+        .init {
+            !collapsed.contains(section)
+        } set: { newValue in
+            if newValue {
+                collapsed.remove(section)
+            } else {
+                collapsed.insert(section)
+            }
+        }
+
+    }
+    
     @ViewBuilder
     var regularTabBar: some View {
         NavigationSplitView {
             List(selection: $selected) {
                 // Sections from SidebarModel
                 ForEach(tabModel.sections, id: \.self) { section in
-                    Section {
+                    Section(section.displayName, isExpanded: isExpanded(section)) {
                         ForEach(tabModel.items(for: section, sizeClass: .regular, context: .column), id: \.self) { item in
                             NavigationLink(value: item) {
                                 Label(item.displayString, systemImage: item.iconName)
                             }
                         }
-                    } header: {
-                        if section != .directory {
-                            Text(section.displayName)
-                        }
                     }
                 }
             }
             .safeAreaInset(edge: .bottom, content: {
-                if !(addressBook?.signedIn ?? false) {
+                if !addressBook.signedIn {
                     AuthenticateButton()
                 }
             })
         } detail: {
             if let selected {
                 tabContent(selected)
+                    .background(selected.destination.gradient)
             }
         }
         .searchable(text: $searchQuery)
@@ -214,22 +226,41 @@ struct TabBar: View {
     @State
     var paths: [NavigationItem: NavigationPath] = .init()
     
+    @State
+    var path: NavigationPath = .init()
+    
     @ViewBuilder
     func tabContent(_ item: NavigationItem) -> some View {
-        NavigationStack(path: path(for: item)) {
+        NavigationStack(path: $path) {
             navigationContent(item.destination)
+                .background(
+                    item.destination.gradient
+                )
+//                .toolbarBackground(Color.clear, for: .automatic)
+                .toolbar {
+                    #if canImport(UIKit)
+                    if horizontalSizeClass == .compact {
+                        ToolbarItem(placement: .topBarLeading) {
+                            OptionsButton()
+                        }
+                    }
+                    #endif
+                }
                 .navigationDestination(for: NavigationDestination.self) { destination in
                     destinationConstructor?.destination(destination)
                 }
         }
     }
     
+    
     private var activePath: Binding<NavigationPath> {
         path(for: selected ?? .community)
     }
     private func path(for item: NavigationItem) -> Binding<NavigationPath> {
         .init {
-            paths[item] ?? .init()
+            var newValue = NavigationPath()
+            newValue.append(item.destination)
+            return paths[item] ?? newValue
         } set: { newValue in
             paths.updateValue(newValue, forKey: item)
         }

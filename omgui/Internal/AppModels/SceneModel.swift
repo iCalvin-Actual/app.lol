@@ -21,18 +21,15 @@ class SceneModel {
     
     // MARK: Lifecycle
     
-    let profileDrafts: DraftFetcher<ProfileMarkdown>
     
     init(
-        addressBook: AddressBook.Scribbled,
+        addressBook: AddressBook,
         interface: DataInterface,
         database: Blackbird.Database
     )
     {
         self.interface = interface
         self.database = database
-        
-        self.profileDrafts = .init(addressBook.me, interface: interface, addressBook: addressBook, db: database)
     }
 }
 
@@ -42,7 +39,7 @@ extension SceneModel {
     static var sample: SceneModel {
         let credential = ""
         let actingAddress = ""
-        let book = AddressBook.Scribbled(
+        let book = AddressBook(
             auth: credential,
             me: actingAddress
         )

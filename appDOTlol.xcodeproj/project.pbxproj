@@ -107,7 +107,6 @@
 		3E67DAF629B4CC8100B7DF82 /* APIInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */; };
 		3E7C162329C35777007C85EC /* omgapi in Frameworks */ = {isa = PBXBuildFile; productRef = 3E7C162229C35777007C85EC /* omgapi */; };
 		3EB190C02E2D6D8D00AD8397 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB190BE2E2D677D00AD8397 /* OptionsButton.swift */; };
-		3EB190C12E2D6D8D00AD8397 /* AuthenticationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB190BF2E2D6CF200AD8397 /* AuthenticationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -221,7 +220,6 @@
 		3E3C62582E04A6830035E466 /* SearchLanding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLanding.swift; sourceTree = "<group>"; };
 		3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIInterface.swift; sourceTree = "<group>"; };
 		3EB190BE2E2D677D00AD8397 /* OptionsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsButton.swift; sourceTree = "<group>"; };
-		3EB190BF2E2D6CF200AD8397 /* AuthenticationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationView.swift; sourceTree = "<group>"; };
 		3EC12B2929BF92CA00367B45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -498,7 +496,6 @@
 		3E2FBC932DCC5919007B9C24 /* NavigationView */ = {
 			isa = PBXGroup;
 			children = (
-				3EB190BF2E2D6CF200AD8397 /* AuthenticationView.swift */,
 				3E2FBC8F2DCC5919007B9C24 /* NavigationItem+View.swift */,
 				3E2FBC902DCC5919007B9C24 /* Sidebar.swift */,
 				3E2FBC922DCC5919007B9C24 /* TabBar.swift */,
@@ -688,7 +685,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3EB190C02E2D6D8D00AD8397 /* OptionsButton.swift in Sources */,
-				3EB190C12E2D6D8D00AD8397 /* AuthenticationView.swift in Sources */,
 				3E67DAF629B4CC8100B7DF82 /* APIInterface.swift in Sources */,
 				3E0A744E29B4950200EFD8E4 /* appDOTlolApp.swift in Sources */,
 				3E2FBCA32DCC5919007B9C24 /* FilterableModels.swift in Sources */,
