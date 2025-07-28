@@ -13,7 +13,7 @@ struct DirectoryView: View {
     let fetcher: AddressDirectoryDataFetcher
     
     var body: some View {
-        ListView<AddressModel, EmptyView>(
+        ListView<AddressModel>(
             filters: .everyone,
             dataFetcher: fetcher
         )

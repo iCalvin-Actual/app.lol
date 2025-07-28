@@ -17,7 +17,7 @@ struct AddressPURLsView: View {
     }
     
     var body: some View {
-        ListView<PURLModel, EmptyView>(
+        ListView<PURLModel>(
             filters: .everyone,
             dataFetcher: fetcher
         )

@@ -121,7 +121,7 @@ struct AddressProfileView: View {
     
 //    @ViewBuilder
 //    func draftsView(_ fetcher: DraftFetcher<ProfileMarkdown>) -> some View {
-//        ListView<ProfileMarkdown.Draft, EmptyView>(dataFetcher: fetcher, selectionOverride: { selected in
+//        ListView<ProfileMarkdown.Draft>(dataFetcher: fetcher, selectionOverride: { selected in
 //            createPoster(selected)
 //        })
 //    }

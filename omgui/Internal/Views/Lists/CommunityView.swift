@@ -27,7 +27,7 @@ struct CommunityView: View {
     
     var body: some View {
         if let communityFetcher {
-            ListView<StatusModel, EmptyView>(
+            ListView<StatusModel>(
                 filters: .everyone,
                 dataFetcher: communityFetcher
             )

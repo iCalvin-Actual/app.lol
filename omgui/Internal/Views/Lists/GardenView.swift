@@ -13,7 +13,7 @@ struct GardenView: View {
     
     var body: some View {
         if let fetcher {
-            ListView<NowListing, EmptyView>(dataFetcher: fetcher)
+            ListView<NowListing>(dataFetcher: fetcher)
         }
     }
 }

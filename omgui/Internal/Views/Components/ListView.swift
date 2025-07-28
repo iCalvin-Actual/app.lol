@@ -7,10 +7,7 @@
 
 import SwiftUI
 
-struct ListView<T: Listable, H: View>: View {
-    
-    @Namespace
-    var namespace
+struct ListView<T: Listable>: View {
     
     @Environment(\.horizontalSizeClass) var horizontalSize
     @Environment(\.verticalSizeClass)   var verticalSize
@@ -25,6 +22,7 @@ struct ListView<T: Listable, H: View>: View {
     @Environment(\.pinnedFetcher) var pinned
     
     @Environment(\.viewContext) var context: ViewContext
+    
     @State var selected: T?
     @State var queryString: String = ""
     
@@ -33,15 +31,8 @@ struct ListView<T: Listable, H: View>: View {
     
     @State var presentingDetail: Bool = false
     
-    @FocusState var focusItem: T?
-    
     @ObservedObject
     var dataFetcher: ListFetcher<T>
-    
-    @ViewBuilder
-    let headerBuilder: (() -> H)?
-    
-    let menuBuilder: ContextMenuBuilder<T> = .init()
     
     func usingRegular(_ width: CGFloat) -> Bool {
         TabBar.usingRegularTabBar(sizeClass: horizontalSize, width: width)
@@ -57,26 +48,10 @@ struct ListView<T: Listable, H: View>: View {
     
     init(
         filters: [FilterOption] = T.defaultFilter,
-        dataFetcher: ListFetcher<T>,
-        headerBuilder: (() -> H)? = nil
+        dataFetcher: ListFetcher<T>
     ) {
         self.filters = filters
         self.dataFetcher = dataFetcher
-        self.headerBuilder = headerBuilder
-    }
-    
-    var items: [T] {
-        if T.self is any BlackbirdListable.Type {
-            return dataFetcher.results
-        }
-        
-        var filters = filters
-        if !queryString.isEmpty {
-            filters.append(.query(queryString))
-        }
-        return filters
-            .applyFilters(to: dataFetcher.results, with: addressBook)
-            .sorted(with: sort)
     }
     
     var applicableFilters: [FilterOption] {
@@ -88,40 +63,8 @@ struct ListView<T: Listable, H: View>: View {
             .task { [dataFetcher] in
                 dataFetcher.fetchNextPageIfNeeded()
             }
-            .onAppear {
-                guard horizontalSize == .compact, selected != nil else {
-                    return
-                }
-                withAnimation {
-                    selected = nil
-                }
-            }
             .onChange(of: sort, { dataFetcher.sort = $1 })
             .onChange(of: filters, { dataFetcher.filters = $1 })
-            .onChange(of: queryString, { oldValue, newValue in
-                var newFilters = filters
-                newFilters.removeAll(where: { filter in
-                    switch filter {
-                    case .query:
-                        return true
-                    default:
-                        return false
-                    }
-                })
-                defer {
-                    dataFetcher.results = []
-                    dataFetcher.nextPage = 0
-                    Task { [dataFetcher] in
-                        await dataFetcher.updateIfNeeded(forceReload: true)
-                    }
-                }
-                guard !newValue.isEmpty else {
-                    filters = newFilters
-                    return
-                }
-                newFilters.append(.query(newValue))
-                filters = newFilters
-            })
             .toolbar {
                 if T.sortOptions.count > 1 || applicableFilters.count > 1 {
                     ToolbarItem(placement: .automatic) {
@@ -158,9 +101,19 @@ struct ListView<T: Listable, H: View>: View {
     
     @ViewBuilder
     func compactBody() -> some View {
-        list()
-            .animation(.easeInOut(duration: 0.3), value: dataFetcher.loaded)
-            .listRowBackground(Color.clear)
+        InnerList(
+            dataFetcher: dataFetcher,
+            selected: $selected,
+            filters: filters,
+            menuFetchers: (
+                following,
+                blocked,
+                localBlocked,
+                pinned
+            )
+        )
+        .animation(.easeInOut(duration: 0.3), value: dataFetcher.loaded)
+        .listRowBackground(Color.clear)
     }
     
     @ViewBuilder
@@ -168,161 +121,169 @@ struct ListView<T: Listable, H: View>: View {
         HStack(spacing: 0) {
             compactBody()
                 .frame(maxWidth: 300)
+                .environment(\.horizontalSizeClass, .compact)
                 .environment(\.viewContext, .column)
-            regularBodyContent()
+                .environment(\.presentListable, { listable in
+                    overridePresenter(listable)
+                })
+            detailBody(selected: selected)
                 .frame(maxWidth: .infinity)
                 .environment(\.viewContext, context == .profile ? .profile : .detail)
                 .environment(\.horizontalSizeClass, actingWidth > 300 ? .regular : .compact)
         }
         .onReceive(dataFetcher.$results) { newResults in
             if selected == nil, let item = newResults.first {
-                selected = item
-                if horizontalSize == .regular {
-                    focusItem = item
+                withAnimation {
+                    selected = item
                 }
             }
         }
     }
-    
+
     @ViewBuilder
-    func regularBodyContent() -> some View {
-        if let selected = selected {
-            destinationConstructor?.destination(destination(for: selected))
-        } else {
-            ThemedTextView(text: "no selection")
-                .padding()
-        }
+    func detailBody(selected: T?) -> some View {
+        Detail(selected: selected)
+            .id(selected?.id)
     }
     
-    @ViewBuilder
-    func list() -> some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                listItems()
-                    .listRowBackground(Color.clear)
-                    .padding(.vertical, 4)
-                
-                if queryString.isEmpty && dataFetcher.nextPage != nil {
-                    LoadingView()
-                        .padding(32)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .listRowBackground(Color.clear)
-                        .onAppear { [dataFetcher] in
-                            dataFetcher.fetchNextPageIfNeeded()
-                        }
-                }
-            }
-            .refreshable(action: { [dataFetcher] in
-                await dataFetcher.updateIfNeeded(forceReload: true)
-            })
-            .listStyle(.plain)
-#if canImport(UIKit) && !os(tvOS)
-            .listRowSpacing(0)
-#endif
-        }
-        .scrollEdgeEffectStyle(.soft, for: .top)
-        #if !os(tvOS)
-        .scrollContentBackground(.hidden)
-        #endif
-        .onReceive(dataFetcher.$loaded, perform: { _ in
-            var newSelection: T?
-            switch (
-                horizontalSize == .regular,
-                dataFetcher.loaded != nil,
-                selected == nil
-            ) {
-            case (false, true, false):
-                newSelection = nil
-            case (true, true, true):
-                newSelection = dataFetcher.results.first
-            default:
-                return
+    struct InnerList: View {
+        @Environment(\.horizontalSizeClass) var horizontalSize
+        @Environment(\.addressBook) var addressBook
+        @Environment(\.presentListable) var present
+        
+        let dataFetcher: ListFetcher<T>
+        @Binding
+        var selected: T?
+        
+        let filters: [FilterOption]
+        let sort: Sort = T.defaultSort
+        
+        let menuFetchers: ContextMenuFetchers
+        let menuBuilder: ContextMenuBuilder<T> = .init()
+        
+        var items: [T] {
+            if T.self is any BlackbirdListable.Type {
+                return dataFetcher.results
             }
             
-            withAnimation { @MainActor in
-                self.selected = newSelection
+            return filters
+                .applyFilters(to: dataFetcher.results, with: addressBook)
+                .sorted(with: sort)
+        }
+        
+        var body: some View {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    listItems()
+                        .listRowBackground(Color.clear)
+                        .padding(.vertical, 4)
+                    
+                    if dataFetcher.nextPage != nil {
+                        LoadingView()
+                            .padding(32)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .listRowBackground(Color.clear)
+                            .onAppear { [dataFetcher] in
+                                dataFetcher.fetchNextPageIfNeeded()
+                            }
+                    }
+                }
+                .refreshable(action: { [dataFetcher] in
+                    await dataFetcher.updateIfNeeded(forceReload: true)
+                })
+                .listStyle(.plain)
+    #if canImport(UIKit) && !os(tvOS)
+                .listRowSpacing(0)
+    #endif
             }
-        })
-    }
-    
-    @ViewBuilder
-    func listItems() -> some View {
-        if let headerBuilder = headerBuilder {
-            Section {
-                headerBuilder()
-                #if !os(tvOS)
-                    .listRowSeparator(.hidden)
-                #endif
-            }
-            Section(dataFetcher.title) {
-                listContent()
-                    .padding(.horizontal, 8)
-            }
-        } else {
+            .scrollEdgeEffectStyle(.soft, for: .top)
+            #if !os(tvOS)
+            .scrollContentBackground(.hidden)
+            #endif
+        }
+        
+        @ViewBuilder
+        func listItems() -> some View {
             listContent()
                 .padding(.horizontal, 8)
         }
-    }
-    
-    @ViewBuilder
-    func listContent() -> some View {
-        if dataFetcher.noContent {
-            emptyRowView()
-        } else if !items.isEmpty {
-            ForEach(items, content: { rowView($0).listRowBackground(Color.clear) })
-        } else {
-            EmptyView()
-        }
-    }
-    
-    @ViewBuilder
-    func emptyRowView() -> some View {
-        HStack {
-            Spacer()
-            ThemedTextView(text: "empty")
-                .font(.title3)
-                .bold()
-                .padding()
-            Spacer()
-        }
-#if !os(tvOS)
-        .listRowSeparator(.hidden, edges: .all)
-        #endif
-        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-    }
-    
-    @ViewBuilder
-    func rowView(_ item: T) -> some View {
-        rowBody(item)
-            .tag(item)
-            .focused($focusItem, equals: item)
-        #if !os(tvOS)
-            .listRowSeparator(.hidden, edges: .all)
-        #endif
-            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .contextMenu(menuItems: {
-                menuBuilder.contextMenu(
-                    for: item,
-                    fetcher: dataFetcher,
-                    addressBook: addressBook,
-                    menuFetchers: (
-                        following,
-                        blocked,
-                        localBlocked,
-                        pinned
-                    )
-                )
-            }) {
-                AddressCard(item.addressName)
+        
+        @ViewBuilder
+        func listContent() -> some View {
+            if dataFetcher.noContent {
+                emptyRowView()
+            } else if !items.isEmpty {
+                ForEach(items, content: { rowView($0).listRowBackground(Color.clear) })
+            } else {
+                EmptyView()
             }
+        }
+        
+        @ViewBuilder
+        func emptyRowView() -> some View {
+            HStack {
+                Spacer()
+                ThemedTextView(text: "empty")
+                    .font(.title3)
+                    .bold()
+                    .padding()
+                Spacer()
+            }
+    #if !os(tvOS)
+            .listRowSeparator(.hidden, edges: .all)
+            #endif
+            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        }
+        
+        @ViewBuilder
+        func rowView(_ item: T) -> some View {
+            rowBody(item)
+                .tag(item)
+            #if !os(tvOS)
+                .listRowSeparator(.hidden, edges: .all)
+            #endif
+                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                .contextMenu(menuItems: {
+                    menuBuilder.contextMenu(
+                        for: item,
+                        fetcher: dataFetcher,
+                        addressBook: addressBook,
+                        menuFetchers: menuFetchers
+                    )
+                }) {
+                    AddressCard(item.addressName)
+                }
+        }
+        
+        @ViewBuilder
+        func rowBody(_ item: T) -> some View {
+            buildRow(item)
+        }
+        
+        @ViewBuilder
+        func buildRow(_ item: T) -> some View {
+            ListRow<T>(model: item, selected: $selected)
+        }
     }
     
-    @ViewBuilder
-    func rowBody(_ item: T) -> some View {
-        buildRow(item)
+    struct Detail: View {
+        @Environment(\.destinationConstructor) var destinationConstructor
+        
+        let selected: T?
+        
+        var body: some View {
+            if let selected {
+                destinationConstructor?.destination(ListView.destination(for: selected))
+            } else {
+               ThemedTextView(text: "no selection")
+                   .padding()
+           }
+        }
     }
-    
-    private func destination(for item: T) -> NavigationDestination? {
+}
+
+extension ListView {
+    static private func destination(for item: T, in context: ViewContext = .column) -> NavigationDestination? {
         switch item {
         case let nowModel as NowListing:
             return .now(nowModel.owner)
@@ -340,14 +301,6 @@ struct ListView<T: Listable, H: View>: View {
             }
         }
         return nil
-    }
-    
-    @ViewBuilder
-    func buildRow(_ item: T) -> some View {
-        ListRow<T>(model: item, selected: $selected)
-            .environment(\.presentListable, {
-                overridePresenter($0)
-            })
     }
 }
 

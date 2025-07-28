@@ -74,14 +74,14 @@ struct DestinationConstructor {
 //            FollowingView(addressBook)
 //        case .followingAddresses:
 //            if let fetcher = addressBook.followingFetcher {
-//                ListView<AddressModel, ListRow<AddressModel>, EmptyView>(filters: .none, dataFetcher: fetcher, rowBuilder: { _ in return nil as ListRow<AddressModel>? })
+//                ListView<AddressModel, ListRow<AddressModel>>(filters: .none, dataFetcher: fetcher, rowBuilder: { _ in return nil as ListRow<AddressModel>? })
 //            }
 //        case .followingStatuses:
 //            if let fetcher = addressBook.followingStatusLogFetcher {
 //                StatusList(fetcher: fetcher)
 //            }
 //        case .following(let name):
-//            ListView<AddressModel, ListRow<AddressModel>, EmptyView>(filters: .none, dataFetcher: fetcher.followingFetcher(for: name, credential: accountModel.credential(for: name, in: addressBook)), rowBuilder: { _ in return nil as ListRow<AddressModel>? })
+//            ListView<AddressModel, ListRow<AddressModel>>(filters: .none, dataFetcher: fetcher.followingFetcher(for: name, credential: accountModel.credential(for: name, in: addressBook)), rowBuilder: { _ in return nil as ListRow<AddressModel>? })
 //        case .addressStatuses:
 //            MyStatusesView(singleAddress: true, addressBook: addressBook, accountModel: accountModel)
 //        case .addressPURLs:

@@ -26,7 +26,7 @@ struct StatusList: View {
     }
     
     var body: some View {
-        ListView<StatusModel, EmptyView>(
+        ListView<StatusModel>(
             filters: .everyone,
             dataFetcher: fetcher
         )

@@ -121,12 +121,12 @@ struct TabBar: View {
         .tabViewBottomAccessory {
             if !visibleAddress.isEmpty {
                 addressAccessory(visibleAddress)
-            } else if let addressBook {
+            } else {
                 Group {
-                    if !addressBook.actingAddress.isEmpty {
-                        addressAccessory(addressBook.actingAddress, showPicker: false)
+                    if !addressBook.me.isEmpty {
+                        addressAccessory(addressBook.me, showPicker: false)
                     } else {
-                        addressAccessory(addressBook.actingAddress, showPicker: false)
+                        addressAccessory(addressBook.me, showPicker: false)
                     }
                 }
                 //                    .foregroundStyle(.primary)
@@ -250,6 +250,7 @@ struct TabBar: View {
                     destinationConstructor?.destination(destination)
                 }
         }
+        .id(item.id)
     }
     
     
