@@ -50,7 +50,7 @@ extension StatusModel     {
     var listSubtitle: String  { owner.addressDisplayString }
     var displayDate: Date?    { date }
     var listCaption: String?  { DateFormatter.short.string(for: date) }
-    var rowDestination: NavigationDestination { .status(owner, id: status.id) }
+    var rowDestination: NavigationDestination { .status(owner, id: id) }
 }
 extension PasteModel     {
     var listTitle: String     { name }

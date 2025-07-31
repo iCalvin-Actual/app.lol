@@ -30,7 +30,16 @@ struct TabBar: View {
     }
     
     @SceneStorage("app.tab.selected")
-    var selected: NavigationItem?
+    var cachedSelection: NavigationItem = .community
+    
+    @State
+    var selected: NavigationItem? {
+        didSet {
+            if let selected {
+                cachedSelection = selected
+            }
+        }
+    }
     
     @Environment(\.addressBook)
     var addressBook
@@ -63,6 +72,11 @@ struct TabBar: View {
     
     var body: some View {
         appropriateBody
+            .onAppear(perform: {
+                if selected == nil {
+                    selected = cachedSelection
+                }
+            })
             .onReceive(selected.publisher, perform: { newValue in
                 if searching && selected != .search {
                     searching = false
@@ -83,18 +97,8 @@ struct TabBar: View {
     var appropriateBody: some View {
         if !Self.usingRegularTabBar(sizeClass: horizontalSizeClass) {
             compactTabBar
-                .onAppear{
-                    if selected == nil {
-                        selected = .community
-                    }
-                }
         } else {
             regularTabBar
-                .onAppear{
-                    if selected == nil {
-                        selected = .community
-                    }
-                }
         }
     }
     
