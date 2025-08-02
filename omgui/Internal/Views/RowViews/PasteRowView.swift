@@ -10,6 +10,8 @@ import SwiftUI
 struct PasteRowView: View {
     @Environment(\.viewContext)
     var context: ViewContext
+    @Environment(\.addressBook)
+    var addressBook: AddressBook
     
     let model: PasteModel
     
@@ -31,7 +33,7 @@ struct PasteRowView: View {
             ZStack(alignment: .topTrailing) {
                 HStack(alignment: .bottom, spacing: 0) {
                     if context != .profile {
-                        AddressIconView(address: model.owner)
+                        AddressIconView(address: model.owner, addressBook: addressBook)
                             .padding(.horizontal, 4)
                     }
                     VStack(alignment: .leading, spacing: 0) {

@@ -20,7 +20,8 @@ struct StatusRowView: View {
     let model: StatusModel
     @Environment(\.viewContext)
     var context: ViewContext
-    
+    @Environment(\.addressBook)
+    var addressBook
     
     let cardColor: Color
     let cardPadding: CGFloat
@@ -115,7 +116,7 @@ struct StatusRowView: View {
         ZStack(alignment: .topTrailing) {
             HStack(alignment: .bottom, spacing: 0) {
                 if context != .profile {
-                    AddressIconView(address: model.address)
+                    AddressIconView(address: model.address, addressBook: addressBook)
                         .padding(.horizontal, 4)
                 }
                 Text(model.displayEmoji.count > 1 ? "✨" : model.displayEmoji.prefix(1))

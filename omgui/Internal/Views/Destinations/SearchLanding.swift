@@ -70,37 +70,6 @@ struct SearchLanding: View {
             }
         }
     }
-    
-    @ViewBuilder
-    var pinnedItems: some View {
-        if !addressBook.pinned.isEmpty && filter == nil {
-            VStack(spacing: 0) {
-                Label {
-                    Text("Pinned")
-                } icon: {
-                    Image(systemName: "pin")
-                }
-                .foregroundStyle(.secondary)
-                .font(.callout)
-                .padding(.leading, 8)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .top, spacing: 0) {
-                        ForEach(addressBook.pinned) { address in
-                            AddressCard(address, embedInMenu: true)
-                                .frame(maxWidth: 88)
-                        }
-                        Spacer()
-                    }
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .padding(.top, 16)
-            .background(Material.thin, in: .rect(cornerRadius: .init(16), style: .continuous))
-            .padding(.horizontal, 12)
-        }
-    }
 
     @ViewBuilder
     func buttonGrid(_ width: CGFloat) -> some View {

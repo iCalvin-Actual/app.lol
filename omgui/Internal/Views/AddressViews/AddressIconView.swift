@@ -3,15 +3,16 @@ import SwiftUI
 
 
 struct AddressIconView<S: Shape>: View {
-    @Environment(\.addressBook)
-    var addressBook
     
-    @Environment(\.addressFollowingFetcher) var following
-    @Environment(\.addressBlockListFetcher) var blocked
-    @Environment(\.localBlocklist) var localBlocked
-    @Environment(\.pinnedFetcher) var pinned
+    @Environment(\.pinAddress) var pin
+    @Environment(\.unpinAddress) var unpin
+    @Environment(\.blockAddress) var block
+    @Environment(\.unblockAddress) var unblock
+    @Environment(\.followAddress) var follow
+    @Environment(\.unfollowAddress) var unfollow
     
     let address: AddressName
+    let addressBook: AddressBook
     let size: CGFloat
     
     let showMenu: Bool
@@ -21,11 +22,13 @@ struct AddressIconView<S: Shape>: View {
     
     init(
         address: AddressName,
-        size: CGFloat = 42.0,
+        addressBook: AddressBook,
+        size: CGFloat = 40.0,
         showMenu: Bool = true,
         contentShape: S = RoundedRectangle(cornerRadius: 12)
     ) {
         self.address = address
+        self.addressBook = addressBook
         self.size = size
         self.showMenu = showMenu
         self.contentShape = contentShape
@@ -50,10 +53,12 @@ struct AddressIconView<S: Shape>: View {
                 for: .init(name: address),
                 addressBook: addressBook,
                 menuFetchers: (
-                    following,
-                    blocked,
-                    localBlocked,
-                    pinned
+                    follow: follow,
+                    block: block,
+                    pin: pin,
+                    unFollow: unfollow,
+                    unBlock: unblock,
+                    unPin: unpin
                 )
             )
         } label: {

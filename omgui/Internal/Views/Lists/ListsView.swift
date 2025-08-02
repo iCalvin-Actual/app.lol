@@ -86,7 +86,7 @@ struct AddressesRow: View {
     
     @ViewBuilder
     func card(_ address: AddressName, _ colorToUse: Color?) -> some View {
-        AddressCard(address)
+        AddressCard(address, addressBook: addressBook)
             .background(colorToUse)
     }
 }
@@ -94,6 +94,8 @@ struct AddressesRow: View {
 struct AccountView: View {
     @Environment(\.authenticate)
     var authenticate
+    @Environment(AccountAuthDataFetcher.self)
+    var authFetcher
     
     @SceneStorage("lol.address")
     var actingAddress: AddressName = ""
@@ -116,16 +118,6 @@ struct AccountView: View {
     
     @ViewBuilder
     var coreBody: some View {
-        if addressBook.signedIn {
-            authenticatedBody
-        } else {
-            Text("Benefits of an account!")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-    }
-    
-    @ViewBuilder
-    var authenticatedBody: some View {
         List {
             Section("Lists") {
                 // Mine addresses horizontal scroll section
@@ -198,24 +190,25 @@ struct AccountView: View {
                 }
             }
             
-            // Logout button row as non-selectable content
-            if addressBook.signedIn && sizeClass == .compact {
-                // Wrap in a Group to avoid affecting List selection
+            if sizeClass == .compact {
                 Group {
-                    Button(role: .destructive, action: {
-                        authenticate("")
-                    }) {
-                        Label {
-                            Text("log out")
-                        } icon: {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                    if addressBook.signedIn {
+                        // Wrap in a Group to avoid affecting List selection
+                        Button(role: .destructive, action: {
+                            authenticate("")
+                        }) {
+                            Label {
+                                Text("log out")
+                            } icon: {
+                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                            }
                         }
+                        .buttonStyle(.plain)
+                        .contentShape(Rectangle())
+#if canImport(UIKit)
+                        .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+#endif
                     }
-                    .buttonStyle(.plain)
-                    .contentShape(Rectangle())
-                    #if canImport(UIKit)
-                    .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-                    #endif
                 }
             }
         }
@@ -242,18 +235,23 @@ struct AuthenticateButton: View {
     @Environment(AccountAuthDataFetcher.self)
     var accountFetcher
     @Environment(\.addressBook) var addressBook
+    @Environment(\.authenticate) var authenticate
     
     var body: some View {
         if !addressBook.signedIn {
             Button(action: {
                 accountFetcher.perform()
             }) {
-                Text("sign in with omg.lol")
-                    .bold()
-                    .font(.callout)
-                    .fontDesign(.serif)
-                    .frame(maxWidth: .infinity)
-                    .padding(3)
+                Label {
+                    Text("sign in with omg.lol")
+                        .bold()
+                        .font(.callout)
+                        .fontDesign(.serif)
+                        .frame(maxWidth: .infinity)
+                        .padding(3)
+                } icon: {
+                    Image(systemName: "key")
+                }
             }
             .buttonStyle(.borderedProminent)
             .accentColor(.lolPink)
@@ -261,7 +259,7 @@ struct AuthenticateButton: View {
             .padding()
         } else {
             Button(action: {
-                accountFetcher.logout()
+                authenticate("")
             }) {
                 Label {
                     Text("log out")
@@ -284,16 +282,18 @@ struct AuthenticateButton: View {
 
 struct AddressCard: View {
     let address: AddressName
+    let addressBook: AddressBook
     let embedInMenu: Bool
     
-    init(_ address: AddressName, embedInMenu: Bool = false) {
+    init(_ address: AddressName, addressBook: AddressBook, embedInMenu: Bool = false) {
         self.address = address
+        self.addressBook = addressBook
         self.embedInMenu = embedInMenu
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            AddressIconView(address: address, size: 55, showMenu: embedInMenu)
+            AddressIconView(address: address, addressBook: addressBook, size: 55, showMenu: embedInMenu)
             Text(address.addressDisplayString)
                 .font(.caption)
                 .fontDesign(.serif)

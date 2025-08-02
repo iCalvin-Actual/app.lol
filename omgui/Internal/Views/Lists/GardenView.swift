@@ -19,6 +19,8 @@ struct GardenView: View {
 }
 
 struct GardenItemView: View {
+    @Environment(\.addressBook) var addressBook
+    
     let model: NowListing
     
     let cardColor: Color
@@ -52,7 +54,7 @@ struct GardenItemView: View {
             .padding(.horizontal, 4)
             .padding(.top, 4)
             HStack(alignment: .bottom) {
-                AddressIconView(address: model.addressName, size: 55)
+                AddressIconView(address: model.addressName, addressBook: addressBook, size: 55)
                 
                 Text(model.listSubtitle)
                     .font(.callout)

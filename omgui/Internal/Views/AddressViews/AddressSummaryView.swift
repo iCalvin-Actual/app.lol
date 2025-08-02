@@ -148,6 +148,7 @@ struct AddressBioLabel: View {
 }
 
 struct AddressSummaryHeader: View {
+    @Environment(\.addressBook) var addressBook
     @Environment(\.horizontalSizeClass)
     var horizontalSizeClass
     @Environment(\.visibleAddressPage)
@@ -170,7 +171,7 @@ struct AddressSummaryHeader: View {
     
     var body: some View {
         HStack {
-            AddressIconView(address: addressBioFetcher.address, showMenu: false, contentShape: Circle())
+            AddressIconView(address: addressBioFetcher.address, addressBook: addressBook, showMenu: false, contentShape: Circle())
             AddressNameView(addressBioFetcher.address)
             Spacer()
             destinationPicker

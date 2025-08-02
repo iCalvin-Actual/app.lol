@@ -16,10 +16,12 @@ struct ListView<T: Listable>: View {
     @Environment(\.addressBook)     var addressBook
     @Environment(\.presentListable) var present
     
-    @Environment(\.addressFollowingFetcher) var following
-    @Environment(\.addressBlockListFetcher) var blocked
-    @Environment(\.localBlocklist) var localBlocked
-    @Environment(\.pinnedFetcher) var pinned
+    @Environment(\.pinAddress) var pin
+    @Environment(\.unpinAddress) var unpin
+    @Environment(\.blockAddress) var block
+    @Environment(\.unblockAddress) var unblock
+    @Environment(\.followAddress) var follow
+    @Environment(\.unfollowAddress) var unfollow
     
     @Environment(\.viewContext) var context: ViewContext
     
@@ -106,10 +108,12 @@ struct ListView<T: Listable>: View {
             selected: $selected,
             filters: filters,
             menuFetchers: (
-                following,
-                blocked,
-                localBlocked,
-                pinned
+                follow: follow,
+                block: block,
+                pin: pin,
+                unFollow: unfollow,
+                unBlock: unblock,
+                unPin: unpin
             )
         )
         .animation(.easeInOut(duration: 0.3), value: dataFetcher.loaded)
@@ -158,7 +162,7 @@ struct ListView<T: Listable>: View {
         let filters: [FilterOption]
         let sort: Sort = T.defaultSort
         
-        let menuFetchers: ContextMenuFetchers
+        let menuFetchers: ContextMenuClosures
         let menuBuilder: ContextMenuBuilder<T> = .init()
         
         var items: [T] {
@@ -251,7 +255,7 @@ struct ListView<T: Listable>: View {
                         menuFetchers: menuFetchers
                     )
                 }) {
-                    AddressCard(item.addressName)
+                    AddressCard(item.addressName, addressBook: addressBook)
                 }
         }
         

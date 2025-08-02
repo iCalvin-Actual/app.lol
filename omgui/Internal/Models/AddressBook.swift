@@ -10,7 +10,7 @@ import SwiftUI
 import Foundation
 
 nonisolated
-struct AddressBook: Equatable {
+struct AddressBook: Equatable, Hashable {
     let auth: APICredential
     let me: AddressName
     let mine: [AddressName]

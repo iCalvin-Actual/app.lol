@@ -238,7 +238,7 @@ public struct OMGScene: View {
     
     private func handleAddressesResults(_ results: [AddressName]) {
         logger.debug("Received addresses")
-        if results.sorted() != addressBook.mine.sorted() {
+        if results.sorted() != addressBook.mine.sorted() || actingAddress.isEmpty {
             if actingAddress.isEmpty, let address = results.first {
                 updateAddress(address)
             } else if !actingAddress.isEmpty, results.isEmpty {
@@ -412,7 +412,7 @@ extension OMGScene {
     
     func pin(_ address: AddressName) {
         Task { [weak pinnedFetcher] in
-            await pinnedFetcher?.pin(address)
+            await pinnedFetcher?.pin(address.lowercased())
         }
     }
     func removePin(_ address: AddressName) {

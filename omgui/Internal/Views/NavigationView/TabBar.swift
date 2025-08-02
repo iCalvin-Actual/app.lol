@@ -97,6 +97,26 @@ struct TabBar: View {
     var appropriateBody: some View {
         if !Self.usingRegularTabBar(sizeClass: horizontalSizeClass) {
             compactTabBar
+            #if os(iOS)
+                .tabViewBottomAccessory {
+                    PinnedAddressesView(addressBook: addressBook)
+                        .id(addressBook.hashValue)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            presentAccount.toggle()
+                        }
+                        .sheet(isPresented: $presentAccount) {
+                            NavigationStack {
+                                navigationContent(.account)
+                                    .environment(\.setAddress, setAddress)
+                                    .environment(\.presentListable, { listItem in
+                                        print("Do a thing")
+                                    })
+                                    .environment(\.addressBook, addressBook)
+                            }
+                        }
+                }
+            #endif
         } else {
             regularTabBar
         }
@@ -122,41 +142,13 @@ struct TabBar: View {
         #endif
         #if os(iOS)
         .tabBarMinimizeBehavior(.onScrollDown)
-        .tabViewBottomAccessory {
-            if !visibleAddress.isEmpty {
-                addressAccessory(visibleAddress)
-            } else {
-                Group {
-                    if !addressBook.me.isEmpty {
-                        addressAccessory(addressBook.me, showPicker: false)
-                    } else {
-                        addressAccessory(addressBook.me, showPicker: false)
-                    }
-                }
-                //                    .foregroundStyle(.primary)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    presentAccount.toggle()
-                }
-                .sheet(isPresented: $presentAccount) {
-                    NavigationStack {
-                        navigationContent(.account)
-                            .environment(\.setAddress, setAddress)
-                            .environment(\.presentListable, { listItem in
-                                print("Do a thing")
-                            })
-                            .environment(\.addressBook, addressBook)
-                    }
-                }
-            }
-        }
         #endif
     }
         
     @ViewBuilder
     func addressAccessory(_ address: AddressName, showPicker: Bool = true) -> some View {
         HStack {
-            AddressIconView(address: address, contentShape: Circle())
+            AddressIconView(address: address, addressBook: addressBook, contentShape: Circle())
             AddressNameView(address)
             Spacer()
             if showPicker {
@@ -241,15 +233,6 @@ struct TabBar: View {
                     item.destination.gradient
                 )
 //                .toolbarBackground(Color.clear, for: .automatic)
-                .toolbar {
-                    #if canImport(UIKit)
-                    if horizontalSizeClass == .compact {
-                        ToolbarItem(placement: .topBarLeading) {
-                            OptionsButton()
-                        }
-                    }
-                    #endif
-                }
                 .navigationDestination(for: NavigationDestination.self) { destination in
                     destinationConstructor?.destination(destination)
                 }
@@ -275,5 +258,35 @@ struct TabBar: View {
     @ViewBuilder
     func navigationContent(_ destination: NavigationDestination) -> some View {
         destinationConstructor?.destination(destination)
+    }
+}
+
+struct PinnedAddressesView: View {
+    let addressBook: AddressBook
+    
+    var body: some View {
+        HStack {
+            if addressBook.mine.count > 0 {
+                AddressIconView(address: addressBook.me, addressBook: addressBook, showMenu: true, contentShape: Circle())
+                    .padding(.top, -1)
+            } else {
+                OptionsButton()
+            }
+            Spacer()
+            ScrollView(.horizontal) {
+                HStack(spacing: -8) {
+                    Spacer().frame(width: 16)
+                    ForEach(addressBook.pinned) {
+                        AddressIconView(address: $0, addressBook: addressBook, showMenu: true, contentShape: Circle())
+                            .simultaneousGesture(DragGesture())
+                    }
+                    Spacer().frame(width: 16)
+                }
+            }
+            .scrollIndicators(.hidden)
+            .scrollEdgeEffectStyle(.soft, for: .horizontal)
+        }
+        .padding(.top, 2)
+        .padding(.horizontal, 2)
     }
 }

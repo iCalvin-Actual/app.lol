@@ -18,6 +18,8 @@ struct PURLView: View {
     var sizeClass
     @Environment(\.viewContext)
     var context
+    @Environment(\.addressBook)
+    var addressBook
     
     @Environment(\.credentialFetcher)
     var credential
@@ -184,7 +186,7 @@ struct PURLView: View {
         if context != .profile {
             VStack(alignment: .leading) {
                 HStack(alignment: .bottom) {
-                    AddressIconView(address: fetcher.address)
+                    AddressIconView(address: fetcher.address, addressBook: addressBook)
                     Text("/\(fetcher.result?.name ?? fetcher.title)")
                         .font(.title2)
                         .fontDesign(.serif)

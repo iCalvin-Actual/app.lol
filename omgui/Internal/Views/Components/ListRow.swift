@@ -9,6 +9,7 @@ import SwiftUI
 import Foundation
 
 struct ListRow<T: Listable>: View {
+    @Environment(\.addressBook) var addressBook
     
     enum Style {
         case standard
@@ -119,7 +120,7 @@ struct ListRow<T: Listable>: View {
     var standardBody: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .bottom) {
-                AddressIconView(address: model.addressName, size: 55)
+                AddressIconView(address: model.addressName, addressBook: addressBook, size: 55)
                 AddressNameView(model.listTitle, font: .headline)
                     .foregroundStyle(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)

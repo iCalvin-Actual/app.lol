@@ -11,10 +11,12 @@ struct SafetyView: View {
     @Environment(\.addressBook)
     var addressBook
     
-    @Environment(\.addressFollowingFetcher) var following
-    @Environment(\.addressBlockListFetcher) var blocked
-    @Environment(\.localBlocklist) var localBlocked
-    @Environment(\.pinnedFetcher) var pinned
+    @Environment(\.pinAddress) var pin
+    @Environment(\.unpinAddress) var unpin
+    @Environment(\.blockAddress) var block
+    @Environment(\.unblockAddress) var unblock
+    @Environment(\.followAddress) var follow
+    @Environment(\.unfollowAddress) var unfollow
     
     var menuBuilder: ContextMenuBuilder<AddressModel> = .init()
     
@@ -51,10 +53,12 @@ struct SafetyView: View {
                                     fetcher: nil,
                                     addressBook: addressBook,
                                     menuFetchers: (
-                                        following,
-                                        blocked,
-                                        localBlocked,
-                                        pinned
+                                        follow: follow,
+                                        block: block,
+                                        pin: pin,
+                                        unFollow: unfollow,
+                                        unBlock: unblock,
+                                        unPin: unpin
                                     )
                                 )
                             })
