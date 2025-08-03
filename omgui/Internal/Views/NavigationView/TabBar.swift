@@ -33,13 +33,7 @@ struct TabBar: View {
     var cachedSelection: NavigationItem = .community
     
     @State
-    var selected: NavigationItem? {
-        didSet {
-            if let selected {
-                cachedSelection = selected
-            }
-        }
-    }
+    var selected: NavigationItem?
     
     @Environment(\.addressBook)
     var addressBook
@@ -56,6 +50,9 @@ struct TabBar: View {
     var visibleAddressPage: AddressContent = .profile
     @State
     var presentAccount: Bool = false
+    @State var searchQuery: String = ""
+    @State var paths: [NavigationItem: NavigationPath] = .init()
+    @State var path: NavigationPath = .init()
     
     @FocusState
     var searching: Bool {
@@ -78,8 +75,13 @@ struct TabBar: View {
                 }
             })
             .onReceive(selected.publisher, perform: { newValue in
-                if searching && selected != .search {
-                    searching = false
+                withAnimation(.interpolatingSpring) {
+                    if searching && selected != .search {
+                        searching = false
+                    }
+                    paths[cachedSelection] = path
+                    cachedSelection = newValue
+                    path = paths[newValue] ?? NavigationPath()
                 }
             })
             .environment(\.presentListable, { item in
@@ -121,8 +123,6 @@ struct TabBar: View {
             regularTabBar
         }
     }
-    
-    @State var searchQuery: String = ""
     
     @ViewBuilder
     var compactTabBar: some View {
@@ -219,12 +219,6 @@ struct TabBar: View {
         #endif
     }
     
-    @State
-    var paths: [NavigationItem: NavigationPath] = .init()
-    
-    @State
-    var path: NavigationPath = .init()
-    
     @ViewBuilder
     func tabContent(_ item: NavigationItem) -> some View {
         NavigationStack(path: $path) {
@@ -232,7 +226,6 @@ struct TabBar: View {
                 .background(
                     item.destination.gradient
                 )
-//                .toolbarBackground(Color.clear, for: .automatic)
                 .navigationDestination(for: NavigationDestination.self) { destination in
                     destinationConstructor?.destination(destination)
                 }
@@ -263,6 +256,10 @@ struct TabBar: View {
 
 struct PinnedAddressesView: View {
     let addressBook: AddressBook
+    
+    init(addressBook: AddressBook) {
+        self.addressBook = addressBook
+    }
     
     var body: some View {
         HStack {

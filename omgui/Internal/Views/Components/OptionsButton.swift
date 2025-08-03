@@ -10,6 +10,7 @@ import SwiftUI
 import WebKit
 
 struct OptionsButton: View {
+    @Environment(\.presentListable) var presentListable
     @Environment(\.pinAddress)
     var pin
     @Environment(\.addressBook)

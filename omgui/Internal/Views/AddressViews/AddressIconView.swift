@@ -10,6 +10,9 @@ struct AddressIconView<S: Shape>: View {
     @Environment(\.unblockAddress) var unblock
     @Environment(\.followAddress) var follow
     @Environment(\.unfollowAddress) var unfollow
+    @Environment(\.presentListable) var present
+    
+    @Environment(\.imageCache) var imageCache
     
     let address: AddressName
     let addressBook: AddressBook
@@ -19,6 +22,13 @@ struct AddressIconView<S: Shape>: View {
     let contentShape: S
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
+    
+    @StateObject
+    var iconFetcher: AddressIconDataFetcher
+    
+    var fetcher: AddressIconDataFetcher {
+        imageCache.object(forKey: NSString(string: address)) ?? iconFetcher
+    }
     
     init(
         address: AddressName,
@@ -32,6 +42,7 @@ struct AddressIconView<S: Shape>: View {
         self.size = size
         self.showMenu = showMenu
         self.contentShape = contentShape
+        self._iconFetcher = .init(wrappedValue: .init(address: address))
     }
     
     var body: some View {
@@ -53,6 +64,7 @@ struct AddressIconView<S: Shape>: View {
                 for: .init(name: address),
                 addressBook: addressBook,
                 menuFetchers: (
+                    navigate: present ?? { _ in },
                     follow: follow,
                     block: block,
                     pin: pin,
@@ -68,15 +80,41 @@ struct AddressIconView<S: Shape>: View {
     
     @ViewBuilder
     var iconView: some View {
-        AsyncImage(url: address.addressIconURL) { image in
-            image.resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: size, height: size)
-                .clipShape(contentShape)
-        } placeholder: {
-            Color.lolRandom(address)
+        if let result = fetcher.result?.data {
+            #if canImport(UIKit)
+            if let image = UIImage(data: result) {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: size, height: size)
+                    .clipShape(contentShape)
+            }
+            #elseif canImport(AppKit)
+            if let image = NSImage(data: result) {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: size, height: size)
+                    .clipShape(contentShape)
+            }
+            #endif
+        } else {
+            AsyncImage(url: address.addressIconURL) { image in
+                image.resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: size, height: size)
+                    .clipShape(contentShape)
+            } placeholder: {
+                Color.lolRandom(address)
+            }
+            .frame(width: size, height: size)
+            .clipShape(contentShape)
+            .task {
+                await fetcher.updateIfNeeded()
+                if imageCache.object(forKey: NSString(string: address)) == nil {
+                    imageCache.setObject(iconFetcher, forKey: NSString(string: address))
+                }
+            }
         }
-        .frame(width: size, height: size)
-        .clipShape(contentShape)
     }
 }

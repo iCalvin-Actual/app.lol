@@ -22,6 +22,8 @@ struct StatusRowView: View {
     var context: ViewContext
     @Environment(\.addressBook)
     var addressBook
+    @Environment(\.presentListable)
+    var present
     
     let cardColor: Color
     let cardPadding: CGFloat
@@ -105,7 +107,11 @@ struct StatusRowView: View {
     @ViewBuilder
     var buttonIfNeeded: some View {
         if context == .detail  {
-            NavigationLink(value: NavigationDestination.address(model.address), label: { headerContent })
+            Button {
+                present?(model)
+            } label: {
+                headerContent
+            }
         } else {
             headerContent
         }

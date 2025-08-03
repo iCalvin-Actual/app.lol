@@ -108,6 +108,7 @@ struct ListView<T: Listable>: View {
             selected: $selected,
             filters: filters,
             menuFetchers: (
+                navigate: present ?? { _ in },
                 follow: follow,
                 block: block,
                 pin: pin,

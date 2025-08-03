@@ -13,6 +13,7 @@ protocol AddressManagable {
 }
 
 typealias ContextMenuClosures = (
+    navigate: (any Listable) -> Void,
     follow: (AddressName) -> Void,
     block: (AddressName) -> Void,
     pin: (AddressName) -> Void,
@@ -64,9 +65,11 @@ extension AddressManagable where Self: Menuable {
         let isPinned = book.pinned.contains(name)
         let canFollow = !book.followers.contains(name)
         let canUnfollow = book.followers.contains(name)
-        NavigationLink(value: NavigationDestination.address(name)) {
+        Button(action: {
+            menuFetchers.navigate(AddressModel(name: name))
+        }, label: {
             Label("view profile", systemImage: "person.fill")
-        }
+        })
         if !isBlocked {
             if canFollow {
                 Button(action: {

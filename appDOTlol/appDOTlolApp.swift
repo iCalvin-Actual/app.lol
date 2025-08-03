@@ -45,6 +45,7 @@ struct appDOTlolApp: App {
     
     let profileCache: ProfileCache = .init()
     let privateCache: PrivateCache = .init()
+    let imageCache: ImageCache = .init()
     
     init() { }
     
@@ -53,6 +54,7 @@ struct appDOTlolApp: App {
             OMGScene(AppClient.interface)
                 .environment(\.profileCache, profileCache)
                 .environment(\.privateCache, privateCache)
+                .environment(\.imageCache, imageCache)
         }
     }
 }

@@ -62,8 +62,8 @@
             filePath = "omgui/Internal/Views/Components/ListView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "282"
-            endingLineNumber = "282"
+            startingLineNumber = "283"
+            endingLineNumber = "283"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -78,8 +78,8 @@
             filePath = "omgui/Internal/Views/Components/ListView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "139"
-            endingLineNumber = "139"
+            startingLineNumber = "140"
+            endingLineNumber = "140"
             landmarkName = "regularBody(actingWidth:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -94,8 +94,8 @@
             filePath = "omgui/Internal/Views/Components/ListView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "141"
-            endingLineNumber = "141"
+            startingLineNumber = "142"
+            endingLineNumber = "142"
             landmarkName = "regularBody(actingWidth:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -114,6 +114,36 @@
             endingLineNumber = "67"
             landmarkName = "body"
             landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "EE36EC47-2E32-471D-B4C4-AA14A4D4DE3E - 6bccee01ae4c15a3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () async -&gt; () in closure #2 () -&gt; () in appDOTlol.StatusView.body.getter : some"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Internal/Views/Destinations/StatusView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "67"
+                  endingLineNumber = "67">
+               </Location>
+               <Location
+                  uuid = "EE36EC47-2E32-471D-B4C4-AA14A4D4DE3E - da6afd4f3572b27d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) await resume partial function for closure #1 () async -&gt; () in closure #2 () -&gt; () in appDOTlol.StatusView.body.getter : some"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Internal/Views/Destinations/StatusView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "67"
+                  endingLineNumber = "67">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -130,6 +160,36 @@
             endingLineNumber = "101"
             landmarkName = "fetchRemote()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "6708F9F4-FF13-4E45-98E6-9B3E7E297BFF - 65fb451de46c6976"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for appDOTlol.StatusDataFetcher.fetchRemote() async throws -&gt; Swift.Int"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Internal/Requests/ModelBackedFetchers/ModelBackedDataFetchers.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "101"
+                  endingLineNumber = "101">
+               </Location>
+               <Location
+                  uuid = "6708F9F4-FF13-4E45-98E6-9B3E7E297BFF - f5a16ee814675d74"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for appDOTlol.StatusDataFetcher.fetchRemote() async throws -&gt; Swift.Int"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Internal/Requests/ModelBackedFetchers/ModelBackedDataFetchers.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "101"
+                  endingLineNumber = "101">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -151,38 +211,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "2A801CDB-430B-4774-82CE-21D7B47F4EF4"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "omgui/Internal/Views/Components/ListView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "299"
-            endingLineNumber = "299"
-            landmarkName = "destination(for:in:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "6311D006-36EF-4FA8-887F-934CDB640DE0"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "omgui/Internal/Views/Components/ListView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "291"
-            endingLineNumber = "291"
-            landmarkName = "destination(for:in:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "AF9186A7-9DE5-49B0-A3D5-C6CFB6C68AFA"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -190,9 +218,9 @@
             filePath = "omgui/Internal/Views/NavigationView/TabBar.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "250"
-            endingLineNumber = "250"
-            landmarkName = "tabContent(_:)"
+            startingLineNumber = "243"
+            endingLineNumber = "243"
+            landmarkName = "path(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -210,6 +238,36 @@
             endingLineNumber = "56"
             landmarkName = "removePin(_:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "A304E14B-D603-4E83-9719-D68A9D0791E1 - e81dcfcf5cab47f3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for appDOTlol.PinnedListDataFetcher.removePin(Swift.String) async -&gt; ()"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Internal/Requests/DataFetchers/LocalListDataFetchers.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "56"
+                  endingLineNumber = "56">
+               </Location>
+               <Location
+                  uuid = "A304E14B-D603-4E83-9719-D68A9D0791E1 - c48d2ab3de47637c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.String) -&gt; Swift.Bool in appDOTlol.PinnedListDataFetcher.removePin(Swift.String) async -&gt; ()"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Internal/Requests/DataFetchers/LocalListDataFetchers.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "56"
+                  endingLineNumber = "56">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -226,22 +284,50 @@
             endingLineNumber = "419"
             landmarkName = "removePin(_:)"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "9512D55D-7E98-4387-85D8-B98F4FFD8F39"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "omgui/Internal/Views/NavigationView/TabBar.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "270"
-            endingLineNumber = "270"
-            landmarkName = "body"
-            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "3396F5D0-08B5-4F23-8F8A-8F53198623BA - a139f3350accd97"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "appDOTlol.OMGScene.removePin(Swift.String) -&gt; ()"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Public/OMGScene.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "419"
+                  endingLineNumber = "419">
+               </Location>
+               <Location
+                  uuid = "3396F5D0-08B5-4F23-8F8A-8F53198623BA - b2c55a143f645cc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () async -&gt; Swift.Optional&lt;()&gt; in appDOTlol.OMGScene.removePin(Swift.String) -&gt; ()"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Public/OMGScene.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "419"
+                  endingLineNumber = "419">
+               </Location>
+               <Location
+                  uuid = "3396F5D0-08B5-4F23-8F8A-8F53198623BA - 41ee952f6fd55bf5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for closure #1 () async -&gt; Swift.Optional&lt;()&gt; in appDOTlol.OMGScene.removePin(Swift.String) -&gt; ()"
+                  moduleName = "appDOTlol.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/calvin/Developer/app_lol/app_lol/omgui/Public/OMGScene.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "419"
+                  endingLineNumber = "419">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -263,49 +349,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5BE4311E-173F-4FA1-A1B7-8AF00D36F2ED"
+            uuid = "37A03C20-21A9-4C53-921B-E4273016C118"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "omgui/Public/OMGScene.swift"
+            filePath = "omgui/Internal/Views/AddressViews/AddressIconView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "343"
-            endingLineNumber = "343"
-            landmarkName = "createAddressBook()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "E35200FC-9EF4-4183-9DD7-3DD16BBD2700"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "omgui/Public/OMGScene.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "242"
-            endingLineNumber = "242"
-            landmarkName = "handleAddressesResults(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "43C37920-F588-47DD-B3D5-00E4070DBEE6"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "omgui/Public/OMGScene.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "240"
-            endingLineNumber = "240"
-            landmarkName = "handleAddressesResults(_:)"
-            landmarkType = "7">
+            startingLineNumber = "86"
+            endingLineNumber = "86"
+            landmarkName = "iconView"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

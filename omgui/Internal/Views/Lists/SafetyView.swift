@@ -17,6 +17,7 @@ struct SafetyView: View {
     @Environment(\.unblockAddress) var unblock
     @Environment(\.followAddress) var follow
     @Environment(\.unfollowAddress) var unfollow
+    @Environment(\.presentListable) var present
     
     var menuBuilder: ContextMenuBuilder<AddressModel> = .init()
     
@@ -53,6 +54,7 @@ struct SafetyView: View {
                                     fetcher: nil,
                                     addressBook: addressBook,
                                     menuFetchers: (
+                                        navigate: present ?? { _ in },
                                         follow: follow,
                                         block: block,
                                         pin: pin,

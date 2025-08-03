@@ -16,6 +16,7 @@ enum ViewContext {
 
 typealias ProfileCache = NSCache<NSString, AddressSummaryDataFetcher>
 typealias PrivateCache = NSCache<NSString, AddressPrivateSummaryDataFetcher>
+typealias ImageCache = NSCache<NSString, AddressIconDataFetcher>
 
 struct DestinationConstructorKey: EnvironmentKey {
     static var defaultValue: DestinationConstructor? { nil }
@@ -339,6 +340,18 @@ extension EnvironmentValues {
     var presentListable: ((any Listable) -> Void)? {
         get { self[PresentListableKey.self] }
         set { self[PresentListableKey.self] = newValue }
+    }
+}
+
+struct AddressIconKey: EnvironmentKey {
+    static var defaultValue: ImageCache {
+        .init()
+    }
+}
+extension EnvironmentValues {
+    var imageCache: ImageCache {
+        get { self[AddressIconKey.self] }
+        set { self[AddressIconKey.self] = newValue }
     }
 }
 
