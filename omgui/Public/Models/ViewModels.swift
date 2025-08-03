@@ -442,7 +442,7 @@ public struct NowListing: BlackbirdListable, Identifiable, Sendable {
         self.init(owner: row[\.$id], url: row[\.$url], date: row[\.$date])
     }
     
-    public init(owner: AddressName, url: String, date: Date) {
+    public init(owner: AddressName, url: String = "", date: Date = .init()) {
         self.id = owner.punified
         self.url = url
         self.date = date

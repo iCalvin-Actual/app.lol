@@ -38,7 +38,7 @@ struct SafetyView: View {
             #endif
             
             Section("blocked") {
-                if addressBook.blocked.isEmpty {
+                if addressBook.appliedBlocked.isEmpty {
                     Text("If you wan't to stop seeing content from an address, Long Press the address or avatar and select Safety > Block")
                 } else {
                     ForEach(addressBook.blocked.map({ AddressModel(name: $0) })) { item in

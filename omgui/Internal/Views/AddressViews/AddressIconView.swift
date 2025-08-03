@@ -80,12 +80,16 @@ struct AddressIconView<S: Shape>: View {
     
     @ViewBuilder
     var iconView: some View {
-        if let result = fetcher.result?.data {
+        if let result = fetcher.result?.data, !result.isEmpty {
             #if canImport(UIKit)
             if let image = UIImage(data: result) {
                 Image(uiImage: image)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: size, height: size)
+                    .clipShape(contentShape)
+            } else {
+                Color.lolRandom(address)
                     .frame(width: size, height: size)
                     .clipShape(contentShape)
             }

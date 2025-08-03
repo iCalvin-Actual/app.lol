@@ -99,7 +99,6 @@ class AccountAddressDataFetcher: DataBackedListDataFetcher<AddressModel> {
     
     @MainActor
     override func throwingRequest() async throws {
-        let credential = credential
         guard !credential.isEmpty else {
             results = []
             localAddressesCache = ""

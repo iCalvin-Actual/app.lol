@@ -40,12 +40,34 @@ struct ListView<T: Listable>: View {
         TabBar.usingRegularTabBar(sizeClass: horizontalSize, width: width)
     }
     
-    func overridePresenter(_ item: any Listable) {
-        guard presentingDetail, let listItem = item as? T else {
+    func overridePresenter(_ item: NavigationDestination) {
+        guard presentingDetail else {
             present?(item)
             return
         }
-        selected = listItem
+        switch item {
+        case .status(let name, id: let id):
+            selected = dataFetcher.results.first(where: {
+                guard let statusModel = $0 as? StatusModel else { return false }
+                return statusModel.id == id && statusModel.owner == name
+            })
+        case .paste(let name, id: let id):
+            selected = dataFetcher.results.first(where: {
+                guard let pasteModel = $0 as? PasteModel else { return false }
+                return pasteModel.name == id && pasteModel.owner == name
+            })
+        case .purl(let name, id: let id):
+            selected = dataFetcher.results.first(where: {
+                guard let purlModel = $0 as? PURLModel else { return false }
+                return purlModel.name == id && purlModel.owner == name
+            })
+        case .now(let name):
+            selected = dataFetcher.results.first(where: { ($0 as? NowListing)?.addressName == name })
+        case .address(let name):
+            selected = dataFetcher.results.first(where: { ($0 as? AddressModel)?.addressName == name })
+        default:
+            present?(item)
+        }
     }
     
     init(
@@ -148,6 +170,7 @@ struct ListView<T: Listable>: View {
     @ViewBuilder
     func detailBody(selected: T?) -> some View {
         Detail(selected: selected)
+            .frame(minWidth: 200)
             .id(selected?.id)
     }
     
@@ -205,6 +228,7 @@ struct ListView<T: Listable>: View {
             #if !os(tvOS)
             .scrollContentBackground(.hidden)
             #endif
+            .frame(minWidth: 200)
         }
         
         @ViewBuilder

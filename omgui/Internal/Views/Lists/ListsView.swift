@@ -16,6 +16,8 @@ struct AddressesRow: View {
     var dismiss
     @Environment(\.presentListable)
     var present
+    @Environment(\.horizontalSizeClass)
+    var sizeClass
     
     var color: Color {
     #if canImport(UIKit)
@@ -71,8 +73,10 @@ struct AddressesRow: View {
     func standardCard(_ address: AddressName, _ colorToUse: Color? = nil) -> some View {
         if let present {
             Button {
-                dismiss()
-                present(AddressModel(name: address))
+                if sizeClass == .compact {
+                    dismiss()
+                }
+                present(.address(address))
             } label: {
                 card(address, colorToUse)
             }
@@ -96,6 +100,8 @@ struct AccountView: View {
     var authenticate
     @Environment(AccountAuthDataFetcher.self)
     var authFetcher
+    @Environment(\.presentListable)
+    var present
     
     @SceneStorage("lol.address")
     var actingAddress: AddressName = ""
@@ -103,17 +109,25 @@ struct AccountView: View {
     @Environment(\.addressBook)
     var addressBook
     
+    @Environment(\.addressFollowingFetcher)
+    var followingFetcher
+    @Environment(\.addressFollowersFetcher)
+    var followersFetcher
+    
     @Environment(\.horizontalSizeClass)
     var sizeClass
+    
+    @State
+    var confirmLogout: Bool = false
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
     
     var body: some View {
-        if sizeClass == .compact {
-            coreBody
-        } else {
-            NavigationStack { coreBody }
-        }
+        coreBody
+            .task { [weak followingFetcher, weak followersFetcher] in
+                await followingFetcher?.updateIfNeeded()
+                await followersFetcher?.updateIfNeeded()
+            }
     }
     
     @ViewBuilder
@@ -188,27 +202,72 @@ struct AccountView: View {
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color.clear)
                 }
+                
+                if !addressBook.pinned.isEmpty {
+                    Section {
+                        AddressesRow(addresses: addressBook.pinned)
+                    } header: {
+                        Label {
+                            Text("pinned")
+                        } icon: {
+                            Image(systemName: "pin")
+                        }
+                        .foregroundStyle(.secondary)
+                        .font(.callout)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .listRowSeparator(.hidden)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .background(Material.ultraThin)
+                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                    .listRowBackground(Color.clear)
+                }
             }
             
             if sizeClass == .compact {
-                Group {
-                    if addressBook.signedIn {
-                        // Wrap in a Group to avoid affecting List selection
-                        Button(role: .destructive, action: {
-                            authenticate("")
-                        }) {
-                            Label {
-                                Text("log out")
-                            } icon: {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
-                            }
+                Section("app.lol") {
+                    ForEach([NavigationItem.appSupport, NavigationItem.safety, NavigationItem.appLatest]) { item in
+                        Button {
+                            present?(item.destination)
+                        } label: {
+                            item.label
                         }
-                        .buttonStyle(.plain)
-                        .contentShape(Rectangle())
-#if canImport(UIKit)
+                        .foregroundStyle(.primary)
                         .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-#endif
                     }
+                }
+                
+                if addressBook.signedIn {
+                    Button(action: {
+                        withAnimation { confirmLogout = true }
+                    }) {
+                        Label {
+                            Text("Log out")
+                        } icon: {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                        }
+                        .bold()
+                        .font(.callout)
+                        .fontDesign(.serif)
+                        .frame(maxWidth: .infinity)
+                        .padding(3)
+                    }
+                    .foregroundStyle(.primary)
+                    .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+                    .alert("Log out?", isPresented: $confirmLogout, actions: {
+                        Button("Cancel", role: .cancel) { }
+                        Button(
+                            "Yes",
+                            role: .destructive,
+                            action: {
+                                authenticate("")
+                            })
+                    }, message: {
+                        Text("Are you sure you want to sign out of omg.lol?")
+                    })
+                    .contentShape(Rectangle())
                 }
             }
         }
@@ -237,6 +296,9 @@ struct AuthenticateButton: View {
     @Environment(\.addressBook) var addressBook
     @Environment(\.authenticate) var authenticate
     
+    @State
+    var confirmLogout: Bool = false
+    
     var body: some View {
         if !addressBook.signedIn {
             Button(action: {
@@ -259,10 +321,10 @@ struct AuthenticateButton: View {
             .padding()
         } else {
             Button(action: {
-                authenticate("")
+                withAnimation { confirmLogout = true }
             }) {
                 Label {
-                    Text("log out")
+                    Text("Log out")
                 } icon: {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                 }
@@ -276,6 +338,17 @@ struct AuthenticateButton: View {
             .accentColor(.lolPink)
             .buttonBorderShape(.roundedRectangle(radius: 6))
             .padding()
+            .alert("Log out?", isPresented: $confirmLogout, actions: {
+                Button("Cancel", role: .cancel) { }
+                Button(
+                    "Yes",
+                    role: .destructive,
+                    action: {
+                        accountFetcher.logout()
+                    })
+            }, message: {
+                Text("Are you sure you want to sign out of omg.lol?")
+            })
         }
     }
 }

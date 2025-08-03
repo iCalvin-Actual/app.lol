@@ -46,10 +46,14 @@ public struct OMGScene: View {
     
     var accountFetcher: AccountAuthDataFetcher {
         return .init(
-            authKey: $authKey,
             session: webAuthSession,
             client: AppClient.info,
-            interface: dataInterface
+            interface: dataInterface,
+            authenticate: {
+                Task { @MainActor [cred = $0] in
+                    authenticate(cred)
+                }
+            }
         )
     }
     
@@ -243,14 +247,21 @@ public struct OMGScene: View {
                 updateAddress(address)
             } else if !actingAddress.isEmpty, results.isEmpty {
                 updateAddress("")
+            } else {
+                configureAddressBook()
             }
-            applyAddressesToCache()
-            Task { [weak database = AppClient.database, results = addressFetcher.results] in
-                guard let database else { return }
-                for model in results {
-                    try await model.write(to: database)
+            if !results.isEmpty {
+                applyAddressesToCache()
+                Task { [weak database = AppClient.database, results = addressFetcher.results] in
+                    guard let database else { return }
+                    for model in results {
+                        try await model.write(to: database)
+                    }
                 }
             }
+        } else if addressBook.signedIn {
+            addressFollowersFetcher.configure(address: actingAddress, credential: authKey)
+            addressFollowingFetcher.configure(address: actingAddress, credential: authKey)
         }
     }
     
@@ -422,6 +433,9 @@ extension OMGScene {
     }
     func block(_ address: AddressName) async {
         let credential = credential(for: actingAddress)
+        if addressBook.pinned.contains(address) {
+            removePin(address)
+        }
         Task { [weak addressBlockedFetcher, weak localBlockedFetcher] in
             if let credential {
                 await addressBlockedFetcher?.block(address, credential: credential)

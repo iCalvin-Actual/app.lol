@@ -108,7 +108,7 @@ struct StatusRowView: View {
     var buttonIfNeeded: some View {
         if context == .detail  {
             Button {
-                present?(model)
+                present?(.status(model.owner, id: model.id))
             } label: {
                 headerContent
             }

@@ -76,7 +76,7 @@ struct ListRow<T: Listable>: View {
             .animation(.easeInOut(duration: 0.42), value: selected.wrappedValue)
             .contentShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture {
-                present?(model)
+                present?(model.rowDestination)
             }
     }
     

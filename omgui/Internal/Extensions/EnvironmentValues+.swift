@@ -334,10 +334,10 @@ extension EnvironmentValues {
 }
 
 struct PresentListableKey: EnvironmentKey {
-    static var defaultValue: ((any Listable) -> Void)? { nil }
+    static var defaultValue: ((NavigationDestination) -> Void)? { nil }
 }
 extension EnvironmentValues {
-    var presentListable: ((any Listable) -> Void)? {
+    var presentListable: ((NavigationDestination) -> Void)? {
         get { self[PresentListableKey.self] }
         set { self[PresentListableKey.self] = newValue }
     }

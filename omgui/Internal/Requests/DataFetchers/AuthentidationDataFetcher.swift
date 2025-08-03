@@ -21,16 +21,16 @@ final class AccountAuthDataFetcher: Sendable {
         interface.authURL()
     }
     
-    let authKey: Binding<APICredential>?
+    let authenticate: @Sendable (APICredential) -> Void
     
     let client: ClientInfo
     let interface: DataInterface
     
-    init(authKey: Binding<APICredential>?, session: WebAuthenticationSession, client: ClientInfo, interface: DataInterface) {
+    init(session: WebAuthenticationSession, client: ClientInfo, interface: DataInterface, authenticate: @escaping @Sendable (APICredential) -> Void) {
         self.webSession = session
         self.client = client
         self.interface = interface
-        self.authKey = authKey
+        self.authenticate = authenticate
     }
     
     private func authenticate() async throws {
@@ -58,7 +58,7 @@ final class AccountAuthDataFetcher: Sendable {
     }
     
     func setToken(_ newValue: APICredential?) {
-        authKey?.wrappedValue = newValue ?? ""
+        authenticate(newValue ?? "")
     }
     
     func perform() {

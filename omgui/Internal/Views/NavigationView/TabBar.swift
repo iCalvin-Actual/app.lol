@@ -43,6 +43,8 @@ struct TabBar: View {
     var horizontalSizeClass
     @Environment(\.setAddress)
     var setAddress
+    @Environment(\.presentListable)
+    var present
     
     @State
     var visibleAddress: AddressName = ""
@@ -53,6 +55,7 @@ struct TabBar: View {
     @State var searchQuery: String = ""
     @State var paths: [NavigationItem: NavigationPath] = .init()
     @State var path: NavigationPath = .init()
+    @State var presentedPath: NavigationPath = .init()
     
     @FocusState
     var searching: Bool {
@@ -85,7 +88,7 @@ struct TabBar: View {
                 }
             })
             .environment(\.presentListable, { item in
-                path.append(item.rowDestination)
+                path.append(item)
             })
             .environment(\.setVisibleAddress, { visible in
                 visibleAddress = visible ?? ""
@@ -108,14 +111,22 @@ struct TabBar: View {
                             presentAccount.toggle()
                         }
                         .sheet(isPresented: $presentAccount) {
-                            NavigationStack {
+                            NavigationStack(path: $presentedPath) {
                                 navigationContent(.account)
-                                    .environment(\.setAddress, setAddress)
-                                    .environment(\.presentListable, { listItem in
-                                        print("Do a thing")
-                                    })
-                                    .environment(\.addressBook, addressBook)
+                                    .navigationDestination(for: NavigationDestination.self) { destination in
+                                        destinationConstructor?.destination(destination)
+                                    }
                             }
+                            .environment(\.setAddress, setAddress)
+                            .environment(\.presentListable, { listItem in
+                                switch listItem {
+                                case .safety, .support, .latest:
+                                    presentedPath.append(listItem)
+                                default:
+                                    path.append(listItem)
+                                }
+                            })
+                            .environment(\.addressBook, addressBook)
                         }
                 }
             #endif
@@ -203,7 +214,7 @@ struct TabBar: View {
                 }
             }
             .safeAreaInset(edge: .bottom, content: {
-                if !addressBook.signedIn {
+                if !addressBook.signedIn, selected != .account {
                     AuthenticateButton()
                 }
             })
@@ -251,6 +262,7 @@ struct TabBar: View {
     @ViewBuilder
     func navigationContent(_ destination: NavigationDestination) -> some View {
         destinationConstructor?.destination(destination)
+            .environment(\.addressBook, addressBook)
     }
 }
 
@@ -263,7 +275,7 @@ struct PinnedAddressesView: View {
     
     var body: some View {
         HStack {
-            if addressBook.mine.count > 0 {
+            if addressBook.signedIn {
                 AddressIconView(address: addressBook.me, addressBook: addressBook, showMenu: true, contentShape: Circle())
                     .padding(.top, -1)
             } else {

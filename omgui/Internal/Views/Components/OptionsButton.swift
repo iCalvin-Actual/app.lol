@@ -28,7 +28,7 @@ struct OptionsButton: View {
         } label: {
             Image(systemName: "person.circle.fill")
                 .resizable()
-                .frame(width: 40, height: 40)
+                .frame(width: 36, height: 36)
                 .padding(.horizontal, 4)
         }
         .alert("Add pinned address", isPresented: $addAddress) {
@@ -45,9 +45,11 @@ struct OptionsButton: View {
     var moreSection: some View {
         Section("more") {
             ForEach([NavigationItem.appLatest, NavigationItem.appSupport, NavigationItem.safety]) { item in
-                NavigationLink(value: item) {
+                Button(action: {
+                    presentListable?(item.destination)
+                }, label: {
                     Label(item.displayString, systemImage: item.iconName)
-                }
+                })
             }
         }
     }

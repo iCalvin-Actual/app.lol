@@ -60,7 +60,7 @@ class SidebarModel {
     }
     
     var sections: [Section] {
-        [.directory, .status, .now, .app]
+        [.more, .app]
     }
     
     var sectionsForLists: [Section] {
@@ -97,7 +97,7 @@ class SidebarModel {
             }
             
         case .more:
-            return [.learn]
+            return [.search, .community, .nowGarden] + addressBook.pinned.sorted().map({ .pinnedAddress($0) })
             
         default:
             return []
