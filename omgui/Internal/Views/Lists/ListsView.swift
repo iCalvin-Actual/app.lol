@@ -235,40 +235,46 @@ struct AccountView: View {
                             item.label
                         }
                         .foregroundStyle(.primary)
+                        #if canImport(UIKit)
                         .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+                        #endif
                     }
                 }
-                
-                if addressBook.signedIn {
-                    Button(action: {
-                        withAnimation { confirmLogout = true }
-                    }) {
-                        Label {
-                            Text("Log out")
-                        } icon: {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                        }
-                        .bold()
-                        .font(.callout)
-                        .fontDesign(.serif)
-                        .frame(maxWidth: .infinity)
-                        .padding(3)
+            }
+            
+            if addressBook.signedIn {
+                Button(action: {
+                    withAnimation { confirmLogout = true }
+                }) {
+                    Label {
+                        Text("Log out")
+                    } icon: {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
                     }
-                    .foregroundStyle(.primary)
-                    .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-                    .alert("Log out?", isPresented: $confirmLogout, actions: {
-                        Button("Cancel", role: .cancel) { }
-                        Button(
-                            "Yes",
-                            role: .destructive,
-                            action: {
-                                authenticate("")
-                            })
-                    }, message: {
-                        Text("Are you sure you want to sign out of omg.lol?")
-                    })
-                    .contentShape(Rectangle())
+                    .bold()
+                    .font(.callout)
+                    .fontDesign(.serif)
+                    .frame(maxWidth: .infinity)
+                    .padding(3)
                 }
+                .foregroundStyle(.primary)
+#if canImport(UIKit)
+                .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+#elseif os(macOS)
+                .padding(.vertical, 16)
+#endif
+                .alert("Log out?", isPresented: $confirmLogout, actions: {
+                    Button("Cancel", role: .cancel) { }
+                    Button(
+                        "Yes",
+                        role: .destructive,
+                        action: {
+                            authenticate("")
+                        })
+                }, message: {
+                    Text("Are you sure you want to sign out of omg.lol?")
+                })
+                .contentShape(Rectangle())
             }
         }
         .animation(.default, value: addressBook.signedIn)
@@ -279,11 +285,14 @@ struct AccountView: View {
         .frame(maxWidth: 800)
         .frame(maxWidth: .infinity)
         .environment(\.defaultMinListRowHeight, 0)
+#if !os(macOS)
         .safeAreaInset(edge: .bottom, content: {
-            if !addressBook.signedIn || sizeClass == .regular {
+            if !addressBook.signedIn {
                 AuthenticateButton()
+                    .padding(.horizontal, 12)
             }
         })
+#endif
         #if !os(tvOS)
         .scrollContentBackground(.hidden)
         #endif
@@ -316,9 +325,7 @@ struct AuthenticateButton: View {
                 }
             }
             .buttonStyle(.borderedProminent)
-            .accentColor(.lolPink)
-            .buttonBorderShape(.roundedRectangle(radius: 6))
-            .padding()
+            .buttonBorderShape(.capsule)
         } else {
             Button(action: {
                 withAnimation { confirmLogout = true }
@@ -335,9 +342,7 @@ struct AuthenticateButton: View {
                 .padding(3)
             }
             .buttonStyle(.borderedProminent)
-            .accentColor(.lolPink)
-            .buttonBorderShape(.roundedRectangle(radius: 6))
-            .padding()
+            .buttonBorderShape(.capsule)
             .alert("Log out?", isPresented: $confirmLogout, actions: {
                 Button("Cancel", role: .cancel) { }
                 Button(

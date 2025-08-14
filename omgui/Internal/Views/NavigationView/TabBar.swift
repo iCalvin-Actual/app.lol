@@ -213,9 +213,18 @@ struct TabBar: View {
                     }
                 }
             }
+            .frame(minWidth: 180)
             .safeAreaInset(edge: .bottom, content: {
-                if !addressBook.signedIn, selected != .account {
+                if !addressBook.signedIn {
+                #if os(macOS)
                     AuthenticateButton()
+                        .padding(8)
+                #else
+                    if selected != .account {
+                        AuthenticateButton()
+                            .padding(8)
+                    }
+                #endif
                 }
             })
         } detail: {
