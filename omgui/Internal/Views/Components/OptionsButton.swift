@@ -18,9 +18,6 @@ struct OptionsButton: View {
     @Environment(AccountAuthDataFetcher.self)
     var accountFetcher
     
-    @State var addAddress: Bool = false
-    @State var address: String = ""
-    
     var body: some View {
         Menu {
             appSection
@@ -30,14 +27,6 @@ struct OptionsButton: View {
                 .resizable()
                 .frame(width: 36, height: 36)
                 .padding(.horizontal, 4)
-        }
-        .alert("Add pinned address", isPresented: $addAddress) {
-            TextField("Address", text: $address)
-            Button("Cancel") { }
-            Button("Add") {
-                addAddress = false
-                pin(address)
-            }.disabled(address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
     }
     
@@ -58,15 +47,6 @@ struct OptionsButton: View {
     var appSection: some View {
         Section("app.lol") {
             AuthenticateButton()
-            Button {
-                withAnimation { addAddress.toggle() }
-            } label: {
-                Label {
-                    Text("add pin")
-                } icon: {
-                    Image(systemName: "plus.circle")
-                }
-            }
         }
     }
 }

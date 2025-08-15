@@ -276,33 +276,158 @@ struct TabBar: View {
 }
 
 struct PinnedAddressesView: View {
+    @Environment(\.presentListable) var presentListable
+    @Environment(\.setAddress) var set
+    @Environment(\.pinAddress) var pin
+    @Environment(\.authenticate) var authenticate
+    
     let addressBook: AddressBook
+    
+    @State var addAddress: Bool = false
+    @State var address: String = ""
+    @State var confirmLogout: Bool = false
     
     init(addressBook: AddressBook) {
         self.addressBook = addressBook
     }
     
+    func pinnedAddressesToShow(in proxy: GeometryProxy) -> [AddressName] {
+        guard let max = maximumAvatars(in: proxy) else {
+            return addressBook.pinned
+        }
+        guard max > 1 else {
+            return []
+        }
+        return Array(addressBook.pinned.prefix(max - 1))
+    }
+    
+    func maximumAvatars(in proxy: GeometryProxy) -> Int? {
+        let avatarSize = 40.0
+        let count: Int = Int(floor(proxy.size.width / (avatarSize - 16)))
+        guard count < addressBook.pinned.count else {
+            return nil
+        }
+        return count
+    }
+    
     var body: some View {
         HStack {
             if addressBook.signedIn {
-                AddressIconView(address: addressBook.me, addressBook: addressBook, showMenu: true, contentShape: Circle())
-                    .padding(.top, -1)
+                Menu {
+                    Button(action: {
+                        withAnimation { confirmLogout = true }
+                    }) {
+                        Label {
+                            Text("Log out")
+                        } icon: {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                        }
+                        .bold()
+                        .font(.callout)
+                        .fontDesign(.serif)
+                    }
+                    ForEach(addressBook.mine.reversed()) { address in
+                        Section(address.addressDisplayString) {
+                            Button {
+                                withAnimation {
+                                    presentListable?(.address(address))
+                                }
+                            } label: {
+                                Label {
+                                    Text("Profile")
+                                } icon: {
+                                    Image(systemName: "person")
+                                }
+                            }
+                            if addressBook.me != address {
+                                Button {
+                                    withAnimation {
+                                        set(address)
+                                    }
+                                } label: {
+                                    Label {
+                                        Text("Switch address")
+                                    } icon: {
+                                        Image(systemName: "shuffle")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    AddressIconView(address: addressBook.me, addressBook: addressBook, showMenu: false, contentShape: Circle())
+                }
+                .padding(.top, -1)
+                .padding(.leading, 1)
+                .alert("Log out?", isPresented: $confirmLogout, actions: {
+                    Button("Cancel", role: .cancel) { }
+                    Button(
+                        "Yes",
+                        role: .destructive,
+                        action: {
+                            authenticate("")
+                        })
+                }, message: {
+                    Text("Are you sure you want to sign out of omg.lol?")
+                })
+                .contentShape(Rectangle())
             } else {
                 OptionsButton()
             }
-            Spacer()
-            ScrollView(.horizontal) {
-                HStack(spacing: -8) {
-                    Spacer().frame(width: 16)
-                    ForEach(addressBook.pinned) {
-                        AddressIconView(address: $0, addressBook: addressBook, showMenu: true, contentShape: Circle())
-                            .simultaneousGesture(DragGesture())
+            GeometryReader { proxy in
+                Menu {
+                    Section("Pinned") {
+                        Button {
+                            withAnimation { addAddress.toggle() }
+                        } label: {
+                            Label {
+                                Text("add pin")
+                            } icon: {
+                                Image(systemName: "plus.circle")
+                            }
+                        }
                     }
-                    Spacer().frame(width: 16)
+                    Divider()
+                    ForEach(addressBook.pinned) { address in
+                        Button {
+                            withAnimation {
+                                presentListable?(.address(address))
+                            }
+                        } label: {
+                            Label {
+                                Text(address.addressDisplayString)
+                            } icon: {
+                                Image(systemName: "pin")
+                            }
+                        }
+
+                    }
+                } label: {
+                    if addressBook.pinned.isEmpty {
+                        Image(systemName: "pin.circle.fill")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .padding(.horizontal, 12)
+                    } else {
+                        HStack(alignment: .top, spacing: -16) {
+                            ForEach(pinnedAddressesToShow(in: proxy).reversed()) {
+                                AddressIconView(address: $0, addressBook: addressBook, showMenu: false, contentShape: Circle())
+                            }
+                        }
+                    }
                 }
+                .padding(.top, 4)
+                .padding(.trailing, 2)
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .scrollIndicators(.hidden)
-            .scrollEdgeEffectStyle(.soft, for: .horizontal)
+            .alert("Add pinned address", isPresented: $addAddress) {
+                TextField("Address", text: $address)
+                Button("Cancel") { }
+                Button("Add") {
+                    addAddress = false
+                    pin(address)
+                }.disabled(address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
         }
         .padding(.top, 2)
         .padding(.horizontal, 2)
