@@ -93,6 +93,9 @@ struct TabBar: View {
             .environment(\.setVisibleAddress, { visible in
                 visibleAddress = visible ?? ""
             })
+            .environment(\.showAddressPage, { page in
+                visibleAddressPage = page
+            })
             .environment(\.searchActive, searching)
             .environment(\.visibleAddressPage, visibleAddressPage)
             .environment(\.visibleAddress, visibleAddress)
@@ -183,7 +186,7 @@ struct TabBar: View {
     }
     
     @State
-    var collapsed: Set<SidebarModel.Section> = .init()
+    var collapsed: Set<SidebarModel.Section> = [.app]
     
     func isExpanded(_ section: SidebarModel.Section) -> Binding<Bool> {
         .init {
@@ -202,6 +205,10 @@ struct TabBar: View {
     var regularTabBar: some View {
         NavigationSplitView {
             List(selection: $selected) {
+                Text("app.lol")
+                    .font(.largeTitle)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fontDesign(.serif)
                 // Sections from SidebarModel
                 ForEach(tabModel.sections, id: \.self) { section in
                     Section(section.displayName, isExpanded: isExpanded(section)) {
@@ -291,27 +298,8 @@ struct PinnedAddressesView: View {
         self.addressBook = addressBook
     }
     
-    func pinnedAddressesToShow(in proxy: GeometryProxy) -> [AddressName] {
-        guard let max = maximumAvatars(in: proxy) else {
-            return addressBook.pinned
-        }
-        guard max > 1 else {
-            return []
-        }
-        return Array(addressBook.pinned.prefix(max - 1))
-    }
-    
-    func maximumAvatars(in proxy: GeometryProxy) -> Int? {
-        let avatarSize = 40.0
-        let count: Int = Int(floor(proxy.size.width / (avatarSize - 16)))
-        guard count < addressBook.pinned.count else {
-            return nil
-        }
-        return count
-    }
-    
     var body: some View {
-        HStack {
+        HStack(spacing: 2) {
             if addressBook.signedIn {
                 Menu {
                     Button(action: {
@@ -374,20 +362,37 @@ struct PinnedAddressesView: View {
             } else {
                 OptionsButton()
             }
-            GeometryReader { proxy in
-                Menu {
-                    Section("Pinned") {
-                        Button {
-                            withAnimation { addAddress.toggle() }
-                        } label: {
-                            Label {
-                                Text("add pin")
-                            } icon: {
-                                Image(systemName: "plus.circle")
-                            }
+            VStack(alignment: .leading) {
+                if !addressBook.signedIn {
+                    Text("Sign in with omg.lol")
+                        .font(.caption)
+                } else if addressBook.mine.count > 1 {
+                    HStack(spacing: 2) {
+                        Image(systemName: "person.circle")
+                            .font(.caption2)
+                        Text("\(addressBook.mine.count)")
+                            .font(.caption)
+                    }
+                }
+                if !addressBook.me.isEmpty {
+                    AddressNameView(addressBook.me)
+                } else {
+                    Spacer()
+                }
+            }
+            .padding(4)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            Menu {
+                Section("Pinned") {
+                    Button {
+                        withAnimation { addAddress.toggle() }
+                    } label: {
+                        Label {
+                            Text("add pin")
+                        } icon: {
+                            Image(systemName: "plus.circle")
                         }
                     }
-                    Divider()
                     ForEach(addressBook.pinned) { address in
                         Button {
                             withAnimation {
@@ -397,29 +402,78 @@ struct PinnedAddressesView: View {
                             Label {
                                 Text(address.addressDisplayString)
                             } icon: {
-                                Image(systemName: "pin")
-                            }
-                        }
-
-                    }
-                } label: {
-                    if addressBook.pinned.isEmpty {
-                        Image(systemName: "pin.circle.fill")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .padding(.horizontal, 12)
-                    } else {
-                        HStack(alignment: .top, spacing: -16) {
-                            ForEach(pinnedAddressesToShow(in: proxy).reversed()) {
-                                AddressIconView(address: $0, addressBook: addressBook, showMenu: false, contentShape: Circle())
+                                if address == addressBook.pinned.last {
+                                    Image(systemName: "pin")
+                                }
                             }
                         }
                     }
                 }
-                .padding(.top, 4)
-                .padding(.trailing, 2)
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                if !addressBook.following.isEmpty {
+                    Section("Following") {
+                        ForEach(addressBook.following) { address in
+                            Button {
+                                withAnimation {
+                                    presentListable?(.address(address))
+                                }
+                            } label: {
+                                Label {
+                                    Text(address.addressDisplayString)
+                                } icon: {
+                                    if address == addressBook.following.last {
+                                        Image(systemName: "binoculars")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Divider()
+            } label: {
+                HStack(spacing: 2) {
+                    HStack(alignment: .bottom, spacing: -12) {
+                        if addressBook.pinned.count > 2 {
+                            AddressIconView(address: addressBook.pinned[2], addressBook: addressBook, size: 24, showMenu: false, contentShape: Circle())
+                        } else {
+                            Image(systemName: "plus.circle.fill")
+                                .frame(width: 24, height: 24)
+                        }
+                        if addressBook.pinned.count > 1 {
+                            AddressIconView(address: addressBook.pinned[1], addressBook: addressBook, size: 32, showMenu: false, contentShape: Circle())
+                                .padding(.trailing, -4)
+                        } else {
+                            Image(systemName: "pin.circle.fill")
+                                .frame(width: 32, height: 32)
+                                .padding(.trailing, -4)
+                        }
+                        if let firstPin = addressBook.pinned.first {
+                            AddressIconView(address: firstPin, addressBook: addressBook, showMenu: false, contentShape: Circle())
+                        }
+                    }
+                    VStack {
+                        Image(systemName: "pin.circle")
+                        if !addressBook.following.isEmpty {
+                            Image(systemName: "person.2.circle")
+                        }
+                    }
+                    .font(.caption2)
+                    if !addressBook.pinned.isEmpty || !addressBook.following.isEmpty {
+                        VStack(alignment: .leading) {
+                            Text("\(addressBook.pinned.count)")
+                            if !addressBook.following.isEmpty {
+                                Text("\(addressBook.following.count)")
+                            }
+                        }
+                        .font(.caption)
+                    }
+                }
+                .foregroundStyle(Color.primary)
+                .animation(.default, value: addressBook.pinned)
+                .animation(.default, value: addressBook.following)
+                .padding(.trailing, 4)
             }
+            .padding(.top, 4)
+            .padding(.trailing, 2)
             .alert("Add pinned address", isPresented: $addAddress) {
                 TextField("Address", text: $address)
                 Button("Cancel") { }

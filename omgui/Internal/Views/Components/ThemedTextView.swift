@@ -22,7 +22,7 @@ struct ThemedTextView: View {
     
     var body: some View {
         appropriateText
-            .truncationMode(.middle)
+            .truncationMode(.tail)
             .font(font)
             .fontDesign(design)
             .foregroundStyle(.primary)

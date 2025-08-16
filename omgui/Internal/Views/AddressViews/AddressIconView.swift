@@ -100,6 +100,10 @@ struct AddressIconView<S: Shape>: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: size, height: size)
                     .clipShape(contentShape)
+            } else {
+                Color.lolRandom(address)
+                    .frame(width: size, height: size)
+                    .clipShape(contentShape)
             }
             #endif
         } else {

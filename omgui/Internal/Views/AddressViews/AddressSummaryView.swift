@@ -9,7 +9,10 @@ import SwiftUI
 import WebKit
 
 struct AddressSummaryView: View {
-    
+    @Environment(\.showAddressPage)
+    var showPage
+    @Environment(\.visibleAddressPage)
+    var visiblePage
     @Environment(\.horizontalSizeClass)
     var horizontalSizeClass
     @Environment(\.visibleAddressPage)
@@ -48,6 +51,37 @@ struct AddressSummaryView: View {
     
     var body: some View {
         sizeAppropriateBody
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Menu {
+                        ForEach(allPages) { page in
+                            Button {
+                                showPage(page)
+                            } label: {
+                                Label {
+                                    Text(page.displayString)
+                                } icon: {
+                                    if page == visiblePage {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 2) {
+                            AddressIconView(address: address, addressBook: addressBook, size: 24, contentShape: Circle())
+                                .frame(width: 24, height: 24)
+                            Text(address.addressDisplayString)
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+                        }
+                    }
+                    .padding(12)
+                    .glassEffect()
+                }
+            }
+//            .navigationTitle(address.addressDisplayString)
+//            .navigationBarTitleDisplayMode(.large)
             .environment(\.viewContext, .profile)
             .task { @MainActor [weak addressSummaryFetcher] in
                 await addressSummaryFetcher?.updateIfNeeded()
@@ -58,17 +92,6 @@ struct AddressSummaryView: View {
     var sizeAppropriateBody: some View {
         if horizontalSizeClass == .regular {
             destination(addressPage)
-                .safeAreaInset(edge: .bottom, content: {
-                    VStack(spacing: 0) {
-                        AddressSummaryHeader(expandBio: $expandBio, addressBioFetcher: addressSummaryFetcher.bioFetcher, allPages: allPages)
-                            .padding()
-                            .onAppear {
-                                Task { @MainActor [addressSummaryFetcher] in
-                                    await addressSummaryFetcher.updateIfNeeded()
-                                }
-                            }
-                    }
-                })
         } else {
             destination(addressPage)
         }
@@ -171,10 +194,9 @@ struct AddressSummaryHeader: View {
     
     var body: some View {
         HStack {
-            AddressIconView(address: addressBioFetcher.address, addressBook: addressBook, showMenu: false, contentShape: Circle())
-            AddressNameView(addressBioFetcher.address)
-            Spacer()
+            AddressIconView(address: addressBioFetcher.address, addressBook: addressBook, showMenu: true, contentShape: Circle())
             destinationPicker
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.leading, 4)
         .padding(.trailing, 8)

@@ -60,7 +60,7 @@ class SidebarModel {
     }
     
     var sections: [Section] {
-        [.more, .app]
+        [.app, .more]
     }
     
     var sectionsForLists: [Section] {
