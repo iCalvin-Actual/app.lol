@@ -140,7 +140,7 @@ public struct OMGScene: View {
     @ViewBuilder
     private var appState: some View {
         TabBar()
-            .tint(Color.black)
+            .tint(Color.lolPink)
             .background(NavigationDestination.community.gradient)
         
             .environment(\.addressBook, addressBook)

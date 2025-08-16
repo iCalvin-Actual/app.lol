@@ -294,6 +294,9 @@ struct PinnedAddressesView: View {
     @State var address: String = ""
     @State var confirmLogout: Bool = false
     
+    @State
+    var hasShownLoginPrompt: Bool = false
+    
     init(addressBook: AddressBook) {
         self.addressBook = addressBook
     }
@@ -334,7 +337,7 @@ struct PinnedAddressesView: View {
                                     }
                                 } label: {
                                     Label {
-                                        Text("Switch address")
+                                        Text("Use address")
                                     } icon: {
                                         Image(systemName: "shuffle")
                                     }
@@ -361,11 +364,22 @@ struct PinnedAddressesView: View {
                 .contentShape(Rectangle())
             } else {
                 OptionsButton()
+                    .foregroundStyle(.secondary)
             }
             VStack(alignment: .leading) {
-                if !addressBook.signedIn {
-                    Text("Sign in with omg.lol")
-                        .font(.caption)
+                if !addressBook.signedIn && !hasShownLoginPrompt {
+                    HStack {
+                        Image(systemName: "key")
+                            .font(.caption2)
+                        Text("Sign in with omg.lol")
+                            .font(.caption)
+                    }
+                    .task {
+                        try? await Task.sleep(nanoseconds: 2000)
+                        withAnimation {
+                            hasShownLoginPrompt = true
+                        }
+                    }
                 } else if addressBook.mine.count > 1 {
                     HStack(spacing: 2) {
                         Image(systemName: "person.circle")
@@ -373,6 +387,7 @@ struct PinnedAddressesView: View {
                         Text("\(addressBook.mine.count)")
                             .font(.caption)
                     }
+                    .foregroundStyle(Color.secondary)
                 }
                 if !addressBook.me.isEmpty {
                     AddressNameView(addressBook.me)
@@ -434,30 +449,30 @@ struct PinnedAddressesView: View {
                     HStack(alignment: .bottom, spacing: -12) {
                         if addressBook.pinned.count > 2 {
                             AddressIconView(address: addressBook.pinned[2], addressBook: addressBook, size: 24, showMenu: false, contentShape: Circle())
-                        } else {
-                            Image(systemName: "plus.circle.fill")
-                                .frame(width: 24, height: 24)
                         }
                         if addressBook.pinned.count > 1 {
                             AddressIconView(address: addressBook.pinned[1], addressBook: addressBook, size: 32, showMenu: false, contentShape: Circle())
                                 .padding(.trailing, -4)
-                        } else {
-                            Image(systemName: "pin.circle.fill")
-                                .frame(width: 32, height: 32)
-                                .padding(.trailing, -4)
                         }
                         if let firstPin = addressBook.pinned.first {
-                            AddressIconView(address: firstPin, addressBook: addressBook, showMenu: false, contentShape: Circle())
+                            AddressIconView(address: firstPin, addressBook: addressBook, size: 36, showMenu: false, contentShape: Circle())
                         }
                     }
                     VStack {
-                        Image(systemName: "pin.circle")
-                        if !addressBook.following.isEmpty {
+                        if addressBook.following.isEmpty {
+                            if addressBook.pinned.count == 0 {
+                                Image(systemName: "pin.circle")
+                                    .font(.body)
+                            } else if addressBook.pinned.count > 2 {
+                                Image(systemName: "pin.circle")
+                            }
+                        } else {
+                            Image(systemName: "pin.circle")
                             Image(systemName: "person.2.circle")
                         }
                     }
                     .font(.caption2)
-                    if !addressBook.pinned.isEmpty || !addressBook.following.isEmpty {
+                    if addressBook.pinned.count > 2 || !addressBook.following.isEmpty {
                         VStack(alignment: .leading) {
                             Text("\(addressBook.pinned.count)")
                             if !addressBook.following.isEmpty {
@@ -467,12 +482,11 @@ struct PinnedAddressesView: View {
                         .font(.caption)
                     }
                 }
-                .foregroundStyle(Color.primary)
+                .foregroundStyle(Color.secondary)
                 .animation(.default, value: addressBook.pinned)
                 .animation(.default, value: addressBook.following)
                 .padding(.trailing, 4)
             }
-            .padding(.top, 4)
             .padding(.trailing, 2)
             .alert("Add pinned address", isPresented: $addAddress) {
                 TextField("Address", text: $address)

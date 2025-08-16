@@ -133,6 +133,27 @@ struct AccountView: View {
     @ViewBuilder
     var coreBody: some View {
         List {
+            if !addressBook.signedIn {
+                Button(action: {
+                    authFetcher.perform()
+                }) {
+                    Label {
+                        Text("Sign in")
+                    } icon: {
+                        Image(systemName: "rectangle.portrait.and.arrow.left")
+                    }
+                    .bold()
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(3)
+                }
+                .foregroundStyle(.primary)
+#if canImport(UIKit)
+                .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+#elseif os(macOS)
+                .padding(.vertical, 16)
+#endif
+            }
             Section("Lists") {
                 // Mine addresses horizontal scroll section
                 if !addressBook.mine.isEmpty {
@@ -253,8 +274,7 @@ struct AccountView: View {
                     }
                     .bold()
                     .font(.callout)
-                    .fontDesign(.serif)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(3)
                 }
                 .foregroundStyle(.primary)
@@ -272,7 +292,7 @@ struct AccountView: View {
                             authenticate("")
                         })
                 }, message: {
-                    Text("Are you sure you want to sign out of omg.lol?")
+                    Text("Are you sure you want to sign out of your omg.lol account? Your pinned and blocked lists will be maintained after logout")
                 })
                 .contentShape(Rectangle())
             }
@@ -285,14 +305,6 @@ struct AccountView: View {
         .frame(maxWidth: 800)
         .frame(maxWidth: .infinity)
         .environment(\.defaultMinListRowHeight, 0)
-#if !os(macOS)
-        .safeAreaInset(edge: .bottom, content: {
-            if !addressBook.signedIn {
-                AuthenticateButton()
-                    .padding(.horizontal, 12)
-            }
-        })
-#endif
         #if !os(tvOS)
         .scrollContentBackground(.hidden)
         #endif
@@ -318,14 +330,14 @@ struct AuthenticateButton: View {
                         .bold()
                         .font(.callout)
                         .fontDesign(.serif)
-                        .frame(maxWidth: .infinity)
-                        .padding(3)
+                        .padding(4)
                 } icon: {
                     Image(systemName: "key")
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.capsule)
+            
         } else {
             Button(action: {
                 withAnimation { confirmLogout = true }
