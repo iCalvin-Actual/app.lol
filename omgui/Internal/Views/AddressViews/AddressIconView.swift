@@ -114,9 +114,9 @@ struct AddressIconView<S: Shape>: View {
                     .clipShape(contentShape)
             } placeholder: {
                 Color.lolRandom(address)
+                    .frame(width: size, height: size)
+                    .clipShape(contentShape)
             }
-            .frame(width: size, height: size)
-            .clipShape(contentShape)
             .task {
                 await fetcher.updateIfNeeded()
                 if imageCache.object(forKey: NSString(string: address)) == nil {

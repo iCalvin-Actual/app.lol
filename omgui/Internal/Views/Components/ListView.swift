@@ -63,8 +63,6 @@ struct ListView<T: Listable>: View {
             })
         case .now(let name):
             selected = dataFetcher.results.first(where: { ($0 as? NowListing)?.addressName == name })
-        case .address(let name):
-            selected = dataFetcher.results.first(where: { ($0 as? AddressModel)?.addressName == name })
         default:
             present?(item)
         }

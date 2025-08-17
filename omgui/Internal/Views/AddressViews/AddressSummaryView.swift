@@ -67,10 +67,18 @@ struct AddressSummaryView: View {
                                 }
                             }
                         }
+                        Button {
+                            withAnimation {
+                                expandBio = addressSummaryFetcher.bioFetcher.bio != nil
+                            }
+                        } label: {
+                            Text("Bio")
+                        }
+                        .disabled(addressSummaryFetcher.bioFetcher.bio == nil)
                     } label: {
                         HStack(spacing: 2) {
-                            AddressIconView(address: address, addressBook: addressBook, size: 24, contentShape: Circle())
-                                .frame(width: 24, height: 24)
+                            AddressIconView(address: address, addressBook: addressBook, size: 30, contentShape: Circle())
+                                .frame(width: 30, height: 30)
                             Text(address.addressDisplayString)
                                 .font(.headline)
                                 .foregroundStyle(.primary)
@@ -80,11 +88,27 @@ struct AddressSummaryView: View {
                     .glassEffect()
                 }
             }
-//            .navigationTitle(address.addressDisplayString)
-//            .navigationBarTitleDisplayMode(.large)
             .environment(\.viewContext, .profile)
             .task { @MainActor [weak addressSummaryFetcher] in
                 await addressSummaryFetcher?.updateIfNeeded()
+            }
+            .sheet(isPresented: $expandBio) {
+                ScrollView {
+                    VStack {
+                        HStack {
+                            AddressIconView(address: address, addressBook: addressBook)
+                            AddressNameView(address)
+                        }
+                        .padding()
+                        Text({
+                            let givenBio = addressSummaryFetcher.bioFetcher.bio?.bio
+                            let markdown = AttributedString(markdown: givenBio)
+                            return ""
+                        }())
+                        Text(addressSummaryFetcher.bioFetcher.bio?.bio ?? "No bio")
+                    }
+                    .padding()
+                }
             }
     }
     
