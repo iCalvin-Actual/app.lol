@@ -46,12 +46,7 @@ struct TabBar: View {
     @Environment(\.presentListable)
     var present
     
-    @State
-    var visibleAddress: AddressName = ""
-    @State
-    var visibleAddressPage: AddressContent = .profile
-    @State
-    var presentAccount: Bool = false
+    @State var presentAccount: Bool = false
     @State var searchQuery: String = ""
     @State var paths: [NavigationItem: NavigationPath] = .init()
     @State var path: NavigationPath = .init()
@@ -90,15 +85,7 @@ struct TabBar: View {
             .environment(\.presentListable, { item in
                 path.append(item)
             })
-            .environment(\.setVisibleAddress, { visible in
-                visibleAddress = visible ?? ""
-            })
-            .environment(\.showAddressPage, { page in
-                visibleAddressPage = page
-            })
             .environment(\.searchActive, searching)
-            .environment(\.visibleAddressPage, visibleAddressPage)
-            .environment(\.visibleAddress, visibleAddress)
     }
     
     @ViewBuilder
@@ -186,7 +173,7 @@ struct TabBar: View {
     }
     
     @State
-    var collapsed: Set<SidebarModel.Section> = [.app]
+    var collapsed: Set<SidebarModel.Section> = []
     
     func isExpanded(_ section: SidebarModel.Section) -> Binding<Bool> {
         .init {
@@ -205,10 +192,6 @@ struct TabBar: View {
     var regularTabBar: some View {
         NavigationSplitView {
             List(selection: $selected) {
-                Text("app.lol")
-                    .font(.largeTitle)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .fontDesign(.serif)
                 // Sections from SidebarModel
                 ForEach(tabModel.sections, id: \.self) { section in
                     Section(section.displayName, isExpanded: isExpanded(section)) {
@@ -221,19 +204,17 @@ struct TabBar: View {
                 }
             }
             .frame(minWidth: 180)
-            .safeAreaInset(edge: .bottom, content: {
-                if !addressBook.signedIn {
-                #if os(macOS)
-                    AuthenticateButton()
-                        .padding(8)
-                #else
-                    if selected != .account {
-                        AuthenticateButton()
-                            .padding(8)
+            .safeAreaInset(edge: .bottom) {
+                PinnedAddressesView(addressBook: addressBook)
+                    .frame(maxHeight: 44)
+                    .glassEffect(.regular, in: .capsule)
+                    .id(addressBook.hashValue)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        selected = .account
                     }
-                #endif
-                }
-            })
+                    .padding(.horizontal, 8)
+            }
         } detail: {
             if let selected {
                 tabContent(selected)
@@ -294,6 +275,16 @@ struct PinnedAddressesView: View {
     @State var address: String = ""
     @State var confirmLogout: Bool = false
     
+    @SceneStorage("lol.highlightFollows") var highlightFollows: Bool = false
+    
+    var shouldHighlightFollows: Bool {
+        highlightFollows && addressBook.signedIn
+    }
+    
+    var highlights: [AddressName] {
+        shouldHighlightFollows ? addressBook.following : addressBook.pinned
+    }
+    
     @State
     var hasShownLoginPrompt: Bool = false
     
@@ -321,7 +312,7 @@ struct PinnedAddressesView: View {
                         Section(address.addressDisplayString) {
                             Button {
                                 withAnimation {
-                                    presentListable?(.address(address))
+                                    presentListable?(.address(address, page: .profile))
                                 }
                             } label: {
                                 Label {
@@ -374,6 +365,8 @@ struct PinnedAddressesView: View {
                         Text("Sign in with omg.lol")
                             .font(.caption)
                     }
+                    .foregroundStyle(.tint)
+                    .animation(.default, value: hasShownLoginPrompt)
                     .task {
                         try? await Task.sleep(nanoseconds: 2000)
                         withAnimation {
@@ -387,7 +380,7 @@ struct PinnedAddressesView: View {
                         Text("\(addressBook.mine.count)")
                             .font(.caption)
                     }
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(.tint)
                 }
                 if !addressBook.me.isEmpty {
                     AddressNameView(addressBook.me)
@@ -398,38 +391,34 @@ struct PinnedAddressesView: View {
             .padding(4)
             .frame(maxWidth: .infinity, alignment: .leading)
             Menu {
-                Section("Pinned") {
-                    Button {
-                        withAnimation { addAddress.toggle() }
-                    } label: {
-                        Label {
-                            Text("add pin")
-                        } icon: {
-                            Image(systemName: "plus.circle")
-                        }
+                Button {
+                    withAnimation { addAddress.toggle() }
+                } label: {
+                    Label {
+                        Text("add pin")
+                    } icon: {
+                        Image(systemName: "plus.circle")
                     }
+                }
+                Menu {
                     ForEach(addressBook.pinned) { address in
                         Button {
                             withAnimation {
-                                presentListable?(.address(address))
+                                presentListable?(.address(address, page: .profile))
                             }
                         } label: {
-                            Label {
-                                Text(address.addressDisplayString)
-                            } icon: {
-                                if address == addressBook.pinned.last {
-                                    Image(systemName: "pin")
-                                }
-                            }
+                            Text(address.addressDisplayString)
                         }
                     }
+                } label: {
+                    Label("Pins", systemImage: "pin")
                 }
                 if !addressBook.following.isEmpty {
                     Section("Following") {
                         ForEach(addressBook.following) { address in
                             Button {
                                 withAnimation {
-                                    presentListable?(.address(address))
+                                    presentListable?(.address(address, page: .profile))
                                 }
                             } label: {
                                 Label {
@@ -444,17 +433,35 @@ struct PinnedAddressesView: View {
                     }
                 }
                 Divider()
+                Menu {
+                    Button {
+                        highlightFollows = true
+                    } label: {
+                        Label("Follows", systemImage: shouldHighlightFollows ? "checkmark" : "binoculars")
+                            .bold(shouldHighlightFollows)
+                    }
+                    .bold(shouldHighlightFollows)
+                    .disabled(!addressBook.signedIn)
+                    Button {
+                        highlightFollows = false
+                    } label: {
+                        Label("Pinned", systemImage: shouldHighlightFollows ? "pin" : "checkmark")
+                    }
+                    .bold(shouldHighlightFollows)
+                } label: {
+                    Label("Highlight", systemImage: "star")
+                }
             } label: {
                 HStack(spacing: 2) {
                     HStack(alignment: .bottom, spacing: -12) {
-                        if addressBook.pinned.count > 2 {
-                            AddressIconView(address: addressBook.pinned[2], addressBook: addressBook, size: 24, showMenu: false, contentShape: Circle())
+                        if highlights.count > 2 {
+                            AddressIconView(address: highlights[2], addressBook: addressBook, size: 24, showMenu: false, contentShape: Circle())
                         }
                         if addressBook.pinned.count > 1 {
-                            AddressIconView(address: addressBook.pinned[1], addressBook: addressBook, size: 32, showMenu: false, contentShape: Circle())
+                            AddressIconView(address: highlights[1], addressBook: addressBook, size: 32, showMenu: false, contentShape: Circle())
                                 .padding(.trailing, -4)
                         }
-                        if let firstPin = addressBook.pinned.first {
+                        if let firstPin = highlights.first {
                             AddressIconView(address: firstPin, addressBook: addressBook, size: 36, showMenu: false, contentShape: Circle())
                         }
                     }
@@ -463,20 +470,30 @@ struct PinnedAddressesView: View {
                             if addressBook.pinned.count == 0 {
                                 Image(systemName: "pin.circle")
                                     .font(.body)
+                                    .bold()
+                                    .foregroundStyle(Color.lolAccent)
                             } else if addressBook.pinned.count > 2 {
                                 Image(systemName: "pin.circle")
+                                    .bold()
+                                    .foregroundStyle(Color.lolAccent)
                             }
                         } else {
                             Image(systemName: "pin.circle")
+                                .bold(!shouldHighlightFollows)
+                                .foregroundStyle(shouldHighlightFollows ? Color.primary : Color.lolAccent)
                             Image(systemName: "person.2.circle")
+                                .bold(shouldHighlightFollows)
+                                .foregroundStyle(shouldHighlightFollows ? Color.lolAccent : Color.primary)
                         }
                     }
                     .font(.caption2)
                     if addressBook.pinned.count > 2 || !addressBook.following.isEmpty {
                         VStack(alignment: .leading) {
                             Text("\(addressBook.pinned.count)")
+                                .foregroundStyle(shouldHighlightFollows ? Color.primary : Color.lolAccent)
                             if !addressBook.following.isEmpty {
                                 Text("\(addressBook.following.count)")
+                                    .foregroundStyle(shouldHighlightFollows ? Color.lolAccent : Color.primary)
                             }
                         }
                         .font(.caption)

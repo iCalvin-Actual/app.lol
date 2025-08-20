@@ -42,7 +42,7 @@ struct ListView<T: Listable>: View {
     
     func overridePresenter(_ item: NavigationDestination) {
         guard presentingDetail else {
-            present?(item)
+            present?(.safety)
             return
         }
         switch item {
@@ -94,6 +94,7 @@ struct ListView<T: Listable>: View {
                     }
                 }
             }
+            .tint(.primary)
     }
     
     @ViewBuilder
@@ -200,6 +201,9 @@ struct ListView<T: Listable>: View {
         var body: some View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
+                    ThemedTextView(text: dataFetcher.title, font: .largeTitle)
+                        .foregroundStyle(.primary)
+                        .padding(.leading)
                     listItems()
                         .listRowBackground(Color.clear)
                         .padding(.vertical, 4)
@@ -300,7 +304,7 @@ struct ListView<T: Listable>: View {
         
         var body: some View {
             if let selected {
-                destinationConstructor?.destination(ListView.destination(for: selected))
+                destinationConstructor?.destination(ListView.destination(for: selected, showingDetail: true))
             } else {
                ThemedTextView(text: "no selection")
                    .padding()
@@ -310,9 +314,12 @@ struct ListView<T: Listable>: View {
 }
 
 extension ListView {
-    static private func destination(for item: T, in context: ViewContext = .column) -> NavigationDestination? {
+    static private func destination(for item: T, in context: ViewContext = .column, showingDetail: Bool = false) -> NavigationDestination? {
         switch item {
         case let nowModel as NowListing:
+            if !showingDetail {
+                return .address(nowModel.owner, page: .now)
+            }
             return .now(nowModel.owner)
         case let pasteModel as PasteModel:
             return .paste(pasteModel.addressName, id: pasteModel.name)
@@ -321,10 +328,10 @@ extension ListView {
         case let statusModel as StatusModel:
             return .status(statusModel.address, id: statusModel.id)
         case let addressModel as AddressModel:
-            return .address(addressModel.addressName)
+            return .address(addressModel.addressName, page: .profile)
         default:
             if context == .column {
-                return .address(item.addressName)
+                return .address(item.addressName, page: .profile)
             }
         }
         return nil

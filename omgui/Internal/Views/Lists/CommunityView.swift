@@ -31,6 +31,9 @@ struct CommunityView: View {
                 filters: .everyone,
                 dataFetcher: communityFetcher
             )
+            #if !os(macOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
             .task { [weak communityFetcher] in
                 guard let communityFetcher else { return }
                 communityFetcher.configure(addressBook: addressBook)
@@ -42,3 +45,4 @@ struct CommunityView: View {
         }
     }
 }
+

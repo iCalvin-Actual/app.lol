@@ -37,8 +37,8 @@ struct DestinationConstructor {
         switch destination {
         case .community:
             CommunityView()
-        case .address(let name):
-            AddressSummaryView(name, addressBook: addressBook)
+        case .address(let name, let page):
+            AddressSummaryView(name, addressBook: addressBook, page: page)
                 .environment(\.visibleAddress, name)
         case .webpage(let name):
             AddressProfileView(name)

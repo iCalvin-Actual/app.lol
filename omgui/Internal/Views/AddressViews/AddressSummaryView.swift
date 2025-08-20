@@ -7,16 +7,13 @@
 
 import SwiftUI
 import WebKit
+import MarkdownUI
 
 struct AddressSummaryView: View {
     @Environment(\.showAddressPage)
     var showPage
-    @Environment(\.visibleAddressPage)
-    var visiblePage
     @Environment(\.horizontalSizeClass)
     var horizontalSizeClass
-    @Environment(\.visibleAddressPage)
-    var addressPage
     @Environment(\.destinationConstructor)
     var destinationConstructor
     @Environment(\.apiInterface)
@@ -27,8 +24,10 @@ struct AddressSummaryView: View {
     @StateObject
     var addressSummaryFetcher: AddressSummaryDataFetcher
     
-    @State
-    var expandBio: Bool = false
+    @State var presentBio: Bool = false
+    @State var expandBio: PresentationDetent = .medium
+    
+    @State var addressPage: AddressContent
     
     let address: AddressName
     let addressBook: AddressBook
@@ -43,9 +42,10 @@ struct AddressSummaryView: View {
         ]
     }
     
-    init(_ addressName: AddressName, addressBook: AddressBook) {
+    init(_ addressName: AddressName, addressBook: AddressBook, page: AddressContent = .profile) {
         self.address = addressName
         self.addressBook = addressBook
+        self.addressPage = page
         self._addressSummaryFetcher = .init(wrappedValue: .init(name: addressName, addressBook: .init(), interface: AppClient.interface))
     }
     
@@ -53,62 +53,30 @@ struct AddressSummaryView: View {
         sizeAppropriateBody
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Menu {
-                        ForEach(allPages) { page in
-                            Button {
-                                showPage(page)
-                            } label: {
-                                Label {
-                                    Text(page.displayString)
-                                } icon: {
-                                    if page == visiblePage {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
-                            }
+                    Button {
+                        withAnimation {
+                            presentBio.toggle()
                         }
-                        Button {
-                            withAnimation {
-                                expandBio = addressSummaryFetcher.bioFetcher.bio != nil
-                            }
-                        } label: {
-                            Text("Bio")
-                        }
-                        .disabled(addressSummaryFetcher.bioFetcher.bio == nil)
                     } label: {
-                        HStack(spacing: 2) {
-                            AddressIconView(address: address, addressBook: addressBook, size: 30, contentShape: Circle())
-                                .frame(width: 30, height: 30)
-                            Text(address.addressDisplayString)
-                                .font(.headline)
-                                .foregroundStyle(.primary)
-                        }
+                        AddressBioButton(address: address, theme: addressSummaryFetcher.profileFetcher?.theme)
                     }
-                    .padding(12)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
                     .glassEffect()
+                    .popover(isPresented: $presentBio) {
+                        AddressBioView(
+                            fetcher: addressSummaryFetcher,
+                            page: $addressPage
+                        )
+                        .environment(\.showAddressPage, showPage)
+                        .environment(\.visibleAddressPage, addressPage)
+                        .environment(\.addressBook, addressBook)
+                    }
                 }
             }
             .environment(\.viewContext, .profile)
             .task { @MainActor [weak addressSummaryFetcher] in
                 await addressSummaryFetcher?.updateIfNeeded()
-            }
-            .sheet(isPresented: $expandBio) {
-                ScrollView {
-                    VStack {
-                        HStack {
-                            AddressIconView(address: address, addressBook: addressBook)
-                            AddressNameView(address)
-                        }
-                        .padding()
-                        Text({
-                            let givenBio = addressSummaryFetcher.bioFetcher.bio?.bio
-                            let markdown = AttributedString(markdown: givenBio)
-                            return ""
-                        }())
-                        Text(addressSummaryFetcher.bioFetcher.bio?.bio ?? "No bio")
-                    }
-                    .padding()
-                }
             }
     }
     
@@ -145,101 +113,310 @@ struct AddressSummaryView: View {
     }
 }
 
-struct AddressBioLabel: View {
-    @Environment(\.viewContext)
-    var context
-    
-    @Binding
-    var expanded: Bool
+struct AddressBioView: View {
+    @Environment(\.addressBook) var addressBook
+    @Environment(\.pinAddress) var pin
+    @Environment(\.unpinAddress) var unpin
+    @Environment(\.blockAddress) var block
+    @Environment(\.unblockAddress) var unblock
+    @Environment(\.followAddress) var follow
+    @Environment(\.unfollowAddress) var unfollow
+    @Environment(\.presentListable) var present
+    @Environment(\.viewContext) var viewContext
     
     @ObservedObject
-    var addressBioFetcher: AddressBioDataFetcher
+    var fetcher: AddressSummaryDataFetcher
+    let page: Binding<AddressContent>
+    
+    var address: AddressName { fetcher.addressName }
+    
+    let menuBuilder = ContextMenuBuilder<AddressModel>()
+    
+    func intToDisplay(_ page: AddressContent) -> String? {
+        switch page {
+        case .statuslog:
+            guard fetcher.statusFetcher.loaded != nil else { return nil }
+            return "\(fetcher.statusFetcher.results.count)"
+        default:
+            return ""
+        }
+    }
+    
+    func disable(_ page: AddressContent) -> Bool {
+        intToDisplay(page) == nil
+    }
+    
+    var containerCorner: CGFloat {
+        viewContext != .detail && bio == nil ? 16 : 8
+    }
+    
+    var bio: String? {
+        let safeBio = fetcher.bioFetcher.bio?.bio?.replacingHTMLLinksWithMarkdown()
+        if safeBio?.isEmpty ?? false { return nil }
+        return safeBio
+    }
     
     var body: some View {
-        if addressBioFetcher.loaded == nil {
-            LoadingView()
-                .task { @MainActor [addressBioFetcher] in
-                    if addressBioFetcher.loaded == nil {
-                        await addressBioFetcher.updateIfNeeded()
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .top, spacing: 4) {
+                AddressIconView(address: address, addressBook: addressBook, size: 66, showMenu: false, contentShape: UnevenRoundedRectangle(topLeadingRadius: containerCorner, bottomLeadingRadius: 8, bottomTrailingRadius: 8, topTrailingRadius: 8, style: .circular))
+                VStack {
+                    HStack(alignment: .firstTextBaseline) {
+                        AddressNameView(address, font: .body)
+                        
+                        Spacer()
+                        
+                        Menu {
+                            menuBuilder.contextMenu(
+                                for: .init(name: address),
+                                addressBook: addressBook,
+                                menuFetchers: (
+                                    navigate: present ?? { _ in },
+                                    follow: follow,
+                                    block: block,
+                                    pin: pin,
+                                    unFollow: unfollow,
+                                    unBlock: unblock,
+                                    unPin: unpin
+                                )
+                            )
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                        }
+                        .tint(.primary)
+                    }
+                    .foregroundStyle(.primary)
+                    Spacer()
+                    HStack(spacing: 4) {
+                        button(.profile)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        button(.now, span: false)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                 }
-        } else if addressBioFetcher.loading {
-            LoadingView()
-        } else if let content = addressBioFetcher.bio?.bio, !content.isEmpty {
-            contentView(content)
-                .onTapGesture {
-                    withAnimation {
-                        expanded.toggle()
-                    }
+                .frame(idealHeight: 60, maxHeight: 66)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 4) {
+                button(.pastebin)
+                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 8, bottomLeadingRadius: containerCorner, bottomTrailingRadius: 8, topTrailingRadius: 8, style: .circular))
+                button(.statuslog)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                button(.purl)
+                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 8, bottomLeadingRadius: 8, bottomTrailingRadius: containerCorner, topTrailingRadius: 8, style: .circular))
+            }
+        
+            if let bio = fetcher.bioFetcher.bio?.bio?.replacingHTMLLinksWithMarkdown(), !bio.isEmpty
+            {
+                Divider()
+                ScrollView {
+                    Markdown(bio)
+                        .multilineTextAlignment(.leading)
+                        .tint(.lolAccent)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
-        } else if context != .profile {
-            AddressNameView(addressBioFetcher.address)
-        } else {
-            Spacer()
+                .padding()
+                .background(Material.ultraThin)
+                .clipShape(.rect(corners: .concentric))
+                .frame(minHeight: 175)
+            }
+        }
+        .padding()
+        .frame(maxWidth: 500, maxHeight: .infinity, alignment: .top)
+        .presentationCompactAdaptation(.popover)
+        .task {
+            await fetcher.updateIfNeeded(forceReload:
+            true)
         }
     }
     
     @ViewBuilder
-    func contentView(_ bio: String) -> some View {
-        if expanded {
-            ScrollView {
-                MarkdownContentView(content: bio)
+    func button(_ addressContent: AddressContent, text: any StringProtocol = "", span: Bool = true) -> some View {
+        Button {
+            page.wrappedValue = addressContent
+        } label: {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Image(systemName: addressContent.icon)
+                Text(addressContent.displayString)
+                    .bold()
+                    .frame(maxWidth: span ? .infinity : nil, alignment: span ? .leading : .center)
             }
-        } else {
-            Text(bio)
-                .lineLimit(3)
-                .font(.callout)
-                .fontDesign(.rounded)
+            .background(addressContent.color)
         }
+        .padding(4)
+        .font(.callout)
+        .fontDesign(.rounded)
+        .foregroundStyle(Material.regular)
+        .frame(minWidth: 95, minHeight: 33)
+        .background(addressContent.color)
+        .colorScheme(.dark)
     }
 }
 
-struct AddressSummaryHeader: View {
+struct AddressBioButton: View {
     @Environment(\.addressBook) var addressBook
-    @Environment(\.horizontalSizeClass)
-    var horizontalSizeClass
-    @Environment(\.visibleAddressPage)
-    var addressPage
-    @Environment(\.showAddressPage)
-    var showPage
+    let address: AddressName
     
-    var expandBio: Binding<Bool>
-    
-    @ObservedObject
-    var addressBioFetcher: AddressBioDataFetcher
-    
-    let allPages: [AddressContent]
-    
-    init(expandBio: Binding<Bool>, addressBioFetcher: AddressBioDataFetcher, allPages: [AddressContent] = [], selection: Binding<AddressContent>? = nil) {
-        self.expandBio = expandBio
-        self.addressBioFetcher = addressBioFetcher
-        self.allPages = allPages
-    }
+    let theme: ThemeModel?
     
     var body: some View {
-        HStack {
-            AddressIconView(address: addressBioFetcher.address, addressBook: addressBook, showMenu: true, contentShape: Circle())
-            destinationPicker
-                .frame(maxWidth: .infinity, alignment: .trailing)
+        HStack(spacing: 2) {
+            AddressIconView(address: address, addressBook: addressBook, size: 30, showMenu: false, contentShape: Circle())
+                .frame(width: 30, height: 30)
+            AddressNameView(address, font: .headline)
+                .bold()
+                .foregroundStyle(theme?.foregroundColor ?? .primary)
         }
-        .padding(.leading, 4)
-        .padding(.trailing, 8)
-        .glassEffect(.regular)
-    }
-    
-    @ViewBuilder
-    var destinationPicker: some View {
-        Picker("Page", selection: .init(get: {
-            addressPage
-        }, set: { newValue in
-            showPage(newValue)
-        })) {
-            ForEach(allPages) { page in
-                Text(page.displayString)
-                    .tag(page)
-            }
-        }
-        .pickerStyle(.menu)
-        .frame(maxHeight: 44)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 4)
     }
 }
+
+extension AttributedString {
+    init(styledMarkdown markdownString: String) throws {
+        var output = try AttributedString(
+            markdown: markdownString,
+            options: .init(
+                allowsExtendedAttributes: true,
+                interpretedSyntax: .full,
+                failurePolicy: .returnPartiallyParsedIfPossible
+            ),
+            baseURL: nil
+        )
+
+        for (intentBlock, intentRange) in output.runs[AttributeScopes.FoundationAttributes.PresentationIntentAttribute.self].reversed() {
+            guard let intentBlock = intentBlock else { continue }
+            for intent in intentBlock.components {
+                switch intent.kind {
+                case .header(level: let level):
+                    switch level {
+                    case 1:
+                        output[intentRange].font = .system(.title).bold()
+                    case 2:
+                        output[intentRange].font = .system(.title2).bold()
+                    case 3:
+                        output[intentRange].font = .system(.title3).bold()
+                    default:
+                        break
+                    }
+                default:
+                    break
+                }
+            }
+            
+            if intentRange.lowerBound != output.startIndex {
+                output.characters.insert(contentsOf: "\n", at: intentRange.lowerBound)
+            }
+        }
+
+        self = output
+    }
+}
+
+extension String {
+    /// Replaces <i>, <b>, and span tags with markdown equivalents where possible.
+    func replacingHTMLTagsWithMarkdown() -> String {
+        var result = self
+
+        // Replace <i> and <em> tags with *...*
+        let italicPatterns = [
+            ("<i>([\\s\\S]*?)</i>", "*$1*"),
+            ("<em>([\\s\\S]*?)</em>", "*$1*")
+        ]
+        for (pattern, replacement) in italicPatterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                result = regex.stringByReplacingMatches(in: result, options: [], range: NSRange(result.startIndex..., in: result), withTemplate: replacement)
+            }
+        }
+
+        // Replace <b> and <strong> tags with **...**
+        let boldPatterns = [
+            ("<b>([\\s\\S]*?)</b>", "**$1**"),
+            ("<strong>([\\s\\S]*?)</strong>", "**$1**")
+        ]
+        for (pattern, replacement) in boldPatterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                result = regex.stringByReplacingMatches(in: result, options: [], range: NSRange(result.startIndex..., in: result), withTemplate: replacement)
+            }
+        }
+
+        // Replace <span style="font-style: italic">...</span> and <span style='font-style:italic'>...</span> to *...*
+        let spanItalicPattern = "<span[^>]*style=[\"']?[^>]*font-style:\\s*italic;?[^>]*[\"']?[^>]*>([\\s\\S]*?)</span>"
+        if let regex = try? NSRegularExpression(pattern: spanItalicPattern, options: .caseInsensitive) {
+            result = regex.stringByReplacingMatches(in: result, options: [], range: NSRange(result.startIndex..., in: result), withTemplate: "*$1*")
+        }
+        // Replace <span style="font-weight: bold">...</span> and similar to **...**
+        let spanBoldPattern = "<span[^>]*style=[\"']?[^>]*font-weight:\\s*bold;?[^>]*[\"']?[^>]*>([\\s\\S]*?)</span>"
+        if let regex = try? NSRegularExpression(pattern: spanBoldPattern, options: .caseInsensitive) {
+            result = regex.stringByReplacingMatches(in: result, options: [], range: NSRange(result.startIndex..., in: result), withTemplate: "**$1**")
+        }
+        return result
+    }
+    
+    /// Replaces HTML <a href="...">text</a> tags with Markdown [text](url) formatting.
+    func replacingHTMLLinksWithMarkdown() -> String {
+        let pattern = #"<a\s+href=[\"']([^\"'>]+)[\"'][^>]*>([\s\S]*?)<\/a>"#
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
+            return self
+        }
+        let range = NSRange(self.startIndex..<self.endIndex, in: self)
+        var result = self
+        let matches = regex.matches(in: self, options: [], range: range).reversed()
+        for match in matches {
+            guard match.numberOfRanges == 3,
+                  let urlRange = Range(match.range(at: 1), in: self),
+                  let textRange = Range(match.range(at: 2), in: self) else { continue }
+            let url = self[urlRange]
+            let text = self[textRange]
+            let markdown = "[\(text)](\(url))"
+            if let fullRange = Range(match.range, in: result) {
+                result.replaceSubrange(fullRange, with: markdown)
+            }
+        }
+        return result
+            .replacingHTMLImagesWithMarkdown()
+            .replacingHTMLTagsWithMarkdown()
+            .replacingHTMLTagsWithMarkdown()
+            .replacingOccurrences(of: "<p>", with: "")
+            .replacingOccurrences(of: "</p>", with: "\r\n")
+    }
+    
+    /// Replaces HTML <img src=... alt=...> tags with Markdown ![alt](src) formatting.
+    func replacingHTMLImagesWithMarkdown() -> String {
+        let pattern = #"<img[^>]*src=[\"']([^\"'>]+)[\"'][^>]*alt=[\"']([^\"'>]*)[\"'][^>]*>|<img[^>]*alt=[\"']([^\"'>]*)[\"'][^>]*src=[\"']([^\"'>]+)[\"'][^>]*>|<img[^>]*src=[\"']([^\"'>]+)[\"'][^>]*>"#
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
+            return self
+        }
+        let range = NSRange(self.startIndex..<self.endIndex, in: self)
+        var result = self
+        let matches = regex.matches(in: self, options: [], range: range).reversed()
+        for match in matches {
+            var src: Substring = ""
+            var alt: Substring = ""
+            if match.numberOfRanges >= 3 {
+                // <img ... src=... alt=...>
+                if let srcRange = Range(match.range(at: 1), in: self),
+                   let altRange = Range(match.range(at: 2), in: self) {
+                    src = self[srcRange]
+                    alt = self[altRange]
+                }
+                // <img ... alt=... src=...>
+                else if let altRange = Range(match.range(at: 3), in: self),
+                        let srcRange = Range(match.range(at: 4), in: self) {
+                    src = self[srcRange]
+                    alt = self[altRange]
+                }
+                // <img ... src=...>
+                else if let srcRange = Range(match.range(at: 5), in: self) {
+                    src = self[srcRange]
+                }
+            }
+            let markdown = "![\(alt)](\(src))"
+            if let fullRange = Range(match.range, in: result) {
+                result.replaceSubrange(fullRange, with: markdown)
+            }
+        }
+        return result
+    }
+}
+

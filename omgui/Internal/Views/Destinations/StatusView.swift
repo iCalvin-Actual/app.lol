@@ -13,10 +13,12 @@ struct StatusView: View {
     var addressBook
     @Environment(\.viewContext)
     var viewContext
-    @Environment(\.addressSummaryFetcher)
-    var summaryFetcher
     @Environment(\.openURL)
     var openUrl
+    @Environment(\.presentListable)
+    var presentDestination
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetcher
     
     @State
     var shareURL: URL?
@@ -36,6 +38,15 @@ struct StatusView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 32) {
+                if let summary = summaryFetcher(fetcher.address) {
+                    AddressBioView(fetcher: summary, page: .init(
+                        get: { .profile },
+                        set: { presentDestination?($0.destination(fetcher.address)) }
+                    ))
+                    .background(Material.ultraThin)
+                    .mask(RoundedRectangle(cornerRadius: 16))
+                    .padding(.horizontal)
+                }
                 if let model = fetcher.result {
                     StatusRowView(model: model)
                         .environment(\.viewContext, ViewContext.detail)

@@ -27,7 +27,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     case saved      (_ feature: AppFeature)
     case comingSoon (_ feature: AppFeature)
     
-    case address    (_ name: AddressName)
+    case address    (_ name: AddressName, page: AddressContent)
     case following  (_ name: AddressName)
     case webpage    (_ name: AddressName)
     case now        (_ name: AddressName)
@@ -63,7 +63,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
         case .saved(let feature):       return "saved.\(feature.rawValue)"
         case .comingSoon(let feature):  return "coming.\(feature.rawValue)"
             
-        case .address(let address):     return "address.\(address)"
+        case .address(let address, let page):     return "address.\(address).\(page)"
         case .following(let address):   return "following.\(address)"
         case .webpage(let address):     return "webpage.\(address)"
         case .now(let address):         return "now.\(address)"
@@ -106,7 +106,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
             guard splitString.count > 1 else {
                 return nil
             }
-            self = .address(splitString[1])
+            self = .address(splitString[1], page: .profile)
         case "saved":
             guard splitString.count > 1, let feature = AppFeature(rawValue: splitString[1]) else {
                 return nil

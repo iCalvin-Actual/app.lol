@@ -12,7 +12,7 @@ import SwiftUI
 @MainActor
 @Observable
 class SidebarModel {
-    enum Section: String, Identifiable {
+    enum Section: String, Identifiable, Hashable {
         var id: String { rawValue }
         
         case account
@@ -60,11 +60,11 @@ class SidebarModel {
     }
     
     var sections: [Section] {
-        [.app, .more]
+        [.more, .app]
     }
     
     var sectionsForLists: [Section] {
-        [.app]
+        [.app, .more]
     }
     
     var addressBook: AddressBook
@@ -93,11 +93,11 @@ class SidebarModel {
                 return []
                 #endif
             } else {
-                return [.account, .appLatest, .appSupport, .safety]
+                return [.appLatest, .appSupport, .safety]
             }
             
         case .more:
-            return [.search, .community, .nowGarden] + addressBook.pinned.sorted().map({ .pinnedAddress($0) })
+            return [.search, .community, .nowGarden]
             
         default:
             return []

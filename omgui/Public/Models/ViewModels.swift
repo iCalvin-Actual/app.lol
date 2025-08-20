@@ -8,6 +8,7 @@
 import Blackbird
 import Foundation
 import os
+import SwiftUI
 
 private let logger = Logger(subsystem: "ViewModels", category: "model-errors")
 
@@ -89,6 +90,13 @@ public struct ThemeModel: Codable, Sendable {
         self.license = license
         self.details = description
         self.preview = preview
+    }
+    
+    var foregroundColor: Color {
+        switch name {
+        default:
+            return .primary
+        }
     }
 }
 

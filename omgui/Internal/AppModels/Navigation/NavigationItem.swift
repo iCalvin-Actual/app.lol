@@ -161,7 +161,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case .following(let address):
             return .following(address)
         case .pinnedAddress(let name):
-            return .address(name)
+            return .address(name, page: .profile)
         case .safety:
             return .safety
         case .newStatus:

@@ -13,6 +13,7 @@ struct AddressIconView<S: Shape>: View {
     @Environment(\.presentListable) var present
     
     @Environment(\.imageCache) var imageCache
+    @Environment(\.addressSummaryFetcher) var summaryCache
     
     let address: AddressName
     let addressBook: AddressBook
@@ -23,64 +24,68 @@ struct AddressIconView<S: Shape>: View {
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
     
-    @StateObject
-    var iconFetcher: AddressIconDataFetcher
+    @StateObject var newSummaryFetcher: AddressSummaryDataFetcher
     
-    var fetcher: AddressIconDataFetcher {
-        imageCache.object(forKey: NSString(string: address)) ?? iconFetcher
+    var summaryFetcher: AddressSummaryDataFetcher {
+        summaryCache(address) ?? newSummaryFetcher
     }
+    var iconFetcher: AddressIconDataFetcher {
+        imageCache.object(forKey: NSString(string: address)) ?? summaryFetcher.iconFetcher
+    }
+    
+    @State
+    var showPopover: Bool = false
     
     init(
         address: AddressName,
         addressBook: AddressBook,
         size: CGFloat = 40.0,
         showMenu: Bool = true,
-        contentShape: S = RoundedRectangle(cornerRadius: 12)
+        contentShape: S = RoundedRectangle(cornerRadius: 8)
     ) {
         self.address = address
         self.addressBook = addressBook
         self.size = size
         self.showMenu = showMenu
         self.contentShape = contentShape
-        self._iconFetcher = .init(wrappedValue: .init(address: address))
+        self._newSummaryFetcher = .init(wrappedValue: .init(name: address, addressBook: addressBook, interface: APIDataInterface()))
     }
     
     var body: some View {
-        #if os(macOS)
-        iconView
-        #else
         if showMenu {
             menu
         } else {
             iconView
         }
-        #endif
     }
     
     @ViewBuilder
     var menu: some View {
-        Menu {
-            menuBuilder.contextMenu(
-                for: .init(name: address),
-                addressBook: addressBook,
-                menuFetchers: (
-                    navigate: present ?? { _ in },
-                    follow: follow,
-                    block: block,
-                    pin: pin,
-                    unFollow: unfollow,
-                    unBlock: unblock,
-                    unPin: unpin
-                )
-            )
+        Button {
+            withAnimation {
+                showPopover.toggle()
+            }
         } label: {
             iconView
+        }
+        .popover(isPresented: $showPopover) {
+            AddressBioView(
+                fetcher: summaryFetcher,
+                page: .init(
+                    get: { .profile },
+                    set: {
+                        showPopover = false
+                        present?(.address(address, page: $0))
+                    }
+                )
+            )
+            
         }
     }
     
     @ViewBuilder
     var iconView: some View {
-        if let result = fetcher.result?.data, !result.isEmpty {
+        if let result = iconFetcher.result?.data, !result.isEmpty {
             #if canImport(UIKit)
             if let image = UIImage(data: result) {
                 Image(uiImage: image)
@@ -118,7 +123,7 @@ struct AddressIconView<S: Shape>: View {
                     .clipShape(contentShape)
             }
             .task {
-                await fetcher.updateIfNeeded()
+                await summaryFetcher.updateIfNeeded()
                 if imageCache.object(forKey: NSString(string: address)) == nil {
                     imageCache.setObject(iconFetcher, forKey: NSString(string: address))
                 }

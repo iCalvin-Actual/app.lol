@@ -76,13 +76,13 @@ struct AddressesRow: View {
                 if sizeClass == .compact {
                     dismiss()
                 }
-                present(.address(address))
+                present(.address(address, page: .profile))
             } label: {
                 card(address, colorToUse)
             }
             .buttonStyle(.plain)
         } else {
-            NavigationLink(value: NavigationDestination.address(address)) {
+            NavigationLink(value: NavigationDestination.address(address, page: .profile)) {
                 card(address, colorToUse)
             }
         }
@@ -140,7 +140,7 @@ struct AccountView: View {
                     Label {
                         Text("Sign in")
                     } icon: {
-                        Image(systemName: "rectangle.portrait.and.arrow.left")
+                        Image(systemName: "key")
                     }
                     .bold()
                     .font(.callout)

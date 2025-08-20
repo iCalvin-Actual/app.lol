@@ -61,7 +61,7 @@ extension ProfileMarkdown: MDDraftable {
         public static var ownerKey: BlackbirdColumnKeyPath { \.$addressName }
         public static var primaryKey: [BlackbirdColumnKeyPath] { [\.$id] }
         public static var dateKey: BlackbirdColumnKeyPath { \.$filterDate }
-        public var rowDestination: NavigationDestination { .editWebpage(addressName) }
+        public func rowDestination(detailPage showDetail: Bool) -> NavigationDestination { .editWebpage(addressName) }
         
         var listTitle: String { id }
         

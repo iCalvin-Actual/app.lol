@@ -14,7 +14,12 @@ protocol Listable: Filterable, Sortable, Menuable, Hashable, Identifiable {
     var listCaption: String? { get }
     var displayDate: Date?   { get }
     var iconURL: URL?        { get }
-    var rowDestination: NavigationDestination { get }
+    func rowDestination(detailPage: Bool) -> NavigationDestination
+}
+extension Listable {
+    func rowDestination(detail: Bool = false) -> NavigationDestination {
+        rowDestination(detailPage: detail)
+    }
 }
 
 extension Listable {
@@ -43,33 +48,40 @@ extension AddressModel {
     var listTitle: String { addressName.addressDisplayString }
     var listSubtitle: String { url?.absoluteString ?? "" }
     var iconURL: URL? { addressName.addressIconURL }
-    var rowDestination: NavigationDestination { .address(addressName) }
+    
+    func rowDestination(detailPage: Bool = false) -> NavigationDestination { .address(addressName, page: .profile) }
 }
 extension StatusModel     {
     var listTitle: String     { status }
     var listSubtitle: String  { owner.addressDisplayString }
     var displayDate: Date?    { date }
     var listCaption: String?  { DateFormatter.short.string(for: date) }
-    var rowDestination: NavigationDestination { .status(owner, id: id) }
+    func rowDestination(detailPage: Bool = false) -> NavigationDestination { .status(owner, id: id) }
 }
 extension PasteModel     {
     var listTitle: String     { name }
     var listSubtitle: String  { String(content.prefix(42)) }
     var listCaption: String?  { DateFormatter.relative.string(for: date) ?? DateFormatter.short.string(for: date) }
-    var rowDestination: NavigationDestination { .paste(owner, id: name) }
+    func rowDestination(detailPage: Bool = false) -> NavigationDestination { .paste(owner, id: name) }
 }
 extension PURLModel     {
     var listTitle: String     { name }
     var listSubtitle: String  { content }
     var listCaption: String?  { DateFormatter.relative.string(for: date) ?? DateFormatter.short.string(for: date) }
-    var rowDesetination: NavigationDestination { .purl(owner, id: name) }
+    func rowDestination(detailPage: Bool = false) -> NavigationDestination { .purl(owner, id: name) }
 }
 extension NowListing     {
     var listTitle: String     { owner.addressDisplayString }
     var listSubtitle: String  { url.replacingOccurrences(of: "https://", with: "") }
     var displayDate: Date?    { date }
     var hideIcon: Bool { false }
-    var rowDestination: NavigationDestination { .now(owner) }
+    func rowDestination(detailPage: Bool = false) -> NavigationDestination {
+        if detailPage {
+            .now(owner)
+        } else {
+            .address(owner, page: .now)
+        }
+    }
 }
 
 extension AddressIconModel {
@@ -81,5 +93,5 @@ extension AddressIconModel {
         nil
     }
     var hideIcon: Bool { false }
-    var rowDestination: NavigationDestination { .address(self.id) }
+    var rowDestination: NavigationDestination { .address(self.id, page: .profile) }
 }

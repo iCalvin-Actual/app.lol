@@ -41,13 +41,12 @@ struct StatusRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             buttonIfNeeded
-                .padding(4)
+                .padding(.vertical, 4)
                 .padding(.horizontal, 4)
-                .padding(.top, 6)
             
             rowBody
-                .foregroundStyle(Color.black)
                 .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
+                .padding([.bottom, .horizontal], 4)
         }
         .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection || context == .detail)
         .confirmationDialog("Open Image", isPresented: $showURLs, actions: {
@@ -90,9 +89,9 @@ struct StatusRowView: View {
 //                    + Text(" ").font(.largeTitle) +
              */
             appropriateMarkdown
+                .tint(.lolAccent)
                 .fontWeight(.medium)
                 .fontDesign(.rounded)
-                .environment(\.colorScheme, .light)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .lineLimit(context == .column ? 5 : nil)
@@ -119,28 +118,32 @@ struct StatusRowView: View {
     
     @ViewBuilder
     var headerContent: some View {
-        ZStack(alignment: .topTrailing) {
-            HStack(alignment: .bottom, spacing: 0) {
-                if context != .profile {
-                    AddressIconView(address: model.address, addressBook: addressBook)
-                        .padding(.horizontal, 4)
-                }
-                Text(model.displayEmoji.count > 1 ? "✨" : model.displayEmoji.prefix(1))
-                    .font(.system(size: 35))
+        HStack(alignment: .bottom, spacing: 4) {
+            if context != .profile {
+                AddressIconView(address: model.address, addressBook: addressBook, contentShape: RoundedRectangle(cornerRadius: 12))
+                    .padding(.horizontal, 2)
+            }
+            VStack(alignment: .leading, spacing: 2) {
                 if context != .profile {
                     AddressNameView(model.address, font: .headline)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } else {
-                    Spacer()
+                        .foregroundStyle(.primary)
+                } else if let timeText = DateFormatter.short.string(for: model.date) {
+                    Text(timeText)
+                        .fontDesign(.serif)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                }
+                if let caption = context != .detail ? DateFormatter.relative.string(for: model.date) ?? model.listCaption : model.listCaption {
+                    Text(caption)
+                        .multilineTextAlignment(.leading)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .truncationMode(.tail)
                 }
             }
-            if let caption = context != .detail ? DateFormatter.relative.string(for: model.date) ?? model.listCaption : model.listCaption {
-                Text(caption)
-                    .multilineTextAlignment(.trailing)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .truncationMode(.head)
-            }
+            Spacer()
+            Text(model.displayEmoji.count > 1 ? "✨" : model.displayEmoji.prefix(1))
+                .font(.system(size: 35))
         }
     }
 }
