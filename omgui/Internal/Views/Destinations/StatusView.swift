@@ -19,6 +19,7 @@ struct StatusView: View {
     var presentDestination
     @Environment(\.addressSummaryFetcher)
     var summaryFetcher
+    @Environment(\.horizontalSizeClass) var sizeClass
     
     @State
     var shareURL: URL?
@@ -36,48 +37,40 @@ struct StatusView: View {
     }
     
     var body: some View {
-        ScrollView(.vertical) {
-            VStack(alignment: .leading, spacing: 32) {
-                if let summary = summaryFetcher(fetcher.address) {
-                    AddressBioView(fetcher: summary, page: .init(
-                        get: { .profile },
-                        set: { presentDestination?($0.destination(fetcher.address)) }
-                    ))
-                    .background(Material.ultraThin)
-                    .mask(RoundedRectangle(cornerRadius: 16))
-                    .padding(.horizontal)
-                }
-                if let model = fetcher.result {
-                    StatusRowView(model: model)
-                        .environment(\.viewContext, ViewContext.detail)
-                        .padding(.horizontal)
-                } else if fetcher.loading {
-                    LoadingView()
-                        .padding()
-                } else {
-                    LoadingView()
-                        .padding()
-                        .task { @MainActor [fetcher] in
-                            await fetcher.updateIfNeeded()
-                        }
-                }
-                if let items = fetcher.result?.imageLinks, !items.isEmpty {
-                    imageSection(items)
-                        .padding(.horizontal)
-                }
-                if let items = fetcher.result?.linkedItems, !items.isEmpty {
-                    linksSection(items)
-                        .padding(.horizontal)
-                }
-                Spacer()
+        VStack(alignment: .leading, spacing: 0) {
+            if let model = fetcher.result {
+                StatusRowView(model: model)
+//                    .frame(maxHeight: .infinity, alignment: .top)
+//                    .background(Color.red)
+                    .padding(.horizontal, 6)
+            } else if fetcher.loading {
+                LoadingView()
+                    .padding()
+            } else {
+                LoadingView()
+                    .padding()
+                    .task { @MainActor [fetcher] in
+                        await fetcher.updateIfNeeded()
+                    }
             }
-            .padding(.vertical)
+            if let items = fetcher.result?.imageLinks, !items.isEmpty {
+                imageSection(items)
+                    .padding(.horizontal)
+            }
+            if let items = fetcher.result?.linkedItems, !items.isEmpty {
+                linksSection(items)
+                    .padding(.horizontal)
+            }
+            Spacer()
         }
+        .padding(4)
+        .padding(.vertical, sizeClass == .compact ? 16 : 0)
         .onChange(of: fetcher.id, {
             Task { [fetcher] in
                 await fetcher.updateIfNeeded(forceReload: true)
             }
         })
+        .environment(\.viewContext, ViewContext.detail)
         #if canImport(UIKit) && !os(tvOS)
         .sheet(item: $presentURL, content: { url in
             SafariView(url: url)
@@ -93,7 +86,24 @@ struct StatusView: View {
                 }
             }
         }
+        #if !os(macOS)
+        .navigationBarTitleDisplayMode(.inline)
         #endif
+#endif
+        .tint(.primary)
+        .toolbar {
+            if let addressSummaryFetcher = summaryFetcher(fetcher.address) {
+                ToolbarItem(placement: .principal) {
+                    AddressPrincipalView(
+                        addressSummaryFetcher: addressSummaryFetcher,
+                        addressPage: .init(
+                            get: { .statuslog },
+                            set: { presentDestination?($0.destination(addressSummaryFetcher.addressName)) }
+                        )
+                    )
+                }
+            }
+        }
     }
     
     @ViewBuilder

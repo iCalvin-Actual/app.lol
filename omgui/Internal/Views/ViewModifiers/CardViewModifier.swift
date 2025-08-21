@@ -24,7 +24,9 @@ struct CardViewModifier: ViewModifier {
         selected ? 8 : 2
     }
     
-    init(color: Color = .lolRandom(), material: Material = .thin, backgroundColor: Color? = nil, padding: CGFloat, radius: CGFloat, selected: Bool) {
+    let address = "rom"
+    
+    init(color: Color = .lolRandom(), material: Material = .ultraThin, backgroundColor: Color? = nil, padding: CGFloat, radius: CGFloat, selected: Bool) {
         self.color = color
         self.material = material
         self.background = backgroundColor
@@ -37,9 +39,9 @@ struct CardViewModifier: ViewModifier {
         content
             .frame(maxWidth: .infinity)
             .padding(padding)
-            .background(contrast == .increased ? Material.ultraThick : material)
+            .background(contrast == .increased ? Material.thick : material)
             .cornerRadius(radius)
-            .shadow(color: selected ? .black : .clear, radius:  4, x: shadowOffset, y: shadowOffset)
+//            .shadow(color: selected ? .black : .clear, radius:  4, x: shadowOffset, y: shadowOffset)
             .padding(2)
     }
 }

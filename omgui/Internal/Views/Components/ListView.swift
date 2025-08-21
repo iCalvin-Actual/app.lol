@@ -201,9 +201,6 @@ struct ListView<T: Listable>: View {
         var body: some View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
-                    ThemedTextView(text: dataFetcher.title, font: .largeTitle)
-                        .foregroundStyle(.primary)
-                        .padding(.leading)
                     listItems()
                         .listRowBackground(Color.clear)
                         .padding(.vertical, 4)
@@ -231,6 +228,8 @@ struct ListView<T: Listable>: View {
             .scrollContentBackground(.hidden)
             #endif
             .frame(minWidth: 200)
+            .navigationTitle(dataFetcher.title)
+            .toolbarTitleDisplayMode(.inlineLarge)
         }
         
         @ViewBuilder
@@ -274,16 +273,6 @@ struct ListView<T: Listable>: View {
                 .listRowSeparator(.hidden, edges: .all)
             #endif
                 .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .contextMenu(menuItems: {
-                    menuBuilder.contextMenu(
-                        for: item,
-                        fetcher: dataFetcher,
-                        addressBook: addressBook,
-                        menuFetchers: menuFetchers
-                    )
-                }) {
-                    AddressCard(item.addressName, addressBook: addressBook)
-                }
         }
         
         @ViewBuilder

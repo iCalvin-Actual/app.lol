@@ -9,6 +9,13 @@ import MarkdownUI
 import SwiftUI
 
 struct StatusRowView: View {
+    @Environment(\.pinAddress) var pin
+    @Environment(\.unpinAddress) var unpin
+    @Environment(\.blockAddress) var block
+    @Environment(\.unblockAddress) var unblock
+    @Environment(\.followAddress) var follow
+    @Environment(\.unfollowAddress) var unfollow
+    
     @State
     var showURLs: Bool = false
     @State
@@ -24,6 +31,10 @@ struct StatusRowView: View {
     var addressBook
     @Environment(\.presentListable)
     var present
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetcher
+    
+    let menuBuilder = ContextMenuBuilder<StatusModel>()
     
     let cardColor: Color
     let cardPadding: CGFloat
@@ -40,15 +51,56 @@ struct StatusRowView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            buttonIfNeeded
-                .padding(.vertical, 4)
-                .padding(.horizontal, 4)
+            headerContent
+                .padding(4)
             
-            rowBody
-                .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
-                .padding([.bottom, .horizontal], 4)
+            mainBody
+            
+            HStack {
+                Text(DateFormatter.short.string(from: model.date))
+                    .font(.caption)
+                    .padding(.horizontal, 4)
+                Spacer()
+                Menu {
+                    menuBuilder.contextMenu(
+                        for: model,
+                        fetcher: nil,
+                        addressBook: addressBook,
+                        menuFetchers: (
+                            navigate: present ?? { _ in },
+                            follow: follow,
+                            block: block,
+                            pin: pin,
+                            unFollow: unfollow,
+                            unBlock: unblock,
+                            unPin: unpin
+                        )
+                    )
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+            .foregroundStyle(.secondary)
+            .padding(4)
+            .padding(.leading, 4)
         }
         .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection || context == .detail)
+        .contextMenu(menuItems: {
+            menuBuilder.contextMenu(
+                for: model,
+                fetcher: nil,
+                addressBook: addressBook,
+                menuFetchers: (
+                    navigate: present ?? { _ in },
+                    follow: follow,
+                    block: block,
+                    pin: pin,
+                    unFollow: unfollow,
+                    unBlock: unblock,
+                    unPin: unpin
+                )
+            )
+        })
         .confirmationDialog("Open Image", isPresented: $showURLs, actions: {
             ForEach(model.imageLinks) { link in
                 Button {
@@ -75,6 +127,15 @@ struct StatusRowView: View {
                 ThemedTextView(text: "Loading image...")
             }
         }
+        .clipped()
+    }
+    
+    @ViewBuilder
+    var mainBody: some View {
+        rowBody
+            .frame(maxHeight: context == .detail ? .infinity : nil, alignment: .top)
+            .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
+            .padding(.horizontal, 4)
     }
     
     @ViewBuilder
@@ -92,35 +153,25 @@ struct StatusRowView: View {
                 .tint(.lolAccent)
                 .fontWeight(.medium)
                 .fontDesign(.rounded)
-                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .lineLimit(context == .column ? 5 : nil)
         .multilineTextAlignment(.leading)
     }
     
     @ViewBuilder
     var appropriateMarkdown: some View {
-        Markdown(model.displayStatus)
-    }
-    
-    @ViewBuilder
-    var buttonIfNeeded: some View {
-        if context == .detail  {
-            Button {
-                present?(.status(model.owner, id: model.id))
-            } label: {
-                headerContent
-            }
-        } else {
-            headerContent
+        ScrollView {
+            Markdown(model.displayStatus)
         }
+        .scrollDisabled(context == .column)
     }
     
     @ViewBuilder
     var headerContent: some View {
         HStack(alignment: .bottom, spacing: 4) {
             if context != .profile {
-                AddressIconView(address: model.address, addressBook: addressBook, contentShape: RoundedRectangle(cornerRadius: 12))
+                AddressIconView(address: model.address, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
                     .padding(.horizontal, 2)
             }
             VStack(alignment: .leading, spacing: 2) {
@@ -162,3 +213,4 @@ struct StatusRowView: View {
     .environment(SceneModel.sample)
     .padding(.horizontal)
 }
+

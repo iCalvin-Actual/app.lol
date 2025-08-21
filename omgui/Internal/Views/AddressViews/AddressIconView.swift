@@ -79,7 +79,7 @@ struct AddressIconView<S: Shape>: View {
                     }
                 )
             )
-            
+            .padding(2)
         }
     }
     

@@ -53,25 +53,7 @@ struct AddressSummaryView: View {
         sizeAppropriateBody
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Button {
-                        withAnimation {
-                            presentBio.toggle()
-                        }
-                    } label: {
-                        AddressBioButton(address: address, theme: addressSummaryFetcher.profileFetcher?.theme)
-                    }
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 2)
-                    .glassEffect()
-                    .popover(isPresented: $presentBio) {
-                        AddressBioView(
-                            fetcher: addressSummaryFetcher,
-                            page: $addressPage
-                        )
-                        .environment(\.showAddressPage, showPage)
-                        .environment(\.visibleAddressPage, addressPage)
-                        .environment(\.addressBook, addressBook)
-                    }
+                    AddressPrincipalView(addressSummaryFetcher: addressSummaryFetcher, addressPage: $addressPage)
                 }
             }
             .environment(\.viewContext, .profile)
@@ -185,7 +167,7 @@ struct AddressBioView: View {
                         }
                         .tint(.primary)
                     }
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.secondary)
                     Spacer()
                     HStack(spacing: 4) {
                         button(.profile)
@@ -218,11 +200,11 @@ struct AddressBioView: View {
                 .padding()
                 .background(Material.ultraThin)
                 .clipShape(.rect(corners: .concentric))
-                .frame(minHeight: 175)
+                .frame(minHeight: 125)
             }
         }
-        .padding()
-        .frame(maxWidth: 500, maxHeight: .infinity, alignment: .top)
+        .padding(6)
+        .frame(maxWidth: 500, alignment: .top)
         .presentationCompactAdaptation(.popover)
         .task {
             await fetcher.updateIfNeeded(forceReload:
@@ -253,9 +235,47 @@ struct AddressBioView: View {
     }
 }
 
+struct AddressPrincipalView: View {
+    @Environment(\.showAddressPage) var showPage
+    @Environment(\.addressBook) var addressBook
+    
+    let addressSummaryFetcher: AddressSummaryDataFetcher
+    
+    @Binding var addressPage: AddressContent
+    
+    @State var presentBio: Bool = false
+    
+    var address: AddressName { addressSummaryFetcher.addressName }
+    
+    var body: some View {
+        Button {
+            withAnimation {
+                presentBio.toggle()
+            }
+        } label: {
+            AddressBioButton(address: address, page: $addressPage, theme: addressSummaryFetcher.profileFetcher?.theme)
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 5)
+        .glassEffect()
+        .popover(isPresented: $presentBio) {
+            AddressBioView(
+                fetcher: addressSummaryFetcher,
+                page: $addressPage
+            )
+            .padding(6)
+            .environment(\.showAddressPage, showPage)
+            .environment(\.visibleAddressPage, addressPage)
+            .environment(\.addressBook, addressBook)
+        }
+    }
+}
+
 struct AddressBioButton: View {
     @Environment(\.addressBook) var addressBook
     let address: AddressName
+    @Binding
+    var page: AddressContent
     
     let theme: ThemeModel?
     
@@ -263,9 +283,14 @@ struct AddressBioButton: View {
         HStack(spacing: 2) {
             AddressIconView(address: address, addressBook: addressBook, size: 30, showMenu: false, contentShape: Circle())
                 .frame(width: 30, height: 30)
-            AddressNameView(address, font: .headline)
-                .bold()
-                .foregroundStyle(theme?.foregroundColor ?? .primary)
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                AddressNameView(address, font: .headline)
+                    .bold()
+                    .foregroundStyle(theme?.foregroundColor ?? .primary)
+                if page != .profile {
+                    ThemedTextView(text: page.displayString, font: .headline)
+                }
+            }
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 4)

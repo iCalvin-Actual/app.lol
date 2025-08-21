@@ -376,8 +376,10 @@ struct PinnedAddressesView: View {
                 } else if addressBook.mine.count > 1 {
                     HStack(spacing: 2) {
                         Image(systemName: "person.circle")
+                            .bold()
                             .font(.caption2)
                         Text("\(addressBook.mine.count)")
+                            .bold()
                             .font(.caption)
                     }
                     .foregroundStyle(.tint)
@@ -490,9 +492,11 @@ struct PinnedAddressesView: View {
                     if addressBook.pinned.count > 2 || !addressBook.following.isEmpty {
                         VStack(alignment: .leading) {
                             Text("\(addressBook.pinned.count)")
+                                .bold(!shouldHighlightFollows)
                                 .foregroundStyle(shouldHighlightFollows ? Color.primary : Color.lolAccent)
                             if !addressBook.following.isEmpty {
                                 Text("\(addressBook.following.count)")
+                                    .bold(shouldHighlightFollows)
                                     .foregroundStyle(shouldHighlightFollows ? Color.lolAccent : Color.primary)
                             }
                         }

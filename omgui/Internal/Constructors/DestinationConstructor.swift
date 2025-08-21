@@ -46,20 +46,25 @@ struct DestinationConstructor {
             AddressNowView(name)
         case .safety:
             SafetyView()
+                .navigationTitle("safety")
+                .toolbarTitleDisplayMode(.inline)
         case .nowGarden:
             GardenView()
         case .pastebin(let address):
             AddressPastesView(address, addressBook: addressBook)
         case .paste(let address, id: let title):
             PasteView(title, from: address)
+                .environment(\.viewContext, .detail)
         case .purls(let address):
             AddressPURLsView(address, addressBook: addressBook)
         case .purl(let address, id: let title):
             PURLView(id: title, from: address)
+                .environment(\.viewContext, .detail)
         case .statusLog(let address):
             StatusList([address], addressBook: addressBook)
         case .status(let address, id: let id):
             StatusView(address: address, id: id)
+                .environment(\.viewContext, .detail)
         case .account:
             AccountView()
         case .lists:
@@ -68,8 +73,14 @@ struct DestinationConstructor {
             SearchLanding()
         case .latest:
             AddressNowView("app")
+                .environment(\.viewContext, .detail)
+                .navigationTitle("@app /now")
+                .toolbarTitleDisplayMode(.inline)
         case .support:
             PasteView("support", from: "app")
+                .environment(\.viewContext, .detail)
+                .navigationTitle("support")
+                .toolbarTitleDisplayMode(.inline)
 //        case .following:
 //            FollowingView(addressBook)
 //        case .followingAddresses:

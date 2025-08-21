@@ -40,12 +40,7 @@ struct SearchLanding: View {
             ScrollView {
                 LazyVStack(pinnedViews: [.sectionHeaders, .sectionFooters]) {
                     Section {
-                        ForEach(0..<128) { _ in
-                            HStack {
-                                Text("Some result")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        }
+                        EmptyView()
                     } header: {
                         headerToUse(proxy.size.width)
                     }
@@ -56,6 +51,8 @@ struct SearchLanding: View {
             .scrollContentBackground(.hidden)
 #endif
         }
+        .navigationTitle("🔍 search.lol")
+        .toolbarTitleDisplayMode(.inlineLarge)
     }
     
     @ViewBuilder

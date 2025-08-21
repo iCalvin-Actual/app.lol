@@ -290,7 +290,7 @@ class AddressBlockListDataFetcher: DataBackedListDataFetcher<AddressModel> {
 
 class NowGardenDataFetcher: ModelBackedListDataFetcher<NowListing> {
     override var title: String {
-        "now.garden🌷"
+        "🌷 now.garden"
     }
     
     override func fetchRemote() async throws -> Int {
@@ -378,11 +378,12 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
         self.displayTitle = title ?? {
             switch addresses.count {
             case 0:
-                return "status.lol/"
+                return "💬 status.lol"
             case 1:
                 return ""
             default:
                 return "statuses"
+                
             }
         }()
         self.addresses = addresses

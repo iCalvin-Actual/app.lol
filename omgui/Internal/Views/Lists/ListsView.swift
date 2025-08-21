@@ -124,6 +124,8 @@ struct AccountView: View {
     
     var body: some View {
         coreBody
+            .navigationTitle("👤 /me")
+            .toolbarTitleDisplayMode(.inlineLarge)
             .task { [weak followingFetcher, weak followersFetcher] in
                 await followingFetcher?.updateIfNeeded()
                 await followersFetcher?.updateIfNeeded()
