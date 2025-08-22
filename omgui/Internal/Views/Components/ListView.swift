@@ -63,6 +63,15 @@ struct ListView<T: Listable>: View {
             })
         case .now(let name):
             selected = dataFetcher.results.first(where: { ($0 as? NowListing)?.addressName == name })
+        case .address(let name, let page):
+            switch page {
+            case .profile:
+                selected = dataFetcher.results.first(where: { ($0 as? AddressModel)?.addressName == name })
+            case .now:
+                selected = dataFetcher.results.first(where: { ($0 as? NowListing)?.addressName == name })
+            default:
+                present?(item)
+            }
         default:
             present?(item)
         }
@@ -306,9 +315,9 @@ extension ListView {
     static private func destination(for item: T, in context: ViewContext = .column, showingDetail: Bool = false) -> NavigationDestination? {
         switch item {
         case let nowModel as NowListing:
-            if !showingDetail {
-                return .address(nowModel.owner, page: .now)
-            }
+//            if !showingDetail {
+//                return .address(nowModel.owner, page: .now)
+//            }
             return .now(nowModel.owner)
         case let pasteModel as PasteModel:
             return .paste(pasteModel.addressName, id: pasteModel.name)

@@ -238,6 +238,7 @@ struct AddressBioView: View {
 struct AddressPrincipalView: View {
     @Environment(\.showAddressPage) var showPage
     @Environment(\.addressBook) var addressBook
+    @Environment(\.dismiss) var dismiss
     
     let addressSummaryFetcher: AddressSummaryDataFetcher
     
@@ -261,7 +262,13 @@ struct AddressPrincipalView: View {
         .popover(isPresented: $presentBio) {
             AddressBioView(
                 fetcher: addressSummaryFetcher,
-                page: $addressPage
+                page: .init(
+                    get: { addressPage },
+                    set: {
+                        presentBio = false
+                        addressPage = $0
+                    }
+                )
             )
             .padding(6)
             .environment(\.showAddressPage, showPage)

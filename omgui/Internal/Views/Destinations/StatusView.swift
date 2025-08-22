@@ -98,7 +98,9 @@ struct StatusView: View {
                         addressSummaryFetcher: addressSummaryFetcher,
                         addressPage: .init(
                             get: { .statuslog },
-                            set: { presentDestination?($0.destination(addressSummaryFetcher.addressName)) }
+                            set: {
+                                presentDestination?(.address(addressSummaryFetcher.addressName, page: $0))
+                            }
                         )
                     )
                 }
