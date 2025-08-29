@@ -48,9 +48,26 @@ struct TabBar: View {
     
     @State var presentAccount: Bool = false
     @State var searchQuery: String = ""
+    @State var searchFilter: Set<SearchLanding.SearchFilter>
     @State var paths: [NavigationItem: NavigationPath] = .init()
     @State var path: NavigationPath = .init()
     @State var presentedPath: NavigationPath = .init()
+    
+    @StateObject
+    var searchFetcher: SearchResultsDataFetcher
+    
+    init() {
+        _searchFetcher = StateObject(
+            wrappedValue: SearchResultsDataFetcher(
+                addressBook: .init(),
+                filters: [],
+                query: "",
+                sort: .alphabet,
+                interface: APIDataInterface()
+            )
+        )
+        self.searchFilter = [.address]
+    }
     
     @FocusState
     var searching: Bool {
@@ -71,7 +88,18 @@ struct TabBar: View {
                 if selected == nil {
                     selected = cachedSelection
                 }
+                if searchFetcher.addressBook != addressBook {
+                    searchFetcher.configure(addressBook: addressBook)
+                }
             })
+            .onChange(of: searchQuery) {
+                if searchFetcher.query != searchQuery {
+                    searchFetcher.configure(query: searchQuery)
+                    Task { [searchFetcher] in
+                        await searchFetcher.updateIfNeeded(forceReload: true)
+                    }
+                }
+            }
             .onReceive(selected.publisher, perform: { newValue in
                 withAnimation(.interpolatingSpring) {
                     if searching && selected != .search {
@@ -86,6 +114,16 @@ struct TabBar: View {
                 path.append(item)
             })
             .environment(\.searchActive, searching)
+            .environment(\.setSearchFilters, {
+                searchFilter = $0
+                if $0 != searchFetcher.filters {
+                    searchFetcher.configure(filters: $0)
+                    Task { [searchFetcher] in
+                        await searchFetcher.updateIfNeeded(forceReload: true)
+                    }
+                }
+            })
+            .environment(\.searchFetcher, searchFetcher)
     }
     
     @ViewBuilder

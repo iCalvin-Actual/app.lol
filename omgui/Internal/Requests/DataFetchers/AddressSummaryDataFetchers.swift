@@ -81,7 +81,6 @@ class AddressSummaryDataFetcher: DataFetcher {
     }
     
     override func throwingRequest() async throws {
-        
         let addressName = self.addressName
         guard !addressName.isEmpty else {
             return

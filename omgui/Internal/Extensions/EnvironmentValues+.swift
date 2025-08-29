@@ -74,6 +74,18 @@ extension EnvironmentValues {
     }
 }
 
+struct SearchFetcherKey: EnvironmentKey {
+    static var defaultValue: SearchResultsDataFetcher? {
+        nil
+    }
+}
+extension EnvironmentValues {
+    var searchFetcher: SearchResultsDataFetcher? {
+        get { self[SearchFetcherKey.self] }
+        set { self[SearchFetcherKey.self] = newValue }
+    }
+}
+
 struct AddressFollowersFetcherKey: EnvironmentKey {
     static var defaultValue: AddressFollowersDataFetcher? {
         nil
@@ -304,6 +316,18 @@ extension EnvironmentValues {
     }
 }
 
+struct SearchQueryEnvironmentKey: EnvironmentKey {
+    static var defaultValue: String {
+        ""
+    }
+}
+extension EnvironmentValues {
+    var searchQuery: String {
+        get { self[SearchQueryEnvironmentKey.self] }
+        set { self[SearchQueryEnvironmentKey.self] = newValue }
+    }
+}
+
 struct PinnedFetcherKey: EnvironmentKey {
     static var defaultValue: PinnedListDataFetcher? {
         nil
@@ -402,6 +426,26 @@ extension EnvironmentValues {
     var setAddress: (AddressName) -> Void {
         get { self[UpdateAddressKey.self] }
         set { self[UpdateAddressKey.self] = newValue }
+    }
+}
+
+struct SearchFilterKey: EnvironmentKey {
+    static var defaultValue: Set<SearchLanding.SearchFilter> { [.address] }
+}
+extension EnvironmentValues {
+    var searchFilters: Set<SearchLanding.SearchFilter> {
+        get { self[SearchFilterKey.self] }
+        set { self[SearchFilterKey.self] = newValue }
+    }
+}
+
+struct UpdateSearchFilterKey: EnvironmentKey {
+    static var defaultValue: (Set<SearchLanding.SearchFilter>) -> Void { { _ in } }
+}
+extension EnvironmentValues {
+    var setSearchFilters: (Set<SearchLanding.SearchFilter>) -> Void {
+        get { self[UpdateSearchFilterKey.self] }
+        set { self[UpdateSearchFilterKey.self] = newValue }
     }
 }
 

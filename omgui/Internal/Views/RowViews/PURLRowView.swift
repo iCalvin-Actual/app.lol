@@ -20,9 +20,9 @@ struct PURLRowView: View {
     let cardradius: CGFloat
     let showSelection: Bool
     
-    init(model: PURLModel, cardColor: Color, cardPadding: CGFloat, cardradius: CGFloat, showSelection: Bool) {
+    init(model: PURLModel, cardColor: Color? = nil, cardPadding: CGFloat = 8, cardradius: CGFloat = 16, showSelection: Bool = false) {
         self.model = model
-        self.cardColor = cardColor
+        self.cardColor = cardColor ?? .lolRandom(model.listTitle)
         self.cardPadding = cardPadding
         self.cardradius = cardradius
         self.showSelection = showSelection

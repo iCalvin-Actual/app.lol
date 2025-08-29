@@ -163,6 +163,7 @@ struct ListView<T: Listable>: View {
                 })
             detailBody(selected: selected)
                 .frame(maxWidth: .infinity)
+                .ignoresSafeArea(edges: .bottom)
                 .environment(\.viewContext, context == .profile ? .profile : .detail)
                 .environment(\.horizontalSizeClass, actingWidth > 300 ? .regular : .compact)
         }

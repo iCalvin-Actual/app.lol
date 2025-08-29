@@ -29,7 +29,7 @@ struct AppClient {
             return try .init(path:
                         FileManager.default
                 .urls(for: .documentDirectory, in: .userDomainMask)[0]
-                .appendingPathComponent("appV1", conformingTo: .database)
+                .appendingPathComponent("appV2", conformingTo: .database)
                 .absoluteString
             )
         } catch {

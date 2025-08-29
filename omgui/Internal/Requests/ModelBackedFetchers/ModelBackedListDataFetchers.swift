@@ -51,6 +51,7 @@ extension AppLatestFetcher {
         .init(addressName: "app")
     }
 }
+
 class AddressDirectoryDataFetcher: ModelBackedListDataFetcher<AddressModel> {
     override var title: String { "omg.lol/" }
     
@@ -58,11 +59,16 @@ class AddressDirectoryDataFetcher: ModelBackedListDataFetcher<AddressModel> {
         items.hashValue
     }
     
-    func configure(addressBook: AddressBook, _ automation: AutomationPreferences = .init()) {
+    func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
         if self.addressBook != addressBook {
             results = []
         }
-        self.addressBook = addressBook
+        if let filters {
+            self.filters = filters
+        }
+        if let addressBook {
+            self.addressBook = addressBook
+        }
         super.configure(automation)
     }
 }
@@ -310,13 +316,26 @@ class AddressPasteBinDataFetcher: ModelBackedListDataFetcher<PasteModel> {
     let addressName: AddressName
     var credential: APICredential?
     
-    init(name: AddressName, credential: APICredential?, addressBook: AddressBook) {
+    init(name: AddressName, credential: APICredential?, addressBook: AddressBook, filters: [FilterOption]? = nil) {
         self.addressName = name
-        super.init(addressBook: addressBook, filters: [.from(name)])
+        super.init(addressBook: addressBook, filters: filters ?? [.from(name)])
     }
     
     func configure(credential: APICredential?, _ automation: AutomationPreferences = .init()) {
         self.credential = credential
+        super.configure(automation)
+    }
+    
+    func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
+        if self.addressBook != addressBook {
+            results = []
+        }
+        if let filters {
+            self.filters = filters
+        }
+        if let addressBook {
+            self.addressBook = addressBook
+        }
         super.configure(automation)
     }
     
@@ -342,15 +361,28 @@ class AddressPURLsDataFetcher: ModelBackedListDataFetcher<PURLModel> {
     let addressName: AddressName
     var credential: APICredential?
     
-    init(name: AddressName, purls: [PURLModel] = [], credential: APICredential?, addressBook: AddressBook) {
+    init(name: AddressName, purls: [PURLModel] = [], credential: APICredential?, addressBook: AddressBook, filters: [FilterOption]? = nil) {
         self.addressName = name
         self.credential = credential
-        super.init(addressBook: addressBook, filters: [.from(name)])
+        super.init(addressBook: addressBook, filters: filters ?? [.from(name)])
     }
     
     func configure(_ newValue: APICredential?, _ automation: AutomationPreferences = .init()) {
         if credential != newValue {
             credential = newValue
+        }
+        super.configure(automation)
+    }
+    
+    func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
+        if self.addressBook != addressBook {
+            results = []
+        }
+        if let filters {
+            self.filters = filters
+        }
+        if let addressBook {
+            self.addressBook = addressBook
         }
         super.configure(automation)
     }
@@ -374,7 +406,7 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
     
     override var title: String { displayTitle }
     
-    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook) {
+    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook, limit: Int = 42) {
         self.displayTitle = title ?? {
             switch addresses.count {
             case 0:
@@ -387,7 +419,7 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
             }
         }()
         self.addresses = addresses
-        super.init(addressBook: addressBook, filters: addresses.isEmpty ? [] : [.fromOneOf(addresses)])
+        super.init(addressBook: addressBook, limit: limit, filters: addresses.isEmpty ? [] : [.fromOneOf(addresses)])
     }
     
     override func fetchRemote() async throws -> Int {
@@ -409,11 +441,16 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
         }
     }
     
-    func configure(addressBook: AddressBook, _ automation: AutomationPreferences = .init()) {
+    func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
         if self.addressBook != addressBook {
             results = []
         }
-        self.addressBook = addressBook
+        if let addressBook {
+            self.addressBook = addressBook
+        }
+        if let filters {
+            self.filters = filters
+        }
         self.loading = true
         self.loaded = .init()
         self.loading = false
