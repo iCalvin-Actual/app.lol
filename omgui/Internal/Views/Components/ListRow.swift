@@ -9,7 +9,16 @@ import SwiftUI
 import Foundation
 
 struct ListRow<T: Listable>: View {
+    @Environment(\.viewContext) var context
     @Environment(\.addressBook) var addressBook
+    @Environment(\.pinAddress) var pin
+    @Environment(\.unpinAddress) var unpin
+    @Environment(\.blockAddress) var block
+    @Environment(\.unblockAddress) var unblock
+    @Environment(\.followAddress) var follow
+    @Environment(\.unfollowAddress) var unfollow
+    @Environment(\.isSearching) var isSearching
+    @Environment(\.presentListable) var present
     
     enum Style {
         case standard
@@ -51,8 +60,7 @@ struct ListRow<T: Listable>: View {
         self.preferredStyle = preferredStyle
     }
     
-    @Environment(\.isSearching) var isSearching
-    @Environment(\.presentListable) var present
+    let menuBuilder = ContextMenuBuilder<T>()
     
     var verticalPadding: CGFloat {
         switch activeStyle {
@@ -91,7 +99,6 @@ struct ListRow<T: Listable>: View {
             pasteView(pasteModel)
         } else {
             standardBody
-                .asCard(color: cardColor, padding: cardPadding, radius: cardradius, selected: showSelection)
         }
     }
     
@@ -116,35 +123,103 @@ struct ListRow<T: Listable>: View {
     }
     
     @ViewBuilder
+    var headerContent: some View {
+        HStack(alignment: .bottom, spacing: 4) {
+            if context != .profile {
+                AddressIconView(address: model.addressName, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
+                    .padding(.horizontal, 2)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                if context != .profile {
+                    AddressNameView(model.addressName, font: .headline)
+                        .foregroundStyle(.primary)
+                } else if let timeText = DateFormatter.short.string(for: model.displayDate) {
+                    Text(timeText)
+                        .fontDesign(.serif)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                }
+                if let caption = context != .detail ? DateFormatter.relative.string(for: model.displayDate) ?? model.listCaption : model.listCaption {
+                    Text(caption)
+                        .multilineTextAlignment(.leading)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .truncationMode(.tail)
+                }
+            }
+            Spacer()
+            Text("/profile")
+                .fontDesign(.serif)
+                .font(.headline)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+        }
+    }
+    
+    @ViewBuilder
     var standardBody: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
+            headerContent
+                .padding(4)
+            
             HStack(alignment: .bottom) {
-                AddressIconView(address: model.addressName, addressBook: addressBook, size: 55)
-                AddressNameView(model.listTitle, font: .headline)
+                Text(model.listSubtitle.isEmpty ? "\(model.addressName).omg.lol" : String(model.listSubtitle.replacingOccurrences(of: "https://", with: "")))
+                    .font(.callout)
                     .foregroundStyle(.primary)
+                    .fontDesign(.monospaced)
+                    .bold()
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
+            .padding(.horizontal, 4)
             
-            let subtitle = model.listSubtitle
-            let caption = model.listCaption ?? ""
-            let hasMoreText: Bool = !subtitle.isEmpty || !caption.isEmpty
-            if hasMoreText {
-                HStack(alignment: .bottom) {
-                    Text(subtitle)
-                        .foregroundStyle(.primary)
-                        .font(.headline)
-                        .bold()
-                        .fontDesign(.monospaced)
-                        .lineLimit(5)
-                    Spacer()
-                    Text(caption)
-                        .foregroundStyle(.secondary)
-                        .font(.subheadline)
-                        .fontDesign(.rounded)
+            
+            HStack {
+                if let date = model.displayDate {
+                    Text(DateFormatter.short.string(from: date))
+                        .font(.caption)
+                        .padding(.horizontal, 4)
                 }
-                .padding(.trailing, trailingPadding)
+                Spacer()
+                Menu {
+                    menuBuilder.contextMenu(
+                        for: model,
+                        fetcher: nil,
+                        addressBook: addressBook,
+                        menuFetchers: (
+                            navigate: present ?? { _ in },
+                            follow: follow,
+                            block: block,
+                            pin: pin,
+                            unFollow: unfollow,
+                            unBlock: unblock,
+                            unPin: unpin
+                        )
+                    )
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
             }
+            .foregroundStyle(.secondary)
+            .padding(4)
+            .padding(.horizontal, 4)
         }
+        .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection)
+        .contextMenu(menuItems: {
+            menuBuilder.contextMenu(
+                for: model,
+                fetcher: nil,
+                addressBook: addressBook,
+                menuFetchers: (
+                    navigate: present ?? { _ in },
+                    follow: follow,
+                    block: block,
+                    pin: pin,
+                    unFollow: unfollow,
+                    unBlock: unblock,
+                    unPin: unpin
+                )
+            )
+        })
     }
 }
 

@@ -11,24 +11,50 @@ import SwiftUI
 
 
 class GlobalAddressDirectoryFetcher: GlobalListDataFetcher<AddressModel> {
+    // Persist the last successful run date as an ISO8601 string in AppStorage.
+    // Using a unique key to avoid collisions.
+    @AppStorage("lol.lastFetch")
+    private var lastFetch: String = ""
+
     @MainActor
     override func throwingRequest() async throws {
-        let directory = try await interface.fetchAddressDirectory()
-        let listItems = directory.map({ AddressModel(name: $0) })
-        
-        for model in listItems {
-            try await model.write(to: db)
+        // Decode last run date if present
+        let formatter = ISO8601DateFormatter()
+        let calendar = Calendar.current
+        if let lastRun = formatter.date(from: lastFetch),
+           calendar.isDateInToday(lastRun) {
+            // Already ran today; skip work
+            return
         }
-    }
-}
-class GlobalNowGardenFetcher: GlobalListDataFetcher<NowListing> {
-    @MainActor
-    override func throwingRequest() async throws {
+
         let garden = try await interface.fetchNowGarden()
         
         for model in garden {
             try await model.write(to: db)
         }
+        
+        let directory = try await interface.fetchAddressDirectory()
+        
+        for address in directory {
+            
+            print("Directory: Prepping model for \(address)")
+            do {
+                var model = try await interface.fetchAddressInfo(address)
+                print("Directory: Fetching now for \(address)")
+                if let listing = try await NowListing.read(from: db, id: address) {
+                    let url = URL(string: String(listing.url.dropLast("/now".count)))
+                    model.url = url
+                }
+                print("Directory: Writing model for \(address)")
+                try await model.write(to: db)
+            } catch {
+                print("Directory: Fallback option for \(address)")
+                try await AddressModel(name: address, url: URL(string: "https://\(address).omg.lol"), date: .distantPast).write(to: db)
+            }
+        }
+
+        // Mark successful completion time
+        lastFetch = formatter.string(from: Date())
     }
 }
 class GlobalStatusLogFetcher: GlobalListDataFetcher<StatusModel> {
@@ -110,9 +136,14 @@ class AccountAddressDataFetcher: DataBackedListDataFetcher<AddressModel> {
             localAddressesCache = ""
             return
         }
-        let results = try await interface.fetchAccountAddresses(credential).map({ AddressModel(name: $0) })
         
-        self.results = results
+        var results: [AddressModel] = []
+        let addresses = try await interface.fetchAccountAddresses(credential)
+        for address in addresses {
+            results.append(try await interface.fetchAddressInfo(address))
+        }
+        
+        self.results = results.sorted(with: .alphabet)
         localAddressesCache = Array(Set(results.map({ $0.addressName }))).joined(separator: "&&&")
     }
     
@@ -456,3 +487,4 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
         self.loading = false
     }
 }
+

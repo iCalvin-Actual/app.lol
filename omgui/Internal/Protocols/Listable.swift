@@ -48,6 +48,7 @@ extension AddressModel {
     var listTitle: String { addressName.addressDisplayString }
     var listSubtitle: String { url?.absoluteString ?? "" }
     var iconURL: URL? { addressName.addressIconURL }
+    var displayDate: Date?    { date }
     
     func rowDestination(detailPage: Bool = false) -> NavigationDestination { .address(addressName, page: .profile) }
 }

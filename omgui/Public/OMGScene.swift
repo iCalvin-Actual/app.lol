@@ -16,7 +16,6 @@ public struct OMGScene: View {
     @Environment(\.privateCache)var privateCache
     
     @StateObject var globalDirectoryFetcher: GlobalAddressDirectoryFetcher
-    @StateObject var globalGardenFetcher: GlobalNowGardenFetcher
     @StateObject var globalStatusFetcher: GlobalStatusLogFetcher
     
     @StateObject var appSupportFetcher: AppSupportFetcher
@@ -79,7 +78,6 @@ public struct OMGScene: View {
         _pinnedFetcher = .init(wrappedValue: .init())
         
         _globalDirectoryFetcher = .init(wrappedValue: .init())
-        _globalGardenFetcher = .init(wrappedValue: .init())
         _globalStatusFetcher = .init(wrappedValue: .init())
         
         _addressFollowingFetcher = .init(wrappedValue: .init(address: "", credential: ""))
@@ -104,7 +102,6 @@ public struct OMGScene: View {
         appState
             .environment(accountFetcher)
             .environment(\.globalDirectoryFetcher, globalDirectoryFetcher)
-            .environment(\.globalGardenFetcher, globalGardenFetcher)
             .environment(\.globalStatusLogFetcher, globalStatusFetcher)
         
             .environment(\.appLatestFetcher, appLatestFetcher)
@@ -184,7 +181,6 @@ public struct OMGScene: View {
             weak addressFollowersFetcher,
             weak addressFollowingFetcher,
             weak globalDirectoryFetcher,
-            weak globalGardenFetcher,
             weak globalStatusFetcher,
             weak statusFetcher,
             weak gardenFetcher,
@@ -201,8 +197,6 @@ public struct OMGScene: View {
             logger.debug("pinnedFetcher updated")
             await globalDirectoryFetcher?.updateIfNeeded(forceReload: true)
             logger.debug("globalDirectoryFetcher updated")
-            await globalGardenFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("globalGardenFetcher updated")
             await globalStatusFetcher?.updateIfNeeded(forceReload: true)
             logger.debug("globalStatusFetcher updated")
             await addressFollowersFetcher?.updateIfNeeded(forceReload: true)

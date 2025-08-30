@@ -16,6 +16,9 @@ struct SearchLanding: View {
     @Environment(\.searchFetcher) var dataFetcher
     @Environment(\.setSearchFilters) var updateFilters
     
+    @State var sort: Sort = .shuffle
+    @State var filterOptions: [FilterOption] = []
+    
     var filter: Binding<Set<SearchFilter>> {
         .init(
             get: { dataFetcher?.filters ?? [] },
@@ -31,11 +34,12 @@ struct SearchLanding: View {
     }
 
     func gridColumns(_ width: CGFloat) -> [GridItem] {
-        if TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
-            return Array(repeating: GridItem(.flexible()), count: 4)
-        } else {
-            return Array(repeating: GridItem(.flexible()), count: 2)
-        }
+        return Array(repeating: GridItem(.flexible()), count: 3)
+//        if TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
+//            return Array(repeating: GridItem(.flexible()), count: 4)
+//        } else {
+//            return Array(repeating: GridItem(.flexible()), count: 2)
+//        }
     }
     
     var usingCompact: Bool {
@@ -64,8 +68,21 @@ struct SearchLanding: View {
             .scrollContentBackground(.hidden)
 #endif
         }
+        .onChange(of: sort, {
+            dataFetcher?.configure(sort: sort)
+            Task { [dataFetcher] in
+                await dataFetcher?.updateIfNeeded(forceReload: true)
+            }
+        })
         .task { [weak dataFetcher] in
+            dataFetcher?.configure(sort: sort)
             await dataFetcher?.perform()
+        }
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                SortOrderMenu(sort: $sort, filters: $filterOptions, sortOptions: [.alphabet, .newestFirst, .oldestFirst, .shuffle], filterOptions: [])
+                    .tint(.primary)
+            }
         }
         .navigationTitle("🔍 search.lol")
         .toolbarTitleDisplayMode(.inlineLarge)
@@ -102,20 +119,10 @@ struct SearchLanding: View {
     func buttonGrid(_ width: CGFloat) -> some View {
         LazyVGrid(columns: gridColumns(width), spacing: 8) {
             Button(action : {
-                toggle(.address)
-            }, label: {
-                Label {
-                    Text("Directory")
-                } icon: {
-                    Image(systemName: "at")
-                }
-            })
-            .buttonStyle(SearchNavigationButtonStyle(selected: filter.wrappedValue.contains(.address)))
-            Button(action : {
                 toggle(.status)
             }, label: {
                 Label {
-                    Text("StatusLog")
+                    Text("Status")
                 } icon: {
                     Image(systemName: "star.bubble")
                 }
@@ -125,7 +132,7 @@ struct SearchLanding: View {
                 toggle(.paste)
             }, label: {
                 Label {
-                    Text("PasteBin")
+                    Text("Paste")
                 } icon: {
                     Image(systemName: "list.clipboard")
                 }
@@ -135,7 +142,7 @@ struct SearchLanding: View {
                 toggle(.purl)
             }, label: {
                 Label {
-                    Text("PURLs")
+                    Text("PURL")
                 } icon: {
                     Image(systemName: "link")
                 }
@@ -150,6 +157,7 @@ struct SearchLanding: View {
             if filter.wrappedValue.contains(toApply) {
                 filter.wrappedValue.remove(toApply)
             } else {
+                filter.wrappedValue = [toApply]
                 filter.wrappedValue.insert(toApply)
             }
         }
@@ -283,10 +291,10 @@ class SearchResultsDataFetcher: DataFetcher {
     func constructResults() {
         var result = [SearchResult]()
         
-        let includeAddresses: Bool = filters.contains(.address) || filters.isEmpty
-        let includeStatuses: Bool = filters.contains(.status) || !query.isEmpty
-        let includePastes: Bool = filters.contains(.paste) || !query.isEmpty
-        let includePURLs: Bool = filters.contains(.purl) || !query.isEmpty
+        let includeAddresses: Bool = filters.isEmpty
+        let includeStatuses: Bool = filters.contains(.status)
+        let includePastes: Bool = filters.contains(.paste)
+        let includePURLs: Bool = filters.contains(.purl)
         
         if includeAddresses {
             result.append(contentsOf: directoryFetcher.results.map({ .address($0) }))
@@ -391,7 +399,6 @@ class SearchResultsDataFetcher: DataFetcher {
     
     @MainActor
     override func throwingRequest() async throws {
-        // No request debouncing here; let child fetchers update immediately.
         try? await search()
     }
     

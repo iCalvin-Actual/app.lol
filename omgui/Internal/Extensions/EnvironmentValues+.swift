@@ -235,18 +235,6 @@ extension EnvironmentValues {
     }
 }
 
-struct GlobalGardenKey: EnvironmentKey {
-    static var defaultValue: GlobalNowGardenFetcher? {
-        nil
-    }
-}
-extension EnvironmentValues {
-    var globalGardenFetcher: GlobalNowGardenFetcher? {
-        get { self[GlobalGardenKey.self] }
-        set { self[GlobalGardenKey.self] = newValue }
-    }
-}
-
 struct GlobalStatusLogKey: EnvironmentKey {
     static var defaultValue: GlobalStatusLogFetcher? {
         nil

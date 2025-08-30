@@ -30,7 +30,7 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
     
     @MainActor
     var baseURL: URL {
-        var url = URL(string: "https://\(address).omg.lol")!
+        var url = URL(string: "https://\(address.puny).omg.lol")!
         if M.self is NowModel.Type {
             url.append(path: "now")
         }

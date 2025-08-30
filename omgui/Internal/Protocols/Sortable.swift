@@ -65,7 +65,14 @@ extension Sort {
             guard let lhS = (lhs as? StringSortable)?.primarySortValue, let rhS = (rhs as? StringSortable)?.primarySortValue else {
                 return false
             }
-            return lhS < rhS
+            switch (lhS.isEmpty, rhS.isEmpty) {
+            case (false, true):
+                return true
+            case (true, false):
+                return false
+            default:
+                return lhS < rhS
+            }
         case .newestFirst, .oldestFirst:
             guard let lhD = (lhs as? DateSortable)?.dateValue, let rhD = (rhs as? DateSortable)?.dateValue else {
                 return false
