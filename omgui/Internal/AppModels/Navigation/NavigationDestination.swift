@@ -191,7 +191,7 @@ extension NavigationDestination {
     }
     
     public var secondaryColor: Color {
-        .lolRandom(rawValue)
+        .lolRandom(rawValue, not: color)
     }
     
     public var gradient: Gradient {
