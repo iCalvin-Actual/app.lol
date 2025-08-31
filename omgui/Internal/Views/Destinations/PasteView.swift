@@ -17,6 +17,8 @@ struct PasteView: View {
     var sizeClass
     @Environment(\.viewContext)
     var viewContext
+    @Environment(\.openURL)
+    var openUrl
     
     @Environment(\.viewContext)
     var context: ViewContext
@@ -24,6 +26,15 @@ struct PasteView: View {
     var addressBook
     @Environment(\.credentialFetcher)
     var credential
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetcher
+    @Environment(\.presentListable)
+    var presentDestination
+    
+    @State
+    var shareURL: URL?
+    @State
+    var presentURL: URL?
     
     @State
     var showDraft: Bool = false
@@ -38,119 +49,205 @@ struct PasteView: View {
     }
     
     var body: some View {
-        mainContent
-            .task {
-                let addressCredential = credential(fetcher.address)
-                if fetcher.credential != addressCredential {
-                    fetcher.configure(credential: addressCredential)
+        VStack(alignment: .leading, spacing: 0) {
+            if let model = fetcher.result {
+                PasteRowView(model: model)
+                    .padding(.horizontal, 6)
+            } else if fetcher.loading {
+                LoadingView()
+                    .padding()
+            } else {
+                LoadingView()
+                    .padding()
+                    .task { @MainActor [fetcher] in
+                        await fetcher.updateIfNeeded()
+                    }
+            }
+            Spacer()
+        }
+        .padding(4)
+        .padding(.vertical, sizeClass == .compact ? 16 : 0)
+        .task {
+            let addressCredential = credential(fetcher.address)
+            if fetcher.credential != addressCredential {
+                fetcher.configure(credential: addressCredential)
+            }
+        }
+        .onChange(of: fetcher.title, {
+            Task { [fetcher] in
+                await fetcher.updateIfNeeded(forceReload: true)
+            }
+        })
+        .onChange(of: fetcher.credential, {
+            Task { [fetcher] in
+                await fetcher.updateIfNeeded(forceReload: true)
+            }
+        })
+#if canImport(UIKit) && !os(tvOS)
+        .sheet(item: $presentURL, content: { url in
+            SafariView(url: url)
+                .ignoresSafeArea(.container, edges: .all)
+        })
+#endif
+        .environment(\.viewContext, ViewContext.detail)
+#if !os(tvOS)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                if let url = fetcher.result?.shareURLs.first?.content {
+                    ShareLink(item: url)
                 }
             }
-            .onChange(of: fetcher.credential, {
-                Task { [fetcher] in
-                    await fetcher.updateIfNeeded(forceReload: true)
-                    
+        }
+    #if !os(macOS)
+        .navigationBarTitleDisplayMode(.inline)
+    #endif
+#endif
+        .tint(.primary)
+        .toolbar {
+            if let addressSummaryFetcher = summaryFetcher(fetcher.address) {
+                ToolbarItem(placement: .principal) {
+                    AddressPrincipalView(
+                        addressSummaryFetcher: addressSummaryFetcher,
+                        addressPage: .init(
+                            get: { .statuslog },
+                            set: {
+                                presentDestination?(.address(addressSummaryFetcher.addressName, page: $0))
+                            }
+                        )
+                    )
                 }
-            })
-            .toolbar {
-//                ToolbarItem(placement: .topBarTrailing) {
-//                    if fetcher.draftPoster != nil {
-//                        Menu {
-//                            Button {
-//                                withAnimation {
-//                                    if detent == .large {
-//                                        detent = .draftDrawer
-//                                    } else if showDraft {
-//                                        detent = .large
-//                                    } else if !showDraft {
-//                                        detent = .medium
-//                                        showDraft = true
-//                                    } else {
-//                                        showDraft = false
-//                                        detent = .draftDrawer
-//                                    }
-//                                }
-//                            } label: {
-//                                Text("edit")
-//                            }
-//                            Menu {
-//                                Button(role: .destructive) {
-//                                    Task {
-//                                        try await fetcher.deleteIfPossible()
-//                                    }
-//                                } label: {
-//                                    Text("confirm")
-//                                }
-//                            } label: {
-//                                Label {
-//                                    Text("delete")
-//                                } icon: {
-//                                    Image(systemName: "trash")
-//                                }
-//                            }
-//                        } label: {
-//                            Image(systemName: "ellipsis.circle")
-//                        }
-//                    }
-//                }
-                #if !os(tvOS)
+            }
+#if !os(tvOS)
+            if let pasteURL = fetcher.result?.pasteURL {
                 ToolbarItem(placement: .automatic) {
-                    if let pasteURL = fetcher.result?.pasteURL {
-                        Menu {
-                            ShareLink("share paste", item: pasteURL)
-                            Divider()
+                    Menu {
+                        ShareLink("share paste", item: pasteURL)
+                        Divider()
+                        Button(action: {
+#if canImport(UIKit)
+                            UIPasteboard.general.string = pasteURL.absoluteString
+#elseif canImport(AppKit)
+                            let pasteboard = NSPasteboard.general
+                            pasteboard.clearContents()
+                            pasteboard.setString(pasteURL.absoluteString, forType: .string)
+#endif
+                        }, label: {
+                            Label(
+                                title: { Text("copy paste") },
+                                icon: { Image(systemName: "doc.on.clipboard") }
+                            )
+                        })
+                        if let shareItem = fetcher.result?.content {
                             Button(action: {
-                                #if canImport(UIKit)
-                                UIPasteboard.general.string = pasteURL.absoluteString
-                                #elseif canImport(AppKit)
+#if canImport(UIKit)
+                                UIPasteboard.general.string = shareItem
+#elseif canImport(AppKit)
                                 let pasteboard = NSPasteboard.general
                                 pasteboard.clearContents()
-                                pasteboard.setString(pasteURL.absoluteString, forType: .string)
-                                #endif
+                                pasteboard.setString(shareItem, forType: .string)
+#endif
                             }, label: {
                                 Label(
-                                    title: { Text("copy paste") },
-                                    icon: { Image(systemName: "doc.on.clipboard") }
+                                    title: { Text("copy paste content") },
+                                    icon: { Image(systemName: "text.alignleft") }
                                 )
                             })
-                            if let shareItem = fetcher.result?.content {
-                                Button(action: {
-                                    #if canImport(UIKit)
-                                    UIPasteboard.general.string = shareItem
-                                    #elseif canImport(AppKit)
-                                    let pasteboard = NSPasteboard.general
-                                    pasteboard.clearContents()
-                                    pasteboard.setString(shareItem, forType: .string)
-                                    #endif
-                                }, label: {
-                                    Label(
-                                        title: { Text("copy paste content") },
-                                        icon: { Image(systemName: "text.alignleft") }
-                                    )
-                                })
-                            }
-                        } label: {
-                            Image(systemName: "square.and.arrow.up")
                         }
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
                     }
                 }
-                #endif
             }
-            .onReceive(fetcher.result.publisher, perform: { _ in
-                withAnimation {
-                    let address = fetcher.result?.addressName ?? ""
-                    guard !address.isEmpty, addressBook.mine.contains(address) else {
-                        showDraft = false
-                        return
+#endif
+        }
+        .onReceive(fetcher.result.publisher, perform: { _ in
+            withAnimation {
+                let address = fetcher.result?.addressName ?? ""
+                guard !address.isEmpty, addressBook.mine.contains(address) else {
+                    showDraft = false
+                    return
+                }
+                if fetcher.result == nil && fetcher.title.isEmpty {
+                    detent = .large
+                    showDraft = true
+                } else if fetcher.result != nil {
+                    detent = .draftDrawer
+                    showDraft = true
+                }
+            }
+        })
+    }
+    
+    @ViewBuilder
+    private func linksSection(_ items: [SharePacket]) -> some View {
+        Text("links")
+            .font(.subheadline)
+        
+        LazyVStack {
+            ForEach(items) { item in
+                linkPreviewBuilder(item)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func linkPreviewBuilder(_ item: SharePacket) -> some View {
+        Button {
+            guard item.content.scheme?.contains("http") ?? false else {
+                openUrl(item.content)
+                return
+            }
+            withAnimation {
+                presentURL = item.content
+            }
+        } label: {
+            HStack {
+                VStack(alignment: .leading) {
+                    if !item.name.isEmpty {
+                        Text(item.name)
+                            .font(.subheadline)
+                            .bold()
+                            .fontDesign(.rounded)
                     }
-                    if fetcher.result == nil && fetcher.title.isEmpty {
-                        detent = .large
-                        showDraft = true
-                    } else if fetcher.result != nil {
-                        detent = .draftDrawer
-                        showDraft = true
+                    
+                    Text(item.content.absoluteString)
+                        .font(.caption)
+                        .fontDesign(.monospaced)
+                }
+                .multilineTextAlignment(.leading)
+                .lineLimit(3)
+                
+                Spacer()
+                
+                if item.content.scheme?.contains("http") ?? false {
+                    ZStack {
+                        #if canImport(UIKit) && !os(tvOS)
+                        RemoteHTMLContentView(activeAddress: fetcher.address, startingURL: item.content, activeURL: $presentURL, scrollEnabled: .constant(false))
+                        #endif
+                            
+                        LinearGradient(
+                            stops: [
+                                .init(color: .lolBackground, location: 0.1),
+                                .init(color: .clear, location: 0.5)
+                            ],
+                            startPoint: .bottom,
+                            endPoint: .top
+                        )
+                    }
+                    .frame(width: 144, height: 144)
+                    .mask {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
                     }
                 }
-            })
+            }
+            .foregroundStyle(Color.primary)
+            .padding(4)
+            .background(Material.thin)
+            .mask {
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+            }
+        }
     }
     
     @ViewBuilder

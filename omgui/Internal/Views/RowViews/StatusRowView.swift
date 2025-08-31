@@ -16,30 +16,24 @@ struct StatusRowView: View {
     @Environment(\.followAddress) var follow
     @Environment(\.unfollowAddress) var unfollow
     
-    @State
-    var showURLs: Bool = false
-    @State
-    var presentUrl: URL?
+    @Environment(\.viewContext) var context: ViewContext
+    @Environment(\.addressBook) var addressBook
+    @Environment(\.presentListable) var present
+    @Environment(\.addressSummaryFetcher) var summaryFetcher
     
-    @GestureState
-    private var zoom = 1.0
+    @GestureState private var zoom = 1.0
+    
+    @State var showURLs: Bool = false
+    @State var presentUrl: URL?
     
     let model: StatusModel
-    @Environment(\.viewContext)
-    var context: ViewContext
-    @Environment(\.addressBook)
-    var addressBook
-    @Environment(\.presentListable)
-    var present
-    @Environment(\.addressSummaryFetcher)
-    var summaryFetcher
-    
-    let menuBuilder = ContextMenuBuilder<StatusModel>()
     
     let cardColor: Color
     let cardPadding: CGFloat
     let cardradius: CGFloat
     let showSelection: Bool
+    
+    let menuBuilder = ContextMenuBuilder<StatusModel>()
     
     init(model: StatusModel, cardColor: Color? = nil, cardPadding: CGFloat = 8, cardradius: CGFloat = 16, showSelection: Bool = false) {
         self.model = model

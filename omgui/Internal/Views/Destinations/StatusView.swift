@@ -78,7 +78,7 @@ struct StatusView: View {
         })
         #endif
         .environment(\.viewContext, ViewContext.detail)
-        #if !os(tvOS)
+#if !os(tvOS)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 if let url = fetcher.result?.shareURLs.first?.content {
@@ -86,9 +86,9 @@ struct StatusView: View {
                 }
             }
         }
-        #if !os(macOS)
+    #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
-        #endif
+    #endif
 #endif
         .tint(.primary)
         .toolbar {
