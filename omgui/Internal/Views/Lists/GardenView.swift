@@ -139,8 +139,8 @@ struct GardenItemView: View {
             Spacer()
             Text("/now")
                 .fontDesign(.serif)
-                .font(.headline)
-                .frame(maxHeight: .infinity)
+                .font(.subheadline)
+                .frame(maxHeight: .infinity, alignment: .top)
         }
     }
 }

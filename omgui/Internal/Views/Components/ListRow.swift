@@ -150,8 +150,8 @@ struct ListRow<T: Listable>: View {
             Spacer()
             Text("/profile")
                 .fontDesign(.serif)
-                .font(.headline)
-                .frame(maxHeight: .infinity, alignment: .bottom)
+                .font(.subheadline)
+                .frame(maxHeight: .infinity)
         }
     }
     

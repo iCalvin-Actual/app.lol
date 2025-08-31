@@ -327,7 +327,7 @@ class AddressBlockListDataFetcher: DataBackedListDataFetcher<AddressModel> {
 
 class NowGardenDataFetcher: ModelBackedListDataFetcher<NowListing> {
     override var title: String {
-        "🌷 now.garden"
+        "🌷 now.lol"
     }
     
     override func fetchRemote() async throws -> Int {
@@ -375,10 +375,7 @@ class AddressPasteBinDataFetcher: ModelBackedListDataFetcher<PasteModel> {
             return 0
         }
         let pastes = try await interface.fetchAddressPastes(addressName, credential: credential).filter {
-            guard $0.addressName == "app" && addressBook.mine.contains($0.addressName) else {
-                return true
-            }
-            return $0.name != "app.lol.blocked"
+            $0.name != "app.lol.blocked"
         }
         let db = db
         for model in pastes {

@@ -258,7 +258,7 @@ struct OnboardingView: View {
         .frame(maxWidth: 800, maxHeight: .infinity)
         .frame(maxWidth: .infinity)
         .ignoresSafeArea(.container, edges: .bottom)
-        .background(Material.ultraThin)
+        .background(Material.thin)
         .animation(.smooth(duration: 0.75), value: preview)
         .animation(.smooth(duration: 0.25), value: appear)
         .animation(.smooth(duration: 0.25), value: safety)

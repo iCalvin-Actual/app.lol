@@ -175,7 +175,7 @@ struct AccountView: View {
                         .listRowSeparator(.hidden)
                     }
                     .frame(maxWidth: .infinity)
-                    .background(Material.ultraThin)
+                    .background(Material.thin)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color.clear)
                 }
@@ -198,7 +198,7 @@ struct AccountView: View {
                         .listRowSeparator(.hidden)
                     }
                     .frame(maxWidth: .infinity)
-                    .background(Material.ultraThin)
+                    .background(Material.thin)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color.clear)
                 }
@@ -221,7 +221,7 @@ struct AccountView: View {
                         .listRowSeparator(.hidden)
                     }
                     .frame(maxWidth: .infinity)
-                    .background(Material.ultraThin)
+                    .background(Material.thin)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color.clear)
                 }
@@ -243,7 +243,7 @@ struct AccountView: View {
                         .listRowSeparator(.hidden)
                     }
                     .frame(maxWidth: .infinity)
-                    .background(Material.ultraThin)
+                    .background(Material.thin)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color.clear)
                 }

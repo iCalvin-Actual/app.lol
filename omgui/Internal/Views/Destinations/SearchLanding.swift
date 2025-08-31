@@ -283,7 +283,7 @@ class SearchResultsDataFetcher: DataFetcher {
     var sort: Sort
     
     // Results debouncing
-    private var resultsDebounceInterval: RunLoop.SchedulerTimeType.Stride = .milliseconds(300)
+    private var resultsDebounceInterval: RunLoop.SchedulerTimeType.Stride = .milliseconds(600)
     
     @Published
     var results: [SearchResult] = []
