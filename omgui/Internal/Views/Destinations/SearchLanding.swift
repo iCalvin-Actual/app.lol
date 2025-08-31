@@ -16,7 +16,7 @@ struct SearchLanding: View {
     @Environment(\.searchFetcher) var dataFetcher
     @Environment(\.setSearchFilters) var updateFilters
     
-    @State var sort: Sort = .shuffle
+    @State var sort: Sort = .newestFirst
     @State var filterOptions: [FilterOption] = []
     
     var filter: Binding<Set<SearchFilter>> {
@@ -80,7 +80,7 @@ struct SearchLanding: View {
         }
         .toolbar {
             ToolbarItem(placement: .automatic) {
-                SortOrderMenu(sort: $sort, filters: $filterOptions, sortOptions: [.alphabet, .newestFirst, .oldestFirst, .shuffle], filterOptions: [])
+                SortOrderMenu(sort: $sort, filters: $filterOptions, sortOptions: [.alphabet, .newestFirst, .oldestFirst], filterOptions: [])
                     .tint(.primary)
             }
         }
@@ -211,7 +211,7 @@ struct SearchResultsView: View {
 }
 
 enum SearchResult: AllSortable, Identifiable {
-    static let sortOptions: [Sort] = [.newestFirst, .oldestFirst, .shuffle, .alphabet]
+    static let sortOptions: [Sort] = [.newestFirst, .oldestFirst, .alphabet]
     
     static let defaultSort: Sort = .newestFirst
     

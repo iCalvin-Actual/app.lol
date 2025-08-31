@@ -45,8 +45,10 @@ struct StatusRowView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            headerContent
-                .padding(4)
+            RowHeader(model: model) {
+                Text(model.displayEmoji.count > 1 ? "✨" : model.displayEmoji.prefix(1))
+                    .font(.system(size: 35))
+            }
             
             mainBody
             
@@ -169,15 +171,8 @@ struct StatusRowView: View {
                     .padding(.horizontal, 2)
             }
             VStack(alignment: .leading, spacing: 2) {
-                if context != .profile {
-                    AddressNameView(model.address, font: .headline)
-                        .foregroundStyle(.primary)
-                } else if let timeText = DateFormatter.short.string(for: model.date) {
-                    Text(timeText)
-                        .fontDesign(.serif)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                }
+                AddressNameView(model.address, font: .headline)
+                    .foregroundStyle(.primary)
                 if let caption = context != .detail ? DateFormatter.relative.string(for: model.date) ?? model.listCaption : model.listCaption {
                     Text(caption)
                         .multilineTextAlignment(.leading)

@@ -128,7 +128,6 @@ extension NowListing: AllSortable {
     static var sortOptions: [Sort] {
         [
             .newestFirst,
-            .shuffle,
             .oldestFirst
         ]
     }

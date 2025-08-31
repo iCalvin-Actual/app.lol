@@ -123,43 +123,14 @@ struct ListRow<T: Listable>: View {
     }
     
     @ViewBuilder
-    var headerContent: some View {
-        HStack(alignment: .bottom, spacing: 4) {
-            if context != .profile {
-                AddressIconView(address: model.addressName, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal, 2)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                if context != .profile {
-                    AddressNameView(model.addressName, font: .headline)
-                        .foregroundStyle(.primary)
-                } else if let timeText = DateFormatter.short.string(for: model.displayDate) {
-                    Text(timeText)
-                        .fontDesign(.serif)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                }
-                if let caption = context != .detail ? DateFormatter.relative.string(for: model.displayDate) ?? model.listCaption : model.listCaption {
-                    Text(caption)
-                        .multilineTextAlignment(.leading)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .truncationMode(.tail)
-                }
-            }
-            Spacer()
-            Text("/profile")
-                .fontDesign(.serif)
-                .font(.subheadline)
-                .frame(maxHeight: .infinity)
-        }
-    }
-    
-    @ViewBuilder
     var standardBody: some View {
         VStack(alignment: .leading, spacing: 0) {
-            headerContent
-                .padding(4)
+            RowHeader(model: model) {
+                Text("/profile")
+                    .fontDesign(.serif)
+                    .font(.subheadline)
+                    .frame(maxHeight: .infinity, alignment: .top)
+            }
             
             HStack(alignment: .bottom) {
                 Text(model.listSubtitle.isEmpty ? "\(model.addressName).omg.lol" : String(model.listSubtitle.replacingOccurrences(of: "https://", with: "")))

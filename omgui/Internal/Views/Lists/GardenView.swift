@@ -49,8 +49,12 @@ struct GardenItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            headerContent
-                .padding(4)
+            RowHeader(model: model) {
+                Text("/now")
+                    .fontDesign(.serif)
+                    .font(.subheadline)
+                    .frame(maxHeight: .infinity, alignment: .top)
+            }
             
             HStack(alignment: .bottom) {
                 Text(model.listSubtitle)
@@ -109,38 +113,5 @@ struct GardenItemView: View {
                 )
             )
         })
-    }
-    
-    @ViewBuilder
-    var headerContent: some View {
-        HStack(alignment: .bottom, spacing: 4) {
-            if context != .profile {
-                AddressIconView(address: model.owner, addressBook: addressBook, contentShape: RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal, 2)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                if context != .profile {
-                    AddressNameView(model.owner, font: .headline)
-                        .foregroundStyle(.primary)
-                } else if let timeText = DateFormatter.short.string(for: model.date) {
-                    Text(timeText)
-                        .fontDesign(.serif)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                }
-                if let caption = context != .detail ? DateFormatter.relative.string(for: model.date) ?? model.listCaption : model.listCaption {
-                    Text(caption)
-                        .multilineTextAlignment(.leading)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .truncationMode(.tail)
-                }
-            }
-            Spacer()
-            Text("/now")
-                .fontDesign(.serif)
-                .font(.subheadline)
-                .frame(maxHeight: .infinity, alignment: .top)
-        }
     }
 }

@@ -38,41 +38,13 @@ struct PasteRowView: View {
         self.showSelection = showSelection
     }
     
-    @ViewBuilder
-    var headerContent: some View {
-        HStack(alignment: .bottom, spacing: 4) {
-            if context != .profile {
-                AddressIconView(address: model.address, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal, 2)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                if context != .profile {
-                    AddressNameView(model.address, font: .headline)
-                        .foregroundStyle(.primary)
-                } else if let timeText = DateFormatter.short.string(for: model.date) {
-                    Text(timeText)
-                        .fontDesign(.serif)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                }
-                if let caption = context != .detail ? DateFormatter.relative.string(for: model.date) ?? model.listCaption : model.listCaption {
-                    Text(caption)
-                        .multilineTextAlignment(.leading)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .truncationMode(.tail)
-                }
-            }
-            Spacer()
-            Text(model.listTitle)
-                .font(.subheadline)
-        }
-    }
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            headerContent
-                .padding(4)
+            RowHeader(model: model) {
+                Text("/\(model.listTitle)")
+                    .fontDesign(.serif)
+                    .font(.subheadline)
+            }
             
             mainBody
             
@@ -131,9 +103,12 @@ struct PasteRowView: View {
     
     @ViewBuilder
     var appropriateMarkdown: some View {
-        ScrollView {
-            Markdown(model.content)
+        if context == .detail {
+            ScrollView {
+                Markdown(model.content)
+            }
+        } else {
+            Text(model.content)
         }
-        .scrollDisabled(context == .column)
     }
 }

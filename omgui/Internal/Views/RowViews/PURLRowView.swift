@@ -8,6 +8,40 @@
 import MarkdownUI
 import SwiftUI
 
+struct RowHeader<T: Listable, V: View>: View {
+    @Environment(\.viewContext) var context
+    @Environment(\.addressBook) var addressBook
+    
+    let model: T
+    let cornerView: () -> V
+    
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 4) {
+            if context != .profile {
+                AddressIconView(address: model.addressName, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
+                    .padding(.horizontal, 2)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                AddressNameView(model.addressName, font: .headline)
+                    .foregroundStyle(.primary)
+                if let caption = context != .detail ? DateFormatter.relative.string(for: model.displayDate) ?? model.listCaption : model.listCaption {
+                    Text(caption)
+                        .multilineTextAlignment(.leading)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .truncationMode(.tail)
+                }
+            }
+            Spacer()
+            cornerView()
+        }
+        .padding(.top, 4)
+        .padding(.horizontal, 4)
+        .padding(4)
+        
+    }
+}
+
 struct PURLRowView: View {
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin
@@ -38,41 +72,13 @@ struct PURLRowView: View {
         self.showSelection = showSelection
     }
     
-    @ViewBuilder
-    var headerContent: some View {
-        HStack(alignment: .bottom, spacing: 4) {
-            if context != .profile {
-                AddressIconView(address: model.addressName, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal, 2)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                if context != .profile {
-                    AddressNameView(model.addressName, font: .headline)
-                        .foregroundStyle(.primary)
-                } else if let timeText = DateFormatter.short.string(for: model.date) {
-                    Text(timeText)
-                        .fontDesign(.serif)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                }
-                if let caption = context != .detail ? DateFormatter.relative.string(for: model.date) ?? model.listCaption : model.listCaption {
-                    Text(caption)
-                        .multilineTextAlignment(.leading)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .truncationMode(.tail)
-                }
-            }
-            Spacer()
-            Text(model.listTitle)
-                .font(.subheadline)
-        }
-    }
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            headerContent
-                .padding(4)
+            RowHeader(model: model) {
+                Text("/\(model.listTitle)")
+                    .fontDesign(.serif)
+                    .font(.subheadline)
+            }
             
             mainBody
             
@@ -119,9 +125,9 @@ struct PURLRowView: View {
     var rowBody: some View {
         if !model.content.isEmpty {
             HStack {
-                Text(model.content)
+                Text(model.content.replacingOccurrences(of: "https://www.", with: ""))
                     .fontWeight(.medium)
-                    .fontDesign(.serif)
+                    .fontDesign(.monospaced)
                     .frame(maxHeight: 30)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
