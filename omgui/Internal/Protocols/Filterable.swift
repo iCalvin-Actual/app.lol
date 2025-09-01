@@ -97,11 +97,11 @@ enum FilterOption: Equatable, RawRepresentable, Identifiable {
     var displayString: String {
         switch self {
         case .recent:
-            return "recent"
+            return "Recent"
         case .notBlocked:
-            return "everyone"
+            return "Everyone"
         case .query:
-            return "search"
+            return "Search"
         default:
             return self.rawValue
         }

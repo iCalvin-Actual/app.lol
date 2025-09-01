@@ -7,16 +7,46 @@
 
 import SwiftUI
 
+struct FilterOptionsMenu: View {
+    @Binding
+    var filters: [FilterOption]
+    
+    var filterOptions: [FilterOption]
+    
+    private func button(_ filter: FilterOption) -> some View {
+        Button {
+            withAnimation {
+                if filters.contains(filter) {
+                    filters = .everyone
+                } else {
+                    filters = [filter]
+                }
+            }
+        } label: {
+            if filters.contains(filter) {
+                Label(filter.displayString, systemImage: "checkmark")
+            } else {
+                Text(filter.displayString)
+            }
+        }
+    }
+    
+    var body: some View {
+        Menu {
+            ForEach(filterOptions) { filter in
+                button(filter)
+            }
+        } label: {
+            Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+        }
+    }
+}
+
 struct SortOrderMenu: View {
     @Binding
     var sort: Sort
     
-    @Binding
-    var filters: [FilterOption]
-    
     var sortOptions: [Sort]
-    
-    var filterOptions: [FilterOption]
     
     private func button(_ sort: Sort) -> some View {
         Button {
@@ -32,39 +62,15 @@ struct SortOrderMenu: View {
         }
     }
     
-    private func button(_ filter: FilterOption) -> some View {
-        Button {
-            withAnimation {
-                if filters.contains(filter) {
-                    filters.removeAll(where: { filter.rawValue == $0.rawValue })
-                } else {
-                    filters.append(filter)
-                }
-            }
-        } label: {
-            if filters.contains(filter) {
-                Label(filter.displayString, systemImage: "checkmark")
-            } else {
-                Text(filter.displayString)
-            }
-        }
-    }
-    
     var body: some View {
         Menu {
             if sortOptions.count > 1 {
                 ForEach(sortOptions) { sort in
                     button(sort)
                 }
-                if !filterOptions.isEmpty {
-                    Divider()
-                }
-            }
-            ForEach(filterOptions) { filter in
-                button(filter)
             }
         } label: {
-            Label("sort", systemImage: "arrow.up.arrow.down.square")
+            Label("Sort", systemImage: "arrow.up.arrow.down.circle")
         }
     }
 }

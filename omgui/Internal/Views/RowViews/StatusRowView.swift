@@ -52,33 +52,7 @@ struct StatusRowView: View {
             
             mainBody
             
-            HStack {
-                Text(DateFormatter.short.string(from: model.date))
-                    .font(.caption)
-                    .padding(.horizontal, 4)
-                Spacer()
-                Menu {
-                    menuBuilder.contextMenu(
-                        for: model,
-                        fetcher: nil,
-                        addressBook: addressBook,
-                        menuFetchers: (
-                            navigate: present ?? { _ in },
-                            follow: follow,
-                            block: block,
-                            pin: pin,
-                            unFollow: unfollow,
-                            unBlock: unblock,
-                            unPin: unpin
-                        )
-                    )
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-            }
-            .foregroundStyle(.secondary)
-            .padding(4)
-            .padding(.leading, 4)
+            RowFooter(model: model)
         }
         .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection || context == .detail)
         .contextMenu(menuItems: {

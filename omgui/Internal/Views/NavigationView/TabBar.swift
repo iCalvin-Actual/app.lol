@@ -247,7 +247,6 @@ struct TabBar: View {
                     .frame(maxHeight: 44)
                     .glassEffect(.regular, in: .capsule)
                     .id(addressBook.hashValue)
-                    .contentShape(Rectangle())
                     .onTapGesture {
                         selected = .account
                     }
@@ -346,7 +345,7 @@ struct PinnedAddressesView: View {
                         .font(.callout)
                         .fontDesign(.serif)
                     }
-                    ForEach(addressBook.mine.reversed()) { address in
+                    ForEach(addressBook.mine.sorted().reversed()) { address in
                         Section(address.addressDisplayString) {
                             Button {
                                 withAnimation {

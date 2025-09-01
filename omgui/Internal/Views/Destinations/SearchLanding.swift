@@ -80,7 +80,7 @@ struct SearchLanding: View {
         }
         .toolbar {
             ToolbarItem(placement: .automatic) {
-                SortOrderMenu(sort: $sort, filters: $filterOptions, sortOptions: [.alphabet, .newestFirst, .oldestFirst], filterOptions: [])
+                SortOrderMenu(sort: $sort, sortOptions: [.alphabet, .newestFirst, .oldestFirst])
                     .tint(.primary)
             }
         }

@@ -54,7 +54,6 @@ struct AddressesRow: View {
         }
         .animation(.default, value: addresses)
         .background(Material.regular)
-        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 12, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 12, style: .continuous))
     }
     
     @ViewBuilder
@@ -124,8 +123,27 @@ struct AccountView: View {
     
     var body: some View {
         coreBody
-            .navigationTitle("👤 /me")
+            .navigationTitle("💗 /\(addressBook.signedIn ? "account" : "app")")
             .toolbarTitleDisplayMode(.inlineLarge)
+            .toolbar {
+                Menu{
+                    ForEach([NavigationItem.appSupport, NavigationItem.safety, NavigationItem.appLatest]) { item in
+                        Button {
+                            present?(item.destination)
+                        } label: {
+                            item.label
+                        }
+                        .foregroundStyle(.primary)
+                        #if canImport(UIKit)
+                        .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+                        #endif
+                    }
+                } label: {
+                    Label("More", systemImage: "ellipsis.circle")
+                        .bold()
+                }
+                .tint(.primary)
+            }
             .task { [weak followingFetcher, weak followersFetcher] in
                 await followingFetcher?.updateIfNeeded()
                 await followersFetcher?.updateIfNeeded()
@@ -135,7 +153,112 @@ struct AccountView: View {
     @ViewBuilder
     var coreBody: some View {
         List {
-            if !addressBook.signedIn {
+            Section("Lists") {
+                // Mine addresses horizontal scroll section
+                if !addressBook.mine.isEmpty {
+                    Label {
+                        Text("Mine")
+                    } icon: {
+                        Image(systemName: "person")
+                    }
+                    .foregroundStyle(.primary)
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .listRowSeparator(.hidden)
+                    
+                    AddressesRow(addresses: addressBook.mine.sorted())
+                        .frame(maxWidth: .infinity)
+                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowBackground(Color.clear)
+                }
+
+                // Following horizontal scroll section
+                if !addressBook.following.isEmpty {
+                    Label {
+                        Text("Following")
+                    } icon: {
+                        Image(systemName: "at")
+                    }
+                    .foregroundStyle(.primary)
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .listRowSeparator(.hidden)
+                    
+                    AddressesRow(addresses: addressBook.following)
+                        .frame(maxWidth: .infinity)
+                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowBackground(Color.clear)
+                }
+
+                // Followers horizontal scroll section
+                if !addressBook.followers.isEmpty {
+                    Label {
+                        Text("Followers")
+                    } icon: {
+                        Image(systemName: "at")
+                    }
+                    .foregroundStyle(.primary)
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .listRowSeparator(.hidden)
+                    
+                    AddressesRow(addresses: addressBook.followers)
+                        .frame(maxWidth: .infinity)
+                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowBackground(Color.clear)
+                }
+                
+                if !addressBook.pinned.isEmpty {
+                    Label {
+                        Text("pinned")
+                    } icon: {
+                        Image(systemName: "pin")
+                    }
+                    .foregroundStyle(.primary)
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .listRowSeparator(.hidden)
+                    
+                    AddressesRow(addresses: addressBook.pinned)
+                        .frame(maxWidth: .infinity)
+                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowBackground(Color.clear)
+                }
+            }
+            
+            if addressBook.signedIn {
+                Button(action: {
+                    withAnimation { confirmLogout = true }
+                }) {
+                    Label {
+                        Text("Log out")
+                    } icon: {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                    }
+                    .bold()
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(3)
+                }
+                .foregroundStyle(.secondary)
+#if canImport(UIKit)
+                .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
+#elseif os(macOS)
+                .padding(.vertical, 16)
+#endif
+                .contentShape(Rectangle())
+                .alert("Log out?", isPresented: $confirmLogout, actions: {
+                    Button("Cancel", role: .cancel) { }
+                    Button(
+                        "Yes",
+                        role: .destructive,
+                        action: {
+                            authenticate("")
+                        })
+                }, message: {
+                    Text("Are you sure you want to sign out of your omg.lol account? Your pinned and blocked lists will be maintained after logout")
+                })
+            } else {
                 Button(action: {
                     authFetcher.perform()
                 }) {
@@ -155,148 +278,6 @@ struct AccountView: View {
 #elseif os(macOS)
                 .padding(.vertical, 16)
 #endif
-            }
-            Section("Lists") {
-                // Mine addresses horizontal scroll section
-                if !addressBook.mine.isEmpty {
-                    Section {
-                        AddressesRow(addresses: addressBook.mine, selection: true)
-                    } header: {
-                        Label {
-                            Text("mine")
-                        } icon: {
-                            Image(systemName: "person")
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowSeparator(.hidden)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(Material.thin)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                }
-                
-                // Following horizontal scroll section
-                if !addressBook.following.isEmpty {
-                    Section {
-                        AddressesRow(addresses: addressBook.following)
-                    } header: {
-                        Label {
-                            Text("following")
-                        } icon: {
-                            Image(systemName: "at")
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowSeparator(.hidden)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(Material.thin)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                }
-                
-                // Followers horizontal scroll section
-                if !addressBook.followers.isEmpty {
-                    Section {
-                        AddressesRow(addresses: addressBook.followers)
-                    } header: {
-                        Label {
-                            Text("followers")
-                        } icon: {
-                            Image(systemName: "at")
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowSeparator(.hidden)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(Material.thin)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                }
-                
-                if !addressBook.pinned.isEmpty {
-                    Section {
-                        AddressesRow(addresses: addressBook.pinned)
-                    } header: {
-                        Label {
-                            Text("pinned")
-                        } icon: {
-                            Image(systemName: "pin")
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowSeparator(.hidden)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .background(Material.thin)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                }
-            }
-            
-            if sizeClass == .compact {
-                Section("app.lol") {
-                    ForEach([NavigationItem.appSupport, NavigationItem.safety, NavigationItem.appLatest]) { item in
-                        Button {
-                            present?(item.destination)
-                        } label: {
-                            item.label
-                        }
-                        .foregroundStyle(.primary)
-                        #if canImport(UIKit)
-                        .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-                        #endif
-                    }
-                }
-            }
-            
-            if addressBook.signedIn {
-                Button(action: {
-                    withAnimation { confirmLogout = true }
-                }) {
-                    Label {
-                        Text("Log out")
-                    } icon: {
-                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                    }
-                    .bold()
-                    .font(.callout)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(3)
-                }
-                .foregroundStyle(.primary)
-#if canImport(UIKit)
-                .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-#elseif os(macOS)
-                .padding(.vertical, 16)
-#endif
-                .alert("Log out?", isPresented: $confirmLogout, actions: {
-                    Button("Cancel", role: .cancel) { }
-                    Button(
-                        "Yes",
-                        role: .destructive,
-                        action: {
-                            authenticate("")
-                        })
-                }, message: {
-                    Text("Are you sure you want to sign out of your omg.lol account? Your pinned and blocked lists will be maintained after logout")
-                })
-                .contentShape(Rectangle())
             }
         }
         .animation(.default, value: addressBook.signedIn)
@@ -389,7 +370,7 @@ struct AddressCard: View {
             Text(address.addressDisplayString)
                 .font(.caption)
                 .fontDesign(.serif)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.primary)
                 .multilineTextAlignment(.trailing)
                 .lineLimit(3)
         }

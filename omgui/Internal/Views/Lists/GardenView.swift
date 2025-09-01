@@ -53,7 +53,6 @@ struct GardenItemView: View {
                 Text("/now")
                     .fontDesign(.serif)
                     .font(.subheadline)
-                    .frame(maxHeight: .infinity, alignment: .top)
             }
             
             HStack(alignment: .bottom) {
@@ -67,34 +66,7 @@ struct GardenItemView: View {
             .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
             .padding(.horizontal, 4)
             
-            
-            HStack {
-                Text(DateFormatter.short.string(from: model.date))
-                    .font(.caption)
-                    .padding(.horizontal, 4)
-                Spacer()
-                Menu {
-                    menuBuilder.contextMenu(
-                        for: model,
-                        fetcher: nil,
-                        addressBook: addressBook,
-                        menuFetchers: (
-                            navigate: present ?? { _ in },
-                            follow: follow,
-                            block: block,
-                            pin: pin,
-                            unFollow: unfollow,
-                            unBlock: unblock,
-                            unPin: unpin
-                        )
-                    )
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-            }
-            .foregroundStyle(.secondary)
-            .padding(4)
-            .padding(.horizontal, 4)
+            RowFooter(model: model)
         }
         .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection)
         .contextMenu(menuItems: {

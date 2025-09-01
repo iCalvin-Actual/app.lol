@@ -21,24 +21,74 @@ struct RowHeader<T: Listable, V: View>: View {
                 AddressIconView(address: model.addressName, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
                     .padding(.horizontal, 2)
             }
-            VStack(alignment: .leading, spacing: 2) {
-                AddressNameView(model.addressName, font: .headline)
-                    .foregroundStyle(.primary)
-                if let caption = context != .detail ? DateFormatter.relative.string(for: model.displayDate) ?? model.listCaption : model.listCaption {
-                    Text(caption)
-                        .multilineTextAlignment(.leading)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .truncationMode(.tail)
+            HStack (alignment: .lastTextBaseline, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
+                    if let caption = context != .detail ? DateFormatter.relative.string(for: model.displayDate) ?? model.listCaption : model.listCaption {
+                        Text(caption)
+                            .multilineTextAlignment(.leading)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .truncationMode(.tail)
+                    }
+                    AddressNameView(model.addressName, font: .headline)
+                        .foregroundStyle(.primary)
                 }
+                
+                Spacer()
+                cornerView()
             }
-            Spacer()
-            cornerView()
         }
         .padding(.top, 4)
         .padding(.horizontal, 4)
         .padding(4)
         
+    }
+}
+
+struct RowFooter<T: Listable>: View {
+    @Environment(\.addressBook) var addressBook
+    @Environment(\.pinAddress) var pin
+    @Environment(\.unpinAddress) var unpin
+    @Environment(\.blockAddress) var block
+    @Environment(\.unblockAddress) var unblock
+    @Environment(\.followAddress) var follow
+    @Environment(\.unfollowAddress) var unfollow
+    @Environment(\.presentListable) var present
+    
+    let model: T
+    
+    let menuBuilder = ContextMenuBuilder<T>()
+    
+    var body: some View {
+        HStack {
+            if let date = model.displayDate {
+                Text(DateFormatter.short.string(from: date))
+                    .font(.caption)
+                    .padding(.horizontal, 4)
+            }
+            Spacer()
+            Menu {
+                menuBuilder.contextMenu(
+                    for: model,
+                    fetcher: nil,
+                    addressBook: addressBook,
+                    menuFetchers: (
+                        navigate: present ?? { _ in },
+                        follow: follow,
+                        block: block,
+                        pin: pin,
+                        unFollow: unfollow,
+                        unBlock: unblock,
+                        unPin: unpin
+                    )
+                )
+            } label: {
+                Image(systemName: "ellipsis.circle")
+            }
+        }
+        .foregroundStyle(.secondary)
+        .padding(4)
+        .padding(.leading, 4)
     }
 }
 
@@ -82,33 +132,7 @@ struct PURLRowView: View {
             
             mainBody
             
-            HStack {
-                Text(DateFormatter.short.string(from: model.date))
-                    .font(.caption)
-                    .padding(.horizontal, 4)
-                Spacer()
-                Menu {
-                    menuBuilder.contextMenu(
-                        for: model,
-                        fetcher: nil,
-                        addressBook: addressBook,
-                        menuFetchers: (
-                            navigate: present ?? { _ in },
-                            follow: follow,
-                            block: block,
-                            pin: pin,
-                            unFollow: unfollow,
-                            unBlock: unblock,
-                            unPin: unpin
-                        )
-                    )
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-            }
-            .foregroundStyle(.secondary)
-            .padding(4)
-            .padding(.leading, 4)
+            RowFooter(model: model)
         }
         .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection)
         .frame(maxWidth: .infinity)

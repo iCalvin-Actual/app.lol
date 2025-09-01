@@ -98,8 +98,13 @@ struct ListView<T: Listable>: View {
             .onChange(of: filters, { dataFetcher.filters = $1 })
             .toolbar {
                 if T.sortOptions.count > 1 || applicableFilters.count > 1 {
-                    ToolbarItem(placement: .automatic) {
-                        SortOrderMenu(sort: $sort, filters: $filters, sortOptions: T.sortOptions, filterOptions: applicableFilters)
+                    ToolbarItemGroup {
+                        if applicableFilters.count > 1 {
+                            FilterOptionsMenu(filters: $filters, filterOptions: applicableFilters)
+                        }
+                        if T.sortOptions.count > 1 {
+                            SortOrderMenu(sort: $sort, sortOptions: T.sortOptions)
+                        }
                     }
                 }
             }
