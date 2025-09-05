@@ -93,9 +93,6 @@ public struct OMGScene: View {
         
         _directoryFetcher = .init(wrappedValue: .init(addressBook: .init()))
         
-        #if canImport(UIKit)
-        UITabBar.appearance().unselectedItemTintColor = UIColor.white
-        #endif
     }
     
     public var body: some View {

@@ -84,7 +84,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     }
     
     init?(rawValue: String) {
-        let splitString = rawValue.components(separatedBy: ".")
+        let splitString = rawValue.lowercased().components(separatedBy: ".")
         switch splitString.first {
         case "loading":     self = .loading
         case "account":     self = .account
@@ -106,7 +106,11 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
             guard splitString.count > 1 else {
                 return nil
             }
-            self = .address(splitString[1], page: .profile)
+            var desiredPath: AddressContent = .profile
+            if let last = splitString.last, last != splitString[1], let content = AddressContent(rawValue: last) {
+                desiredPath = content
+            }
+            self = .address(splitString[1], page: desiredPath)
         case "saved":
             guard splitString.count > 1, let feature = AppFeature(rawValue: splitString[1]) else {
                 return nil

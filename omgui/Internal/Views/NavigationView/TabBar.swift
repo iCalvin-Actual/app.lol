@@ -111,7 +111,7 @@ struct TabBar: View {
                 }
             })
             .environment(\.presentListable, { item in
-                path.append(item)
+                present(item)
             })
             .environment(\.searchActive, searching)
             .environment(\.setSearchFilters, {
@@ -124,6 +124,94 @@ struct TabBar: View {
                 }
             })
             .environment(\.searchFetcher, searchFetcher)
+            .onOpenURL(perform: openURL(_:))
+    }
+    
+    func present(_ destination: NavigationDestination) {
+        switch destination {
+        case .account:
+            presentAccount = true
+        default:
+            path.append(destination)
+        }
+    }
+    
+    func openURL(_ givenURL: URL) {
+        switch givenURL.scheme {
+        case "app-omg-lol",
+            "lol",
+            "https://":
+            var addressName: AddressName?
+            
+            // Check unique cases
+            let givenHost = givenURL.host
+            if givenHost == "omg.lol" || givenHost == "profile.omg.lol" {
+                var urlPath = givenURL.pathComponents.first ?? ""
+                if urlPath.hasPrefix("@") {
+                    urlPath = urlPath.replacingOccurrences(of: "@", with: "")
+                } else if urlPath.hasPrefix("~") {
+                    urlPath = urlPath.replacingOccurrences(of: "~", with: "")
+                }
+
+                guard !urlPath.isEmpty else {
+                    present(.community)
+                    return
+                }
+                present(.address(urlPath, page: .profile))
+                return
+            }
+            
+            // Determine Address
+            if let givenHost {
+                let splitComponents = givenHost.components(separatedBy: ".")
+                if splitComponents.count == 3 {
+                    if givenHost.hasSuffix("status.lol"), let addressName = splitComponents.first {
+                        let components = givenURL.pathComponents
+                        if components.count > 1, let statusId = components.last {
+                            present(.status(addressName, id: statusId))
+                        } else {
+                            present(.statusLog(addressName))
+                        }
+                        return
+                    } else if givenHost.hasSuffix("url.lol"), let addressName = splitComponents.first {
+                        let components = givenURL.pathComponents
+                        if components.count > 1, let statusId = components.last {
+                            present(.purl(addressName, id: statusId))
+                        } else {
+                            present(.purls(addressName))
+                        }
+                        return
+                    } else if givenHost.hasSuffix("paste.lol"), let addressName = splitComponents.first {
+                        let components = givenURL.pathComponents
+                        if components.count > 1, let statusId = components.last {
+                            present(.paste(addressName, id: statusId))
+                        } else {
+                            present(.pastebin(addressName))
+                        }
+                        return
+                    } else if givenHost.hasSuffix("omg.lol") || givenHost.hasSuffix("profile.lol") {
+                        addressName = splitComponents.first
+                    }
+                    guard let addressName else {
+                        present(.community)
+                        return
+                    }
+                    if givenURL.path() == "now" {
+                        present(.now(addressName))
+                        return
+                    }
+                    present(.address(addressName, page: .profile))
+                    return
+                }
+            }
+            
+            // Fallback to assuming path is a navigation raw value
+            let desiredDestination = NavigationDestination(rawValue: givenURL.lastPathComponent) ?? .support
+            
+            present(desiredDestination)
+        default:
+            return
+        }
     }
     
     @ViewBuilder
