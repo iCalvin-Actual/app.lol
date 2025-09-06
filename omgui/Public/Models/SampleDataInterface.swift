@@ -471,7 +471,7 @@ calvin
 
 extension StatusModel {
     static func sample(with address: AddressName, id: String? = nil) -> StatusModel {
-        let contentItems = ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat", " Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.", "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."]
+        let contentItems = ["Lorem [ipsum dolor sit](https://icalvin.dev) amet, [consectetur](https://www.apple.com) adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", "Ut enim ad minim veniam, [quis nostrud](https://icalvin.dev) exercitation ullamco [laboris](https://www.apple.com) nisi ut aliquip ex ea commodo consequat", " Duis aute irure dolor in [reprehenderit](https://www.apple.com) in voluptate [velit esse cillum](https://icalvin.dev) dolore eu fugiat nulla pariatur.", "Excepteur sint occaecat cupidatat non proident, [sunt in culpa](https://www.apple.com) qui officia [deserunt mollit](https://icalvin.dev) anim id est laborum."]
         let emojiItems = ["🙈", "🤷", "😘", "🤣", "😅", "🦖", "🤓", "🙃", "✨", "🎉", "🤔", "😍", "🙊", "😉", "🖤", "🤩"]
         let content = contentItems.randomElement()!
         let emoji = emojiItems.randomElement()!

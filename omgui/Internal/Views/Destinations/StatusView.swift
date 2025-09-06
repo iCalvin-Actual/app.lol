@@ -9,25 +9,16 @@ import SwiftUI
 
 struct StatusView: View {
     
-    @Environment(\.addressBook)
-    var addressBook
-    @Environment(\.viewContext)
-    var viewContext
-    @Environment(\.openURL)
-    var openUrl
-    @Environment(\.presentListable)
-    var presentDestination
-    @Environment(\.addressSummaryFetcher)
-    var summaryFetcher
+    @Environment(\.addressBook) var addressBook
+    @Environment(\.viewContext) var viewContext
+    @Environment(\.openURL) var openUrl
+    @Environment(\.presentListable) var presentDestination
+    @Environment(\.addressSummaryFetcher) var summaryFetcher
     @Environment(\.horizontalSizeClass) var sizeClass
     
-    @State
-    var shareURL: URL?
-    @State
-    var presentURL: URL?
-    
-    @State
-    var expandBio: Bool = false
+    @State var shareURL: URL?
+    @State var presentURL: URL?
+    @State var expandLinks: Bool = false
     
     @StateObject
     var fetcher: StatusDataFetcher
@@ -40,8 +31,7 @@ struct StatusView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let model = fetcher.result {
                 StatusRowView(model: model)
-//                    .frame(maxHeight: .infinity, alignment: .top)
-//                    .background(Color.red)
+                    .frame(maxHeight: expandLinks ? 300 : .infinity, alignment: .top)
                     .padding(.horizontal, 6)
             } else if fetcher.loading {
                 LoadingView()
@@ -55,11 +45,9 @@ struct StatusView: View {
             }
             if let items = fetcher.result?.imageLinks, !items.isEmpty {
                 imageSection(items)
-                    .padding(.horizontal)
             }
             if let items = fetcher.result?.linkedItems, !items.isEmpty {
                 linksSection(items)
-                    .padding(.horizontal)
             }
             Spacer()
         }
@@ -122,15 +110,32 @@ struct StatusView: View {
     
     @ViewBuilder
     private func linksSection(_ items: [SharePacket]) -> some View {
-        Text("links")
-            .font(.subheadline)
-        
-        LazyVStack {
-            ForEach(items) { item in
-                linkPreviewBuilder(item)
-                    .frame(maxWidth: .infinity)
+        Section(isExpanded: $expandLinks) {
+            ScrollView {
+                ForEach(items) { item in
+                    linkPreviewBuilder(item)
+                        .frame(maxWidth: .infinity)
+                }
             }
+        } header: {
+            Button {
+                withAnimation{
+                    expandLinks.toggle()
+                }
+            } label: {
+                HStack {
+                    Label("Links", systemImage: "link")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .rotationEffect(.init(degrees: expandLinks ? 90 : 0))
+                }
+            }
+            .foregroundStyle(.primary)
+            .buttonStyle(.bordered)
+            .clipShape(Capsule())
         }
+        .padding(8)
     }
     
     @ViewBuilder
@@ -151,6 +156,7 @@ struct StatusView: View {
                             .font(.subheadline)
                             .bold()
                             .fontDesign(.rounded)
+                            .foregroundColor(.secondary)
                     }
                     
                     Text(item.content.absoluteString)
@@ -161,34 +167,39 @@ struct StatusView: View {
                 .lineLimit(3)
                 
                 Spacer()
-                
-                if item.content.scheme?.contains("http") ?? false {
-                    ZStack {
-                        #if canImport(UIKit) && !os(tvOS)
-                        RemoteHTMLContentView(activeAddress: fetcher.address, startingURL: item.content, activeURL: $presentURL, scrollEnabled: .constant(false))
-                        #endif
-                            
-                        LinearGradient(
-                            stops: [
-                                .init(color: .lolBackground, location: 0.1),
-                                .init(color: .clear, location: 0.5)
-                            ],
-                            startPoint: .bottom,
-                            endPoint: .top
-                        )
-                    }
-                    .frame(width: 144, height: 144)
-                    .mask {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    }
-                }
             }
             .foregroundStyle(Color.primary)
-            .padding(4)
+            .padding(8)
             .background(Material.thin)
-            .mask {
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+#Preview {
+    @Previewable @State var model: StatusModel?
+    
+    let db = AppClient.database
+    
+    NavigationStack {
+        if let model {
+            StatusView(address: model.addressName, id: model.id)
+                .background(NavigationDestination.account.gradient)
         }
     }
+    .task {
+        do {
+            let sampleModel = StatusModel.sample(with: "app")
+            try await sampleModel.write(to: db)
+            model = sampleModel
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    .environment(\.viewContext, .detail)
+    .environment(\.addressBook, .init())
+    .environment(\.credentialFetcher, { _ in "" })
+    .environment(\.pinAddress, { _ in })
+    .environment(\.presentListable, { _ in })
+    .environment(\.blackbirdDatabase, db)
 }
