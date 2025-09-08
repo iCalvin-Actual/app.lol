@@ -34,16 +34,16 @@ struct GardenItemView: View {
     
     let cardColor: Color
     let cardPadding: CGFloat
-    let cardradius: CGFloat
+    let cardRadius: CGFloat
     let showSelection: Bool
     
     let menuBuilder = ContextMenuBuilder<NowListing>()
     
-    init(model: NowListing, cardColor: Color, cardPadding: CGFloat, cardradius: CGFloat, showSelection: Bool) {
+    init(model: NowListing, cardColor: Color, cardPadding: CGFloat, cardRadius: CGFloat, showSelection: Bool) {
         self.model = model
         self.cardColor = cardColor
         self.cardPadding = cardPadding
-        self.cardradius = cardradius
+        self.cardRadius = cardRadius
         self.showSelection = showSelection
     }
     
@@ -55,20 +55,19 @@ struct GardenItemView: View {
                     .font(.subheadline)
             }
             
-            HStack(alignment: .bottom) {
-                Text(model.listSubtitle)
-                    .font(.callout)
-                    .foregroundStyle(.primary)
-                    .fontDesign(.monospaced)
-                    .bold()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
-            .padding(.horizontal, 4)
+            Text(model.listSubtitle)
+                .font(.callout)
+                .foregroundStyle(.primary)
+                .fontDesign(.monospaced)
+                .bold()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(8)
+                .asCard(material: .regular, padding: 4, radius: cardRadius)
+                .padding(.horizontal, 4)
             
-            RowFooter(model: model)
+            RowFooter(model: model) { EmptyView() }
         }
-        .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection)
+        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
         .contextMenu(menuItems: {
             menuBuilder.contextMenu(
                 for: model,

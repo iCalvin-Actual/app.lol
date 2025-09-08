@@ -51,8 +51,8 @@ struct PasteView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let model = fetcher.result {
-                PasteRowView(model: model)
-                    .padding(.horizontal, 6)
+                PasteRowView(model: model, cardPadding: 16)
+                    .padding(.horizontal, 8)
             } else if fetcher.loading {
                 LoadingView()
                     .padding()
@@ -65,8 +65,6 @@ struct PasteView: View {
             }
             Spacer()
         }
-        .padding(4)
-        .padding(.vertical, sizeClass == .compact ? 16 : 0)
         .task {
             let addressCredential = credential(fetcher.address)
             if fetcher.credential != addressCredential {
@@ -102,14 +100,14 @@ struct PasteView: View {
         .navigationBarTitleDisplayMode(.inline)
     #endif
 #endif
-        .tint(.primary)
+        .tint(.secondary)
         .toolbar {
             if let addressSummaryFetcher = summaryFetcher(fetcher.address) {
                 ToolbarItem(placement: .principal) {
                     AddressPrincipalView(
                         addressSummaryFetcher: addressSummaryFetcher,
                         addressPage: .init(
-                            get: { .statuslog },
+                            get: { .pastebin },
                             set: {
                                 presentDestination?(.address(addressSummaryFetcher.addressName, page: $0))
                             }
@@ -117,48 +115,6 @@ struct PasteView: View {
                     )
                 }
             }
-#if !os(tvOS)
-            if let pasteURL = fetcher.result?.pasteURL {
-                ToolbarItem(placement: .automatic) {
-                    Menu {
-                        ShareLink("share paste", item: pasteURL)
-                        Divider()
-                        Button(action: {
-#if canImport(UIKit)
-                            UIPasteboard.general.string = pasteURL.absoluteString
-#elseif canImport(AppKit)
-                            let pasteboard = NSPasteboard.general
-                            pasteboard.clearContents()
-                            pasteboard.setString(pasteURL.absoluteString, forType: .string)
-#endif
-                        }, label: {
-                            Label(
-                                title: { Text("copy paste") },
-                                icon: { Image(systemName: "doc.on.clipboard") }
-                            )
-                        })
-                        if let shareItem = fetcher.result?.content {
-                            Button(action: {
-#if canImport(UIKit)
-                                UIPasteboard.general.string = shareItem
-#elseif canImport(AppKit)
-                                let pasteboard = NSPasteboard.general
-                                pasteboard.clearContents()
-                                pasteboard.setString(shareItem, forType: .string)
-#endif
-                            }, label: {
-                                Label(
-                                    title: { Text("copy paste content") },
-                                    icon: { Image(systemName: "text.alignleft") }
-                                )
-                            })
-                        }
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                }
-            }
-#endif
         }
         .onReceive(fetcher.result.publisher, perform: { _ in
             withAnimation {
@@ -247,40 +203,6 @@ struct PasteView: View {
             .mask {
                 RoundedRectangle(cornerRadius: 4, style: .continuous)
             }
-        }
-    }
-    
-    @ViewBuilder
-    var mainContent: some View {
-        if fetcher.loaded != nil {
-            ScrollView {
-                if let model = fetcher.result {
-                    PasteRowView(model: model, cardColor: .lolRandom(model.listTitle), cardPadding: 8, cardradius: 16, showSelection: true)
-                        .environment(\.viewContext, .detail)
-                        .padding()
-                } else {
-                    Text(fetcher.result?.content ?? "")
-                    #if !os(tvOS)
-                        .textSelection(.enabled)
-                    #endif
-                        .font(.body)
-                        .fontDesign(.rounded)
-                        .padding(.vertical, 4)
-                        .padding(.horizontal)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .padding(4)
-            .frame(maxWidth: .infinity)
-        } else {
-            LoadingView()
-                .padding()
-                .onAppear {
-                    Task { @MainActor [fetcher] in
-                        await fetcher.updateIfNeeded(forceReload: true)
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
     

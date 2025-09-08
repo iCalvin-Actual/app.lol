@@ -17,6 +17,10 @@ struct PURLView: View {
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.viewContext) var context
     @Environment(\.addressBook) var addressBook
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetcher
+    @Environment(\.presentListable)
+    var presentDestination
     
     @Environment(\.credentialFetcher) var credential
     
@@ -53,8 +57,8 @@ struct PURLView: View {
         WebView(fetcher.page)
             .safeAreaInset(edge: .bottom) {
                 if let model = fetcher.result {
-                    PURLRowView(model: model, cardColor: .lolRandom(model.listTitle), cardPadding: 8, cardradius: 16, showSelection: true)
-                        .padding()
+                    PURLRowView(model: model, cardColor: .lolRandom(model.listTitle), cardPadding: 8, cardRadius: 16, showSelection: true)
+                        .padding(8)
                 }
             }
     }

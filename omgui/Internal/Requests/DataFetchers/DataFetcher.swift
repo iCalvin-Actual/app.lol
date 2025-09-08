@@ -91,6 +91,13 @@ class ListFetcher<T: Listable>: Request {
     @MainActor
     func fetchNextPageIfNeeded() {
     }
+    
+    @MainActor
+    func refresh() {
+        results = []
+        loaded = nil
+        fetchNextPageIfNeeded()
+    }
 }
 
 class DataBackedListDataFetcher<T: Listable>: ListFetcher<T> {

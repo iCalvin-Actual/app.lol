@@ -18,7 +18,6 @@ struct StatusView: View {
     
     @State var shareURL: URL?
     @State var presentURL: URL?
-    @State var expandLinks: Bool = false
     
     @StateObject
     var fetcher: StatusDataFetcher
@@ -28,31 +27,23 @@ struct StatusView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        Group {
             if let model = fetcher.result {
-                StatusRowView(model: model)
-                    .frame(maxHeight: expandLinks ? 300 : .infinity, alignment: .top)
-                    .padding(.horizontal, 6)
+                StatusRowView(model: model, cardPadding: 16)
+                    .frame(maxHeight: .infinity, alignment: .top)
             } else if fetcher.loading {
                 LoadingView()
                     .padding()
+                    .frame(maxHeight: .infinity, alignment: .center)
             } else {
                 LoadingView()
                     .padding()
+                    .frame(maxHeight: .infinity, alignment: .center)
                     .task { @MainActor [fetcher] in
                         await fetcher.updateIfNeeded()
                     }
             }
-            if let items = fetcher.result?.imageLinks, !items.isEmpty {
-                imageSection(items)
-            }
-            if let items = fetcher.result?.linkedItems, !items.isEmpty {
-                linksSection(items)
-            }
-            Spacer()
         }
-        .padding(4)
-        .padding(.vertical, sizeClass == .compact ? 16 : 0)
         .onChange(of: fetcher.id, {
             Task { [fetcher] in
                 await fetcher.updateIfNeeded(forceReload: true)
@@ -78,7 +69,7 @@ struct StatusView: View {
         .navigationBarTitleDisplayMode(.inline)
     #endif
 #endif
-        .tint(.primary)
+        .tint(.secondary)
         .toolbar {
             if let addressSummaryFetcher = summaryFetcher(fetcher.address) {
                 ToolbarItem(placement: .principal) {
@@ -94,85 +85,6 @@ struct StatusView: View {
                 }
             }
         }
-    }
-    
-    @ViewBuilder
-    private func imageSection(_ items: [SharePacket]) -> some View {
-        Text("images")
-            .font(.title2)
-        LazyVStack {
-            ForEach(items) { item in
-                linkPreviewBuilder(item)
-                    .frame(maxWidth: .infinity)
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func linksSection(_ items: [SharePacket]) -> some View {
-        Section(isExpanded: $expandLinks) {
-            ScrollView {
-                ForEach(items) { item in
-                    linkPreviewBuilder(item)
-                        .frame(maxWidth: .infinity)
-                }
-            }
-        } header: {
-            Button {
-                withAnimation{
-                    expandLinks.toggle()
-                }
-            } label: {
-                HStack {
-                    Label("Links", systemImage: "link")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .rotationEffect(.init(degrees: expandLinks ? 90 : 0))
-                }
-            }
-            .foregroundStyle(.primary)
-            .buttonStyle(.bordered)
-            .clipShape(Capsule())
-        }
-        .padding(8)
-    }
-    
-    @ViewBuilder
-    private func linkPreviewBuilder(_ item: SharePacket) -> some View {
-        Button {
-            guard item.content.scheme?.contains("http") ?? false else {
-                openUrl(item.content)
-                return
-            }
-            withAnimation {
-                presentURL = item.content
-            }
-        } label: {
-            HStack {
-                VStack(alignment: .leading) {
-                    if !item.name.isEmpty {
-                        Text(item.name)
-                            .font(.subheadline)
-                            .bold()
-                            .fontDesign(.rounded)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    Text(item.content.absoluteString)
-                        .font(.caption)
-                        .fontDesign(.monospaced)
-                }
-                .multilineTextAlignment(.leading)
-                .lineLimit(3)
-                
-                Spacer()
-            }
-            .foregroundStyle(Color.primary)
-            .padding(8)
-            .background(Material.thin)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 

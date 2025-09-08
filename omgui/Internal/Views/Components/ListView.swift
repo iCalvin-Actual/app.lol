@@ -91,6 +91,9 @@ struct ListView<T: Listable>: View {
     
     var body: some View {
         sizeAppropriateBody
+            .refreshable {
+                dataFetcher.refresh()
+            }
             .task { [dataFetcher] in
                 dataFetcher.fetchNextPageIfNeeded()
             }
@@ -215,10 +218,9 @@ struct ListView<T: Listable>: View {
         
         var body: some View {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 0) {
+                LazyVStack(alignment: .leading, spacing: -4) {
                     listItems()
                         .listRowBackground(Color.clear)
-                        .padding(.vertical, 4)
                     
                     if dataFetcher.nextPage != nil {
                         LoadingView()
@@ -230,6 +232,7 @@ struct ListView<T: Listable>: View {
                             }
                     }
                 }
+                .padding(.horizontal, 0)
                 .refreshable(action: { [dataFetcher] in
                     await dataFetcher.updateIfNeeded(forceReload: true)
                 })
@@ -250,7 +253,6 @@ struct ListView<T: Listable>: View {
         @ViewBuilder
         func listItems() -> some View {
             listContent()
-                .padding(.horizontal, 8)
         }
         
         @ViewBuilder

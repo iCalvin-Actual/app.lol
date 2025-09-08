@@ -53,7 +53,7 @@ struct SearchLanding: View {
                     columns: [
                         GridItem(.adaptive(minimum: 250, maximum: 400), spacing: 8, alignment: .top)
                     ],
-                    spacing: 8,
+                    spacing: 0,
                     pinnedViews: [.sectionHeaders, .sectionFooters]
                 ) {
                     Section {
@@ -62,7 +62,6 @@ struct SearchLanding: View {
                         headerToUse(proxy.size.width)
                     }
                 }
-                .padding(.horizontal, 8)
             }
 #if !os(tvOS)
             .scrollContentBackground(.hidden)
@@ -81,7 +80,7 @@ struct SearchLanding: View {
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 SortOrderMenu(sort: $sort, sortOptions: [.alphabet, .newestFirst, .oldestFirst])
-                    .tint(.primary)
+                    .tint(.secondary)
             }
         }
         .navigationTitle("🔍 search.lol")

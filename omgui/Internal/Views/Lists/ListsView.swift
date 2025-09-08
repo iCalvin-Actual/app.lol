@@ -142,7 +142,7 @@ struct AccountView: View {
                     Label("More", systemImage: "ellipsis.circle")
                         .bold()
                 }
-                .tint(.primary)
+                .tint(.secondary)
             }
             .task { [weak followingFetcher, weak followersFetcher] in
                 await followingFetcher?.updateIfNeeded()

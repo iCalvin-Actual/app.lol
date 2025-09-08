@@ -36,9 +36,9 @@ struct ListRow<T: Listable>: View {
         .lolRandom(model.listTitle)
     }
     var cardPadding: CGFloat {
-        8
+        16
     }
-    var cardradius: CGFloat {
+    var cardRadius: CGFloat {
         16
     }
     var showSelection: Bool {
@@ -79,7 +79,6 @@ struct ListRow<T: Listable>: View {
     
     var body: some View {
         appropriateBody
-            .padding(2)
             .animation(.easeInOut(duration: 0.42), value: selected.wrappedValue)
             .contentShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture {
@@ -104,22 +103,22 @@ struct ListRow<T: Listable>: View {
     
     @ViewBuilder
     func statusBody(_ model: StatusModel) -> some View {
-        StatusRowView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardradius: cardradius, showSelection: showSelection)
+        StatusRowView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardRadius: cardRadius, showSelection: showSelection)
     }
     
     @ViewBuilder
     func gardenView(_ model: NowListing) -> some View {
-        GardenItemView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardradius: cardradius, showSelection: showSelection)
+        GardenItemView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardRadius: cardRadius, showSelection: showSelection)
     }
     
     @ViewBuilder
     func pasteView(_ model: PasteModel) -> some View {
-        PasteRowView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardradius: cardradius, showSelection: showSelection)
+        PasteRowView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardRadius: cardRadius, showSelection: showSelection)
     }
     
     @ViewBuilder
     func purlView(_ model: PURLModel) -> some View {
-        PURLRowView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardradius: cardradius, showSelection: showSelection)
+        PURLRowView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardRadius: cardRadius, showSelection: showSelection)
     }
     
     @ViewBuilder
@@ -131,20 +130,19 @@ struct ListRow<T: Listable>: View {
                     .font(.subheadline)
             }
             
-            HStack(alignment: .bottom) {
-                Text(model.listSubtitle.isEmpty ? "\(model.addressName).omg.lol" : String(model.listSubtitle.replacingOccurrences(of: "https://", with: "")))
-                    .font(.callout)
-                    .foregroundStyle(.primary)
-                    .fontDesign(.monospaced)
-                    .bold()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
-            .padding(.horizontal, 4)
+            Text(model.listSubtitle.isEmpty ? "\(model.addressName).omg.lol" : String(model.listSubtitle.replacingOccurrences(of: "https://", with: "")))
+                .font(.callout)
+                .foregroundStyle(.primary)
+                .fontDesign(.monospaced)
+                .bold()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(8)
+                .asCard(material: .regular, padding: 0, radius: cardRadius)
+                .padding(.horizontal, 4)
             
-            RowFooter(model: model)
+            RowFooter(model: model) { EmptyView() }
         }
-        .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection)
+        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
         .contextMenu(menuItems: {
             menuBuilder.contextMenu(
                 for: model,

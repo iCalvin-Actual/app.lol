@@ -23,7 +23,7 @@ struct RowHeader<T: Listable, V: View>: View {
             }
             HStack (alignment: .lastTextBaseline, spacing: 4) {
                 VStack(alignment: .leading, spacing: 2) {
-                    if let caption = context != .detail ? DateFormatter.relative.string(for: model.displayDate) ?? model.listCaption : model.listCaption {
+                    if let caption = DateFormatter.relative.string(for: model.displayDate) ?? model.listCaption {
                         Text(caption)
                             .multilineTextAlignment(.leading)
                             .font(.caption2)
@@ -45,7 +45,7 @@ struct RowHeader<T: Listable, V: View>: View {
     }
 }
 
-struct RowFooter<T: Listable>: View {
+struct RowFooter<T: Listable, A: View>: View {
     @Environment(\.addressBook) var addressBook
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin
@@ -58,15 +58,18 @@ struct RowFooter<T: Listable>: View {
     let model: T
     
     let menuBuilder = ContextMenuBuilder<T>()
+    @ViewBuilder
+    let accessoryBuilder: () -> A
     
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
             if let date = model.displayDate {
                 Text(DateFormatter.short.string(from: date))
                     .font(.caption)
                     .padding(.horizontal, 4)
             }
             Spacer()
+            accessoryBuilder()
             Menu {
                 menuBuilder.contextMenu(
                     for: model,
@@ -109,16 +112,16 @@ struct PURLRowView: View {
     
     let cardColor: Color
     let cardPadding: CGFloat
-    let cardradius: CGFloat
+    let cardRadius: CGFloat
     let showSelection: Bool
     
     let menuBuilder = ContextMenuBuilder<PURLModel>()
     
-    init(model: PURLModel, cardColor: Color? = nil, cardPadding: CGFloat = 8, cardradius: CGFloat = 16, showSelection: Bool = false) {
+    init(model: PURLModel, cardColor: Color? = nil, cardPadding: CGFloat = 8, cardRadius: CGFloat = 16, showSelection: Bool = false) {
         self.model = model
         self.cardColor = cardColor ?? .lolRandom(model.listTitle)
         self.cardPadding = cardPadding
-        self.cardradius = cardradius
+        self.cardRadius = cardRadius
         self.showSelection = showSelection
     }
     
@@ -132,16 +135,17 @@ struct PURLRowView: View {
             
             mainBody
             
-            RowFooter(model: model)
+            RowFooter(model: model) { EmptyView() }
         }
-        .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection)
+        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
         .frame(maxWidth: .infinity)
     }
     
     @ViewBuilder
     var mainBody: some View {
         rowBody
-            .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
+            .padding(8)
+            .asCard(material: .regular, padding: 4, radius: cardRadius)
             .padding(.horizontal, 4)
     }
     
@@ -152,10 +156,10 @@ struct PURLRowView: View {
                 Text(model.content.replacingOccurrences(of: "https://www.", with: ""))
                     .fontWeight(.medium)
                     .fontDesign(.monospaced)
-                    .frame(maxHeight: 30)
+                    .frame(maxHeight: context == .detail ? 30 : nil)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .lineLimit(context == .column ? 5 : nil)
+            .lineLimit(4)
             .multilineTextAlignment(.leading)
         }
     }

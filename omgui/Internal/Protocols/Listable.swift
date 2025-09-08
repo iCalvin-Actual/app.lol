@@ -62,13 +62,13 @@ extension StatusModel     {
 extension PasteModel     {
     var listTitle: String     { name }
     var listSubtitle: String  { String(content.prefix(42)) }
+    var displayDate: Date?    { date }
     var listCaption: String?  { DateFormatter.relative.string(for: date) ?? DateFormatter.short.string(for: date) }
     func rowDestination(detailPage: Bool = false) -> NavigationDestination { .paste(owner, id: name) }
 }
 extension PURLModel     {
     var listTitle: String     { name }
     var listSubtitle: String  { content }
-    var listCaption: String?  { DateFormatter.relative.string(for: date) ?? DateFormatter.short.string(for: date) }
     func rowDestination(detailPage: Bool = false) -> NavigationDestination { .purl(owner, id: name) }
 }
 extension NowListing     {

@@ -25,16 +25,16 @@ struct PasteRowView: View {
     
     let cardColor: Color
     let cardPadding: CGFloat
-    let cardradius: CGFloat
+    let cardRadius: CGFloat
     let showSelection: Bool
     
     let menuBuilder = ContextMenuBuilder<PasteModel>()
     
-    init(model: PasteModel, cardColor: Color? = nil, cardPadding: CGFloat = 8, cardradius: CGFloat = 16, showSelection: Bool = false) {
+    init(model: PasteModel, cardColor: Color? = nil, cardPadding: CGFloat = 8, cardRadius: CGFloat = 16, showSelection: Bool = false) {
         self.model = model
         self.cardColor = cardColor ?? .lolRandom(model.listTitle)
         self.cardPadding = cardPadding
-        self.cardradius = cardradius
+        self.cardRadius = cardRadius
         self.showSelection = showSelection
     }
     
@@ -48,9 +48,9 @@ struct PasteRowView: View {
             
             mainBody
             
-            RowFooter(model: model)
+            RowFooter(model: model) { EmptyView() }
         }
-        .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection)
+        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
         .frame(maxWidth: .infinity, maxHeight: context == .detail ? .infinity : 250)
     }
     
@@ -58,21 +58,19 @@ struct PasteRowView: View {
     var mainBody: some View {
         rowBody
             .frame(maxHeight: context == .detail ? .infinity : nil, alignment: .top)
-            .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
+            .asCard(material: .regular, radius: cardRadius)
             .padding(.horizontal, 4)
     }
     
     @ViewBuilder
     var rowBody: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            appropriateMarkdown
-                .tint(.lolAccent)
-                .fontWeight(.medium)
-                .fontDesign(.rounded)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .lineLimit(context == .column ? 5 : nil)
-        .multilineTextAlignment(.leading)
+        appropriateMarkdown
+            .tint(.lolAccent)
+            .fontWeight(.medium)
+            .fontDesign(.rounded)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .lineLimit(context == .column ? 4 : nil)
+            .multilineTextAlignment(.leading)
     }
     
     @ViewBuilder
@@ -80,9 +78,12 @@ struct PasteRowView: View {
         if context == .detail {
             ScrollView {
                 Markdown(model.content)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(8)
             }
         } else {
             Text(model.content)
+                .padding(8)
         }
     }
 }

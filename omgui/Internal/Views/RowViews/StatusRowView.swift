@@ -15,6 +15,7 @@ struct StatusRowView: View {
     @Environment(\.unblockAddress) var unblock
     @Environment(\.followAddress) var follow
     @Environment(\.unfollowAddress) var unfollow
+    @Environment(\.openURL) var openUrl
     
     @Environment(\.viewContext) var context: ViewContext
     @Environment(\.addressBook) var addressBook
@@ -24,22 +25,23 @@ struct StatusRowView: View {
     @GestureState private var zoom = 1.0
     
     @State var showURLs: Bool = false
-    @State var presentUrl: URL?
+    @State var presentImage: URL?
+    @State var presentURL: URL?
     
     let model: StatusModel
     
     let cardColor: Color
     let cardPadding: CGFloat
-    let cardradius: CGFloat
+    let cardRadius: CGFloat
     let showSelection: Bool
     
     let menuBuilder = ContextMenuBuilder<StatusModel>()
     
-    init(model: StatusModel, cardColor: Color? = nil, cardPadding: CGFloat = 8, cardradius: CGFloat = 16, showSelection: Bool = false) {
+    init(model: StatusModel, cardColor: Color? = nil, cardPadding: CGFloat = 8, cardRadius: CGFloat = 16, showSelection: Bool = false) {
         self.model = model
         self.cardColor = cardColor ?? .lolRandom(model.displayEmoji)
         self.cardPadding = cardPadding
-        self.cardradius = cardradius
+        self.cardRadius = cardRadius
         self.showSelection = showSelection
     }
     
@@ -52,9 +54,34 @@ struct StatusRowView: View {
             
             mainBody
             
-            RowFooter(model: model)
+            RowFooter(model: model) {
+                if !model.linkedItems.isEmpty {
+                    Menu {
+                        ForEach(model.linkedItems) { item in
+                            Button {
+                                guard item.content.scheme?.contains("http") ?? false else {
+                                    openUrl(item.content)
+                                    return
+                                }
+                                withAnimation {
+                                    presentURL = item.content
+                                }
+                            } label: {
+                                Text(item.name)
+                                    .font(.headline)
+                                Text(item.content.absoluteString)
+                                    .font(.subheadline)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "link.circle")
+                    }
+                } else {
+                    EmptyView()
+                }
+            }
         }
-        .asCard(color: cardColor, padding: 0, radius: cardradius, selected: showSelection || context == .detail)
+        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection || context == .detail)
         .contextMenu(menuItems: {
             menuBuilder.contextMenu(
                 for: model,
@@ -74,13 +101,13 @@ struct StatusRowView: View {
         .confirmationDialog("Open Image", isPresented: $showURLs, actions: {
             ForEach(model.imageLinks) { link in
                 Button {
-                    presentUrl = link.content
+                    presentImage = link.content
                 } label: {
                     Text(link.name)
                 }
             }
         })
-        .sheet(item: $presentUrl) { url in
+        .sheet(item: $presentImage) { url in
             AsyncImage(url: url) { image in
                 image.resizable()
                     .aspectRatio(contentMode: .fit)
@@ -97,20 +124,23 @@ struct StatusRowView: View {
                 ThemedTextView(text: "Loading image...")
             }
         }
+        .sheet(item: $presentURL) { url in
+            SafariView(url: url)
+        }
         .clipped()
     }
     
     @ViewBuilder
     var mainBody: some View {
         rowBody
-            .frame(maxHeight: context == .detail ? .infinity : nil, alignment: .top)
-            .asCard(color: cardColor, material: .regular, padding: cardPadding, radius: cardradius)
+            .padding(8)
+            .asCard(material: .regular, padding: 4, radius: cardRadius)
             .padding(.horizontal, 4)
     }
     
     @ViewBuilder
     var rowBody: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 8) {
             /*
              This was tricky to set up
              so I'm leaving it here
@@ -123,6 +153,23 @@ struct StatusRowView: View {
                 .tint(.lolAccent)
                 .fontWeight(.medium)
                 .fontDesign(.rounded)
+//                .frame(maxHeight: context == .detail ? .infinity : nil, alignment: .top)
+            
+            if !model.imageLinks.isEmpty {
+                if let singleImage = model.imageLinks.first, model.imageLinks.count == 1 {
+                    imagePreview(singleImage.content)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(alignment: .center) {
+                            ForEach(model.imageLinks) { image in
+                                imagePreview(image.content)
+                            }
+                        }
+                        .padding(8)
+                    }
+                    .padding(-8)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .lineLimit(context == .column ? 5 : nil)
@@ -130,10 +177,49 @@ struct StatusRowView: View {
     }
     
     @ViewBuilder
+    func imagePreview(_ url: URL) -> some View {
+        Button {
+            presentURL = url
+        } label: {
+            // Async image thumbnail cropped to a square with rounded corners
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                case .failure(_):
+                    // Fallback placeholder on failure
+                    Color.secondary.opacity(0.2)
+                        .overlay(
+                            Image(systemName: "photo")
+                                .foregroundStyle(.secondary)
+                        )
+                case .empty:
+                    // Loading placeholder
+                    ProgressView()
+                        .background(Color.secondary.opacity(0.1))
+                @unknown default:
+                    Color.secondary.opacity(0.2)
+                }
+            }
+            .frame(height: nil)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+    
+    @State private var offset: CGFloat = 0
+    @ViewBuilder
     var appropriateMarkdown: some View {
         ScrollView {
-            Markdown(model.displayStatus)
+            Markdown(model.displayStatus, hideImages: true)
         }
+        .onScrollGeometryChange(for: CGFloat.self, of: { proxy in
+            proxy.contentOffset.y
+        }, action: { oldValue, newValue in
+            offset = newValue
+        })
         .scrollDisabled(context == .column)
     }
     
@@ -163,17 +249,46 @@ struct StatusRowView: View {
 }
 
 #Preview {
-    VStack {
-        Spacer()
-        StatusRowView(model: .sample(with: "app"))
-            .environment(\.viewContext, ViewContext.column)
-        StatusRowView(model: .sample(with: "alexcox"))
-            .environment(\.viewContext, ViewContext.profile)
-        StatusRowView(model: .sample(with: "app"))
-            .environment(\.viewContext, ViewContext.detail)
-        Spacer()
+    @Previewable @State var fetcher: StatusLogDataFetcher?
+    
+    let db = AppClient.database
+    
+    NavigationStack {
+        if let fetcher {
+            ListView(dataFetcher: fetcher)
+                .background(NavigationDestination.account.gradient)
+        }
     }
+    .task {
+        do {
+            let sampleModels: [StatusModel] = [.sample(with: "app"), .sample(with: "alex"), .sample(with: "merlinmann")]
+            try await sampleModels.first?.write(to: db)
+            fetcher = .init(addressBook: .init())
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    .environment(\.viewContext, .detail)
+    .environment(\.addressBook, .init())
+    .environment(\.credentialFetcher, { _ in "" })
+    .environment(\.pinAddress, { _ in })
+    .environment(\.presentListable, { _ in })
+    .environment(\.blackbirdDatabase, db)
+}
+
+#Preview {
+    ScrollView {
+        VStack(spacing: 0) {
+            StatusRowView(model: .sample(with: "app"))
+                .environment(\.viewContext, ViewContext.column)
+            StatusRowView(model: .sample(with: "alexcox"))
+                .environment(\.viewContext, ViewContext.profile)
+            StatusRowView(model: .sample(with: "app"))
+                .environment(\.viewContext, ViewContext.detail)
+        }
+        .padding(.vertical)
+    }
+    .environment(\.viewContext, .column)
     .environment(SceneModel.sample)
-    .padding(.horizontal)
 }
 
