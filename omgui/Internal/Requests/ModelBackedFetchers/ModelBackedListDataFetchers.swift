@@ -444,7 +444,7 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
         displayTitle
     }
     
-    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook, limit: Int = 42) {
+    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook, limit: Int = .max) {
         self.displayTitle = title ?? {
             switch addresses.count {
             case 0:

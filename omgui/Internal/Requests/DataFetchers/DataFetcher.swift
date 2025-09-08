@@ -50,7 +50,7 @@ class ListFetcher<T: Listable>: Request {
         }
     }
     
-    init(items: [T] = [], limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
+    init(items: [T] = [], limit: Int = .max, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
         self.results = items
         self.limit = limit
         self.filters = filters

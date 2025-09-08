@@ -72,7 +72,7 @@ class ModelBackedListDataFetcher<T: ModelBackedListable>: ListFetcher<T> {
     
     var lastHash: Int?
     
-    init(addressBook: AddressBook, limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
+    init(addressBook: AddressBook, limit: Int = .max, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
         self.addressBook = addressBook
         self.db = AppClient.database
         super.init(items: [], limit: limit, filters: filters, sort: sort, automation: automation)
