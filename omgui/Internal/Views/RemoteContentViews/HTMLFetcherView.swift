@@ -9,7 +9,6 @@ import SwiftUI
 #if canImport(WebKit)
 import WebKit
 #endif
-import WebKit
 
 
 struct AddressProfilePageView: View {
@@ -37,6 +36,12 @@ struct AddressProfilePageView: View {
                     .ignoresSafeArea(.container, edges: .all)
             })
             #endif
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    ShareLink(item: fetcher.baseURL)
+                        .tint(.primary)
+                }
+            }
     }
 }
 
@@ -60,6 +65,12 @@ struct AddressNowPageView: View {
                     .ignoresSafeArea(.container, edges: .all)
             })
             #endif
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    ShareLink(item: fetcher.baseURL)
+                        .tint(.primary)
+                }
+            }
     }
 }
 

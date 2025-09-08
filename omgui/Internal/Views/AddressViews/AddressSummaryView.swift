@@ -52,7 +52,7 @@ struct AddressSummaryView: View {
     var body: some View {
         sizeAppropriateBody
             .toolbar {
-                ToolbarItem(placement: .principal) {
+                ToolbarItem(placement: .topBarLeading) {
                     AddressPrincipalView(addressSummaryFetcher: addressSummaryFetcher, addressPage: $addressPage)
                 }
             }
@@ -129,7 +129,7 @@ struct AddressBioView: View {
     }
     
     var containerCorner: CGFloat {
-        viewContext != .detail && bio == nil ? 16 : 8
+        16
     }
     
     var bio: String? {
@@ -141,7 +141,19 @@ struct AddressBioView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .top, spacing: 4) {
-                AddressIconView(address: address, addressBook: addressBook, size: 66, showMenu: false, contentShape: UnevenRoundedRectangle(topLeadingRadius: containerCorner, bottomLeadingRadius: 8, bottomTrailingRadius: 8, topTrailingRadius: 8, style: .circular))
+                AddressIconView(
+                    address: address,
+                    addressBook: addressBook,
+                    size: 66,
+                    showMenu: false,
+                    contentShape:  UnevenRoundedRectangle(
+                        topLeadingRadius: containerCorner,
+                        bottomLeadingRadius: 8,
+                        bottomTrailingRadius: 8,
+                        topTrailingRadius: 8,
+                        style: .circular
+                    )
+                )
                 VStack {
                     HStack(alignment: .firstTextBaseline) {
                         AddressNameView(address, font: .body)
@@ -175,18 +187,28 @@ struct AddressBioView: View {
                         button(.now, span: false)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
+                    .foregroundStyle(Material.regular)
+                    .labelIconToTitleSpacing(4)
                 }
                 .frame(idealHeight: 60, maxHeight: 66)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            
             HStack(spacing: 4) {
                 button(.pastebin)
-                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 8, bottomLeadingRadius: containerCorner, bottomTrailingRadius: 8, topTrailingRadius: 8, style: .circular))
+                    .disabled(!fetcher.pasteFetcher.hasContent)
+                    .foregroundStyle(fetcher.pasteFetcher.hasContent ? Material.regular : Material.ultraThin)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 button(.statuslog)
+                    .disabled(!fetcher.statusFetcher.hasContent)
+                    .foregroundStyle(fetcher.statusFetcher.hasContent ? Material.regular : Material.ultraThin)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 button(.purl)
-                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 8, bottomLeadingRadius: 8, bottomTrailingRadius: containerCorner, topTrailingRadius: 8, style: .circular))
+                    .disabled(!fetcher.purlFetcher.hasContent)
+                    .foregroundStyle(fetcher.purlFetcher.hasContent ? Material.regular : Material.ultraThin)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
+            .labelStyle(.iconOnly)
         
             if let bio = fetcher.bioFetcher.bio?.bio?.replacingHTMLLinksWithMarkdown(), !bio.isEmpty
             {
@@ -199,11 +221,17 @@ struct AddressBioView: View {
                 }
                 .padding()
                 .background(Material.ultraThin)
-                .clipShape(.rect(corners: .concentric))
+                .clipShape(UnevenRoundedRectangle(
+                    topLeadingRadius: 8,
+                    bottomLeadingRadius: containerCorner,
+                    bottomTrailingRadius: containerCorner,
+                    topTrailingRadius: 8,
+                    style: .circular
+                ))
                 .frame(minHeight: 125)
             }
         }
-        .padding(6)
+        .padding(16)
         .frame(maxWidth: 500, alignment: .top)
         .presentationCompactAdaptation(.popover)
         .task {
@@ -217,19 +245,15 @@ struct AddressBioView: View {
         Button {
             page.wrappedValue = addressContent
         } label: {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Image(systemName: addressContent.icon)
-                Text(addressContent.displayString)
-                    .bold()
-                    .frame(maxWidth: span ? .infinity : nil, alignment: span ? .leading : .center)
-            }
-            .background(addressContent.color)
+            Label(addressContent.displayString, systemImage: addressContent.icon)
+                .bold()
+                .frame(maxWidth: span ? .infinity : nil, alignment: addressContent == .profile ? .leading : .center)
         }
-        .padding(4)
+        .padding(2)
+        .padding(.horizontal, 2)
         .font(.callout)
         .fontDesign(.rounded)
-        .foregroundStyle(Material.regular)
-        .frame(minWidth: 95, minHeight: 33)
+        .frame(minHeight: 33)
         .background(addressContent.color)
         .colorScheme(.dark)
     }
@@ -270,7 +294,7 @@ struct AddressPrincipalView: View {
                     }
                 )
             )
-            .padding(6)
+            .padding(2)
             .environment(\.showAddressPage, showPage)
             .environment(\.visibleAddressPage, addressPage)
             .environment(\.addressBook, addressBook)
@@ -294,7 +318,8 @@ struct AddressBioButton: View {
                 AddressNameView(address, font: .headline)
                     .bold()
                     .foregroundStyle(theme?.foregroundColor ?? .primary)
-                if page != .profile {
+                    .lineLimit(2)
+                if page == .now {
                     ThemedTextView(text: page.displayString, font: .headline)
                 }
             }

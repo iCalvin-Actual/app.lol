@@ -37,8 +37,9 @@ struct FilterOptionsMenu: View {
                 button(filter)
             }
         } label: {
-            Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+            Label("Filter", systemImage: "line.3.horizontal.decrease")
         }
+        .foregroundStyle(.secondary)
     }
 }
 
@@ -70,7 +71,7 @@ struct SortOrderMenu: View {
                 }
             }
         } label: {
-            Label("Sort", systemImage: "arrow.up.arrow.down.circle")
+            Label("Sort", systemImage: "arrow.up.arrow.down")
         }
     }
 }

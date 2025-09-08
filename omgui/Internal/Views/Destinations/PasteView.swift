@@ -103,7 +103,7 @@ struct PasteView: View {
         .tint(.secondary)
         .toolbar {
             if let addressSummaryFetcher = summaryFetcher(fetcher.address) {
-                ToolbarItem(placement: .principal) {
+                ToolbarItem(placement: .topBarLeading) {
                     AddressPrincipalView(
                         addressSummaryFetcher: addressSummaryFetcher,
                         addressPage: .init(

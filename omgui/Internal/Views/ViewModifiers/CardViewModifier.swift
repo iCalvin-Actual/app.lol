@@ -32,16 +32,16 @@ struct CardViewModifier: ViewModifier {
         self.pullIn = pullIn
     }
     
-    var shadowPadding: CGFloat { selected ? padding : padding / 2 }
+    var shadowPadding: CGFloat { padding / 2 }
     
     func body(content: Content) -> some View {
         content
             .frame(maxWidth: .infinity)
             .background(contrast == .increased ? Material.thick : material)
             .cornerRadius(radius)
-            .padding(.horizontal, shadowPadding)
+            .padding(.horizontal, padding / 2)
             .padding(.vertical, pullIn ? shadowPadding / 2 : shadowPadding)
-            .shadow(color: .secondary.opacity(0.5), radius: shadowPadding / 2)
+            .shadow(color: selected ? .black.opacity(0.8) : .secondary.opacity(colorScheme == .dark ? 0 : 0.5), radius: shadowPadding / 2)
     }
 }
 

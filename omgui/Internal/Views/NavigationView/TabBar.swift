@@ -45,7 +45,11 @@ struct TabBar: View {
     var setAddress
     @Environment(\.presentListable)
     var present
+    @Environment(\.pinAddress)
+    var pin
     
+    @State var address: String = ""
+    @State var addAddress: Bool = false
     @State var presentAccount: Bool = false
     @State var searchQuery: String = ""
     @State var searchFilter: Set<SearchLanding.SearchFilter>
@@ -125,6 +129,14 @@ struct TabBar: View {
             })
             .environment(\.searchFetcher, searchFetcher)
             .onOpenURL(perform: openURL(_:))
+            .alert("Add pinned address", isPresented: $addAddress) {
+                TextField("Address", text: $address)
+                Button("Cancel") { }
+                Button("Add") {
+                    addAddress = false
+                    pin(address)
+                }.disabled(address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
     }
     
     func present(_ destination: NavigationDestination) {
@@ -220,7 +232,7 @@ struct TabBar: View {
             compactTabBar
             #if os(iOS)
                 .tabViewBottomAccessory {
-                    PinnedAddressesView(addressBook: addressBook)
+                    PinnedAddressesView(addressBook: addressBook, addAddress: $addAddress)
                         .id(addressBook.hashValue)
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -318,20 +330,56 @@ struct TabBar: View {
     var regularTabBar: some View {
         NavigationSplitView {
             List(selection: $selected) {
+                ThemedTextView(text: "app", font: .largeTitle, design: .serif, suffix: ".lol")
+                    .foregroundStyle(Color.lolAccent)
+                
                 // Sections from SidebarModel
-                ForEach(tabModel.sections, id: \.self) { section in
-                    Section(section.displayName, isExpanded: isExpanded(section)) {
-                        ForEach(tabModel.items(for: section, sizeClass: .regular, context: .column), id: \.self) { item in
-                            NavigationLink(value: item) {
+                Section {
+                    ForEach(tabModel.items(for: SidebarModel.Section.more, sizeClass: .regular, context: .column), id: \.self) { item in
+                        NavigationLink(value: item) {
+                            Label(item.displayString, systemImage: item.iconName)
+                        }
+                    }
+                }
+                Section {
+                    ForEach(tabModel.items(for: SidebarModel.Section.app, sizeClass: .regular, context: .column), id: \.self) { item in
+                        NavigationLink(value: item) {
+                            Label(item.displayString, systemImage: item.iconName)
+                        }
+                    }
+                }
+                Section(isExpanded: isExpanded(.directory)) {
+                    Button {
+                        withAnimation { addAddress.toggle() }
+                    } label: {
+                        Label {
+                            Text("Add pin")
+                        } icon: {
+                            Image(systemName: "plus.circle")
+                        }
+                    }
+                    ForEach(tabModel.items(for: SidebarModel.Section.directory, sizeClass: .regular, context: .column), id: \.self) { item in
+                        NavigationLink(value: item) {
+                            if item == tabModel.items(for: .directory, sizeClass: .regular, context: .column).first {
                                 Label(item.displayString, systemImage: item.iconName)
+                            } else {
+                                Label {
+                                    Text(item.displayString)
+                                } icon: {
+                                    Image(systemName: "pin")
+                                        .opacity(0)
+                                }
                             }
                         }
                     }
+                } header: {
+                    Label("pinned", systemImage: "pin")
+                        .foregroundStyle(.secondary)
                 }
             }
             .frame(minWidth: 180)
             .safeAreaInset(edge: .bottom) {
-                PinnedAddressesView(addressBook: addressBook)
+                PinnedAddressesView(addressBook: addressBook, addAddress: $addAddress)
                     .frame(maxHeight: 44)
                     .glassEffect(.regular, in: .capsule)
                     .id(addressBook.hashValue)
@@ -396,8 +444,8 @@ struct PinnedAddressesView: View {
     
     let addressBook: AddressBook
     
-    @State var addAddress: Bool = false
-    @State var address: String = ""
+    @Binding var addAddress: Bool
+    
     @State var confirmLogout: Bool = false
     
     @SceneStorage("lol.highlightFollows") var highlightFollows: Bool = false
@@ -413,8 +461,9 @@ struct PinnedAddressesView: View {
     @State
     var hasShownLoginPrompt: Bool = false
     
-    init(addressBook: AddressBook) {
+    init(addressBook: AddressBook, addAddress: Binding<Bool>) {
         self.addressBook = addressBook
+        self._addAddress = addAddress
     }
     
     var body: some View {
@@ -522,7 +571,7 @@ struct PinnedAddressesView: View {
                     withAnimation { addAddress.toggle() }
                 } label: {
                     Label {
-                        Text("add pin")
+                        Text("Add pin")
                     } icon: {
                         Image(systemName: "plus.circle")
                     }
@@ -634,14 +683,6 @@ struct PinnedAddressesView: View {
                 .padding(.trailing, 4)
             }
             .padding(.trailing, 2)
-            .alert("Add pinned address", isPresented: $addAddress) {
-                TextField("Address", text: $address)
-                Button("Cancel") { }
-                Button("Add") {
-                    addAddress = false
-                    pin(address)
-                }.disabled(address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            }
         }
         .padding(.top, 2)
         .padding(.horizontal, 2)

@@ -27,8 +27,8 @@ struct SafetyView: View {
     @ViewBuilder
     var body: some View {
         List(selection: $selected) {
-            Section("reach out") {
-                Text("if you need to reach out for help with another address, for any reason, do not hesitate.")
+            Section("Reach out") {
+                Text("If you need to reach out for help with another address, for any reason, do not hesitate.")
                     .multilineTextAlignment(.leading)
                 ReportButton()
             }
@@ -37,9 +37,9 @@ struct SafetyView: View {
             .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
             #endif
             
-            Section("blocked") {
+            Section("Blocked") {
                 if addressBook.appliedBlocked.isEmpty {
-                    Text("If you wan't to stop seeing content from an address, Long Press the address or avatar and select Safety > Block")
+                    Text("If you wan't to stop seeing content from an address, Long Press the address or avatar and select Safety, and then Block")
                 } else {
                     ForEach(addressBook.blocked.map({ AddressModel(name: $0) })) { item in
                         ListRow(model: item)
@@ -72,6 +72,8 @@ struct SafetyView: View {
             .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
             #endif
         }
+        .navigationTitle("Safety")
+        .toolbarTitleDisplayMode(.inlineLarge)
         #if !os(tvOS)
         .scrollContentBackground(.hidden)
         #endif

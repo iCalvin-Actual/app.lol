@@ -49,14 +49,12 @@ struct StatusView: View {
                 await fetcher.updateIfNeeded(forceReload: true)
             }
         })
-        .environment(\.viewContext, ViewContext.detail)
         #if canImport(UIKit) && !os(tvOS)
         .sheet(item: $presentURL, content: { url in
             SafariView(url: url)
                 .ignoresSafeArea(.container, edges: .all)
         })
         #endif
-        .environment(\.viewContext, ViewContext.detail)
 #if !os(tvOS)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -72,7 +70,7 @@ struct StatusView: View {
         .tint(.secondary)
         .toolbar {
             if let addressSummaryFetcher = summaryFetcher(fetcher.address) {
-                ToolbarItem(placement: .principal) {
+                ToolbarItem(placement: .topBarTrailing) {
                     AddressPrincipalView(
                         addressSummaryFetcher: addressSummaryFetcher,
                         addressPage: .init(

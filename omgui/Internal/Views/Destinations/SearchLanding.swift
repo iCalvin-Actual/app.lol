@@ -51,7 +51,7 @@ struct SearchLanding: View {
             ScrollView {
                 LazyVGrid(
                     columns: [
-                        GridItem(.adaptive(minimum: 250, maximum: 400), spacing: 8, alignment: .top)
+                        GridItem(.adaptive(minimum: 300, maximum: 550), spacing: 0, alignment: .top)
                     ],
                     spacing: 0,
                     pinnedViews: [.sectionHeaders, .sectionFooters]
@@ -60,6 +60,7 @@ struct SearchLanding: View {
                         ForEach(dataFetcher?.results ?? [], content: row(_:))
                     } header: {
                         headerToUse(proxy.size.width)
+                            .padding(.bottom, 8)
                     }
                 }
             }

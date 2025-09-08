@@ -78,7 +78,7 @@ class ListFetcher<T: Listable>: Request {
     }
     
     var hasContent: Bool {
-        !results.isEmpty
+        !results.isEmpty && loaded != nil
     }
     
     var noContent: Bool {

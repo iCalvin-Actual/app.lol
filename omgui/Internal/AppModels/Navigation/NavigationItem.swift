@@ -91,7 +91,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         switch self {
         case .account:      return "/me"
         case .safety:       return "/safety"
-        case .community:    return "/status"
+        case .community:    return "/social"
         case .nowGarden:    return "/now"
         case .search:       return "/directory"
         case .lists:        return "/me"

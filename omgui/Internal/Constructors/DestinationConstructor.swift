@@ -46,8 +46,6 @@ struct DestinationConstructor {
             AddressNowView(name)
         case .safety:
             SafetyView()
-                .navigationTitle("safety")
-                .toolbarTitleDisplayMode(.inline)
         case .nowGarden:
             GardenView()
         case .pastebin(let address):

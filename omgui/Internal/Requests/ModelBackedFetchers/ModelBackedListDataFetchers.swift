@@ -347,6 +347,10 @@ class AddressPasteBinDataFetcher: ModelBackedListDataFetcher<PasteModel> {
     let addressName: AddressName
     var credential: APICredential?
     
+    override var title: String {
+        "Pastebin"
+    }
+    
     init(name: AddressName, credential: APICredential?, addressBook: AddressBook, filters: [FilterOption]? = nil) {
         self.addressName = name
         super.init(addressBook: addressBook, filters: filters ?? [.from(name)])
@@ -388,6 +392,10 @@ class AddressPasteBinDataFetcher: ModelBackedListDataFetcher<PasteModel> {
 class AddressPURLsDataFetcher: ModelBackedListDataFetcher<PURLModel> {
     let addressName: AddressName
     var credential: APICredential?
+    
+    override var title: String {
+        "PURLs"
+    }
     
     init(name: AddressName, purls: [PURLModel] = [], credential: APICredential?, addressBook: AddressBook, filters: [FilterOption]? = nil) {
         self.addressName = name
@@ -432,17 +440,17 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
     let displayTitle: String
     let addresses: [AddressName]
     
-    override var title: String { displayTitle }
+    override var title: String {
+        displayTitle
+    }
     
     init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook, limit: Int = 42) {
         self.displayTitle = title ?? {
             switch addresses.count {
             case 0:
                 return "💬 status.lol"
-            case 1:
-                return ""
             default:
-                return "statuses"
+                return "status.lol"
                 
             }
         }()

@@ -37,6 +37,14 @@ struct PURLView: View {
     
     var body: some View {
         preview
+            .toolbar {
+                if let shareUrl = fetcher.result?.primaryURL {
+                    ToolbarItem(placement: .primaryAction) {
+                        ShareLink(item: shareUrl.content)
+                            .tint(.primary)
+                    }
+                }
+            }
             .task { [weak fetcher] in
                 guard let fetcher else { return }
                 fetcher.configure(credential: credential(fetcher.address))

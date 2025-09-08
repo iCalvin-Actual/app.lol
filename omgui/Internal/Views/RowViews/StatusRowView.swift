@@ -81,7 +81,7 @@ struct StatusRowView: View {
                 }
             }
         }
-        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection || context == .detail)
+        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
         .contextMenu(menuItems: {
             menuBuilder.contextMenu(
                 for: model,
@@ -212,15 +212,19 @@ struct StatusRowView: View {
     @State private var offset: CGFloat = 0
     @ViewBuilder
     var appropriateMarkdown: some View {
-        ScrollView {
+        if context == .detail {
+            ScrollView {
+                Markdown(model.displayStatus, hideImages: true)
+            }
+            .onScrollGeometryChange(for: CGFloat.self, of: { proxy in
+                proxy.contentOffset.y
+            }, action: { oldValue, newValue in
+                offset = newValue
+            })
+        } else {
             Markdown(model.displayStatus, hideImages: true)
+                .lineLimit(4)
         }
-        .onScrollGeometryChange(for: CGFloat.self, of: { proxy in
-            proxy.contentOffset.y
-        }, action: { oldValue, newValue in
-            offset = newValue
-        })
-        .scrollDisabled(context == .column)
     }
     
     @ViewBuilder

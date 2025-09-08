@@ -29,13 +29,13 @@ class SidebarModel {
         var displayName: String {
             switch self {
             case .account:      return "my account"
-            case .directory:    return "address book"
+            case .directory:    return "pinned"
             case .now:          return "/now pages"
             case .status:       return "status.lol"
             case .saved:        return "cache.app.lol"
             case .weblog:       return "blog.app.lol"
             case .comingSoon:   return "Coming Soon"
-            case .more:         return "omg.lol"
+            case .more:         return ""
             case .new:          return "New"
             case .app:          return "app.lol"
             }
@@ -77,7 +77,7 @@ class SidebarModel {
         switch section {
             
         case .directory:
-            return [.search] + addressBook.pinned.sorted().map({ .pinnedAddress($0) })
+            return addressBook.pinned.sorted().map({ .pinnedAddress($0) })
             
         case .now:
             return [.nowGarden]
@@ -97,7 +97,7 @@ class SidebarModel {
             }
             
         case .more:
-            return [.community, .nowGarden]
+            return [.search, .community, .nowGarden]
             
         default:
             return []
