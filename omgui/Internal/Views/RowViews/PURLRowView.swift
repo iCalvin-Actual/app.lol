@@ -18,7 +18,7 @@ struct RowHeader<T: Listable, V: View>: View {
     var body: some View {
         HStack(alignment: .bottom, spacing: 4) {
             if context != .profile {
-                AddressIconView(address: model.addressName, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
+                AddressIconView(address: model.addressName, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
                     .padding(.horizontal, 2)
             }
             HStack (alignment: .lastTextBaseline, spacing: 4) {
@@ -57,9 +57,9 @@ struct RowFooter<T: Listable, A: View>: View {
     
     let model: T
     
+    @ViewBuilder let accessoryBuilder: () -> A
+    
     let menuBuilder = ContextMenuBuilder<T>()
-    @ViewBuilder
-    let accessoryBuilder: () -> A
     
     var body: some View {
         HStack(alignment: .top) {
@@ -104,7 +104,6 @@ struct PURLRowView: View {
     @Environment(\.unfollowAddress) var unfollow
     
     @Environment(\.viewContext) var context: ViewContext
-    @Environment(\.addressBook) var addressBook
     @Environment(\.presentListable) var present
     @Environment(\.addressSummaryFetcher) var summaryFetcher
     

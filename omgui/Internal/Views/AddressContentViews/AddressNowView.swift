@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AddressNowView: View {
-    @StateObject
+    @State
     var fetcher: AddressNowPageDataFetcher
     
     init(_ address: AddressName) {

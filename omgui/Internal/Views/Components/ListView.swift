@@ -33,8 +33,7 @@ struct ListView<T: Listable>: View {
     
     @State var presentingDetail: Bool = false
     
-    @ObservedObject
-    var dataFetcher: ListFetcher<T>
+    let dataFetcher: ListFetcher<T>
     
     func usingRegular(_ width: CGFloat) -> Bool {
         TabBar.usingRegularTabBar(sizeClass: horizontalSize, width: width)
@@ -175,13 +174,13 @@ struct ListView<T: Listable>: View {
                 .environment(\.viewContext, context == .profile ? .profile : .detail)
                 .environment(\.horizontalSizeClass, actingWidth > 300 ? .regular : .compact)
         }
-        .onReceive(dataFetcher.$results) { newResults in
+        .onChange(of: dataFetcher.results, { _, newResults in
             if selected == nil, let item = newResults.first {
                 withAnimation {
                     selected = item
                 }
             }
-        }
+        })
     }
 
     @ViewBuilder
@@ -196,9 +195,9 @@ struct ListView<T: Listable>: View {
         @Environment(\.addressBook) var addressBook
         @Environment(\.presentListable) var present
         
-        let dataFetcher: ListFetcher<T>
-        @Binding
-        var selected: T?
+        @Bindable var dataFetcher: ListFetcher<T>
+        
+        @Binding var selected: T?
         
         let filters: [FilterOption]
         let sort: Sort = T.defaultSort
@@ -270,10 +269,12 @@ struct ListView<T: Listable>: View {
         func emptyRowView() -> some View {
             HStack {
                 Spacer()
-                ThemedTextView(text: "empty")
-                    .font(.title3)
-                    .bold()
-                    .padding()
+                if dataFetcher.loaded != nil && dataFetcher.results.isEmpty {
+                    ThemedTextView(text: "empty")
+                        .font(.title3)
+                        .bold()
+                        .padding()
+                }
                 Spacer()
             }
     #if !os(tvOS)

@@ -21,17 +21,15 @@ struct AutomationPreferences {
     }
 }
 
-class Request: ObservableObject {
+@Observable
+class Request {
     
     let interface: DataInterface
     let automation: AutomationPreferences
     
-    @Published
     var loaded: Date? = nil
-    @Published
     var loading: Bool = false
     
-    @Published
     var error: Error?
     
     var requests: [AnyCancellable] = []

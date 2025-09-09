@@ -29,7 +29,7 @@ struct PURLView: View {
     
     @State var presented: URL? = nil
     
-    @StateObject var fetcher: AddressPURLDataFetcher
+    @State var fetcher: AddressPURLDataFetcher
     
     init(id: String, from address: AddressName) {
         _fetcher = .init(wrappedValue: .init(name: address, title: id))
@@ -65,43 +65,16 @@ struct PURLView: View {
         WebView(fetcher.page)
             .safeAreaInset(edge: .bottom) {
                 if let model = fetcher.result {
-                    PURLRowView(model: model, cardColor: .lolRandom(model.listTitle), cardPadding: 8, cardRadius: 16, showSelection: true)
-                        .padding(8)
+                    PURLRowView(
+                        model: model,
+                        cardColor: .lolRandom(model.listTitle),
+                        cardPadding: 8,
+                        cardRadius: 16,
+                        showSelection: true
+                    )
+                    .padding(8)
                 }
             }
-    }
-    
-    @ViewBuilder
-    var pathInfo: some View {
-        if context != .profile {
-            VStack(alignment: .leading) {
-                HStack(alignment: .bottom) {
-                    AddressIconView(address: fetcher.address, addressBook: addressBook)
-                    Text("/\(fetcher.result?.name ?? fetcher.title)")
-                        .font(.title2)
-                        .fontDesign(.serif)
-                        .foregroundStyle(Color.primary)
-                        .multilineTextAlignment(.leading)
-                }
-                
-                if let destination = fetcher.result?.content, !destination.isEmpty {
-                    Text(destination)
-                    #if !os(tvOS)
-                        .textSelection(.enabled)
-                    #endif
-                        .font(.caption)
-                        .fontDesign(.rounded)
-                        .multilineTextAlignment(.leading)
-                }
-            }
-            .lineLimit(3)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background(Material.thin)
-            .cornerRadius(10)
-            .padding()
-            .background(Color.clear)
-        }
     }
 }
 

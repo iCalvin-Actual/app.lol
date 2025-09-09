@@ -13,7 +13,7 @@ public struct AddressProfileEditorView: View {
     @Environment(\.dismiss)
     var dismiss
     
-    @StateObject
+    @State
     var draftPoster: ProfileMarkdownDraftPoster
     
     var selectedDraft: ProfileMarkdown.Draft?

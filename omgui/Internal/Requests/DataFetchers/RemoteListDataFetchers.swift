@@ -11,7 +11,6 @@ import Foundation
 class AddressBioDataFetcher: DataFetcher {
     let address: AddressName
     
-    @Published
     var bio: AddressSummaryModel?
     
     init(address: AddressName) {

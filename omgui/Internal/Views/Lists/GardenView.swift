@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct GardenView: View {
-    @Environment(\.nowGardenFetcher)
-    var fetcher
+    let fetcher: NowGardenDataFetcher
+    
+    init(gardenFetcher: NowGardenDataFetcher) {
+        self.fetcher = gardenFetcher
+    }
     
     var body: some View {
-        if let fetcher {
-            ListView<NowListing>(dataFetcher: fetcher)
-        }
+        ListView<NowListing>(dataFetcher: fetcher)
     }
 }
 

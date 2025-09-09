@@ -102,7 +102,7 @@ class AccountAddressDataFetcher: DataBackedListDataFetcher<AddressModel> {
     override var title: String {
         "my addresses"
     }
-    private var credential: String
+    let credential: String
     
     @AppStorage("lol.cache.myAddresses")
     var localAddressesCache: String = ""
@@ -120,13 +120,6 @@ class AccountAddressDataFetcher: DataBackedListDataFetcher<AddressModel> {
     init(credential: APICredential) {
         self.credential = credential
         super.init()
-    }
-    
-    func configure(credential: APICredential, _ automation: AutomationPreferences = .init()) {
-        if self.credential != credential {
-            self.credential = credential
-            super.configure(automation)
-        }
     }
     
     @MainActor
@@ -278,8 +271,7 @@ class AddressBlockListDataFetcher: DataBackedListDataFetcher<AddressModel> {
         }
         let address = address
         let credential = credential
-        let pastes = try await interface.fetchAddressPastes(address, credential: credential)
-        guard let blocked = pastes.first(where: { $0.name == "app.lol.blocked" }) else {
+        guard let blocked = try await interface.fetchPaste("app.lol.blocked", from: address, credential: credential) else {
             return
         }
         self.results = blocked.content.components(separatedBy: .newlines).map({ String($0) }).filter({ !$0.isEmpty }).map({ AddressModel(name: $0) })
@@ -444,14 +436,13 @@ class StatusLogDataFetcher: ModelBackedListDataFetcher<StatusModel> {
         displayTitle
     }
     
-    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook, limit: Int = .max) {
+    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook, limit: Int = 42) {
         self.displayTitle = title ?? {
             switch addresses.count {
             case 0:
                 return "💬 status.lol"
             default:
                 return "status.lol"
-                
             }
         }()
         self.addresses = addresses

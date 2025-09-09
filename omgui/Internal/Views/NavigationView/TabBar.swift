@@ -35,8 +35,10 @@ struct TabBar: View {
     @State
     var selected: NavigationItem?
     
-    @Environment(\.addressBook)
-    var addressBook
+    let addressBook: AddressBook
+    
+    @Environment(\.addressSummaryFetcher)
+    var addressSummaryFetcher
     @Environment(\.destinationConstructor)
     var destinationConstructor
     @Environment(\.horizontalSizeClass)
@@ -52,26 +54,10 @@ struct TabBar: View {
     @State var addAddress: Bool = false
     @State var presentAccount: Bool = false
     @State var searchQuery: String = ""
-    @State var searchFilter: Set<SearchLanding.SearchFilter>
+    @State var searchFilter: Set<SearchLanding.SearchFilter> = [.address]
     @State var paths: [NavigationItem: NavigationPath] = .init()
     @State var path: NavigationPath = .init()
     @State var presentedPath: NavigationPath = .init()
-    
-    @StateObject
-    var searchFetcher: SearchResultsDataFetcher
-    
-    init() {
-        _searchFetcher = StateObject(
-            wrappedValue: SearchResultsDataFetcher(
-                addressBook: .init(),
-                filters: [],
-                query: "",
-                sort: .alphabet,
-                interface: APIDataInterface()
-            )
-        )
-        self.searchFilter = [.address]
-    }
     
     @FocusState
     var searching: Bool {
@@ -92,17 +78,9 @@ struct TabBar: View {
                 if selected == nil {
                     selected = cachedSelection
                 }
-                if searchFetcher.addressBook != addressBook {
-                    searchFetcher.configure(addressBook: addressBook)
-                }
             })
             .onChange(of: searchQuery) {
-                if searchFetcher.query != searchQuery {
-                    searchFetcher.configure(query: searchQuery)
-                    Task { [searchFetcher] in
-                        await searchFetcher.updateIfNeeded(forceReload: true)
-                    }
-                }
+                destinationConstructor?.search(searchQuery: searchQuery)
             }
             .onReceive(selected.publisher, perform: { newValue in
                 withAnimation(.interpolatingSpring) {
@@ -120,14 +98,8 @@ struct TabBar: View {
             .environment(\.searchActive, searching)
             .environment(\.setSearchFilters, {
                 searchFilter = $0
-                if $0 != searchFetcher.filters {
-                    searchFetcher.configure(filters: $0)
-                    Task { [searchFetcher] in
-                        await searchFetcher.updateIfNeeded(forceReload: true)
-                    }
-                }
+                destinationConstructor?.search(searchFilters: $0)
             })
-            .environment(\.searchFetcher, searchFetcher)
             .onOpenURL(perform: openURL(_:))
             .alert("Add pinned address", isPresented: $addAddress) {
                 TextField("Address", text: $address)
@@ -232,7 +204,7 @@ struct TabBar: View {
             compactTabBar
             #if os(iOS)
                 .tabViewBottomAccessory {
-                    PinnedAddressesView(addressBook: addressBook, addAddress: $addAddress)
+                    PinnedAddressesView(addAddress: $addAddress)
                         .id(addressBook.hashValue)
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -282,20 +254,6 @@ struct TabBar: View {
         #if os(iOS)
         .tabBarMinimizeBehavior(.onScrollDown)
         #endif
-    }
-        
-    @ViewBuilder
-    func addressAccessory(_ address: AddressName, showPicker: Bool = true) -> some View {
-        HStack {
-            AddressIconView(address: address, addressBook: addressBook, contentShape: Circle())
-            AddressNameView(address)
-            Spacer()
-            if showPicker {
-                destinationPicker
-            }
-        }
-        .padding(.top, 2)
-        .padding(.horizontal, 2)
     }
     
     @ViewBuilder
@@ -379,7 +337,7 @@ struct TabBar: View {
             }
             .frame(minWidth: 180)
             .safeAreaInset(edge: .bottom) {
-                PinnedAddressesView(addressBook: addressBook, addAddress: $addAddress)
+                PinnedAddressesView(addAddress: $addAddress)
                     .frame(maxHeight: 44)
                     .glassEffect(.regular, in: .capsule)
                     .id(addressBook.hashValue)
@@ -441,8 +399,7 @@ struct PinnedAddressesView: View {
     @Environment(\.setAddress) var set
     @Environment(\.pinAddress) var pin
     @Environment(\.authenticate) var authenticate
-    
-    let addressBook: AddressBook
+    @Environment(\.addressBook) var addressBook
     
     @Binding var addAddress: Bool
     
@@ -461,8 +418,7 @@ struct PinnedAddressesView: View {
     @State
     var hasShownLoginPrompt: Bool = false
     
-    init(addressBook: AddressBook, addAddress: Binding<Bool>) {
-        self.addressBook = addressBook
+    init(addAddress: Binding<Bool>) {
         self._addAddress = addAddress
     }
     
@@ -511,7 +467,7 @@ struct PinnedAddressesView: View {
                         }
                     }
                 } label: {
-                    AddressIconView(address: addressBook.me, addressBook: addressBook, showMenu: false, contentShape: Circle())
+                    AddressIconView(address: addressBook.me, showMenu: false, contentShape: Circle())
                 }
                 .padding(.top, -1)
                 .padding(.leading, 1)
@@ -631,14 +587,14 @@ struct PinnedAddressesView: View {
                 HStack(spacing: 2) {
                     HStack(alignment: .bottom, spacing: -12) {
                         if highlights.count > 2 {
-                            AddressIconView(address: highlights[2], addressBook: addressBook, size: 24, showMenu: false, contentShape: Circle())
+                            AddressIconView(address: highlights[2], size: 24, showMenu: false, contentShape: Circle())
                         }
                         if addressBook.pinned.count > 1 {
-                            AddressIconView(address: highlights[1], addressBook: addressBook, size: 32, showMenu: false, contentShape: Circle())
+                            AddressIconView(address: highlights[1], size: 32, showMenu: false, contentShape: Circle())
                                 .padding(.trailing, -4)
                         }
                         if let firstPin = highlights.first {
-                            AddressIconView(address: firstPin, addressBook: addressBook, size: 36, showMenu: false, contentShape: Circle())
+                            AddressIconView(address: firstPin, size: 36, showMenu: false, contentShape: Circle())
                         }
                     }
                     VStack {

@@ -25,7 +25,6 @@
 		3E2FBCB02DCC5919007B9C24 /* DirectoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC832DCC5919007B9C24 /* DirectoryView.swift */; };
 		3E2FBCB22DCC5919007B9C24 /* EditableModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC462DCC5919007B9C24 /* EditableModels.swift */; };
 		3E2FBCB32DCC5919007B9C24 /* StatusList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC8B2DCC5919007B9C24 /* StatusList.swift */; };
-		3E2FBCB42DCC5919007B9C24 /* DestinationConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC3B2DCC5919007B9C24 /* DestinationConstructor.swift */; };
 		3E2FBCB52DCC5919007B9C24 /* SceneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC352DCC5919007B9C24 /* SceneModel.swift */; };
 		3E2FBCB62DCC5919007B9C24 /* ThemedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC6E2DCC5919007B9C24 /* ThemedTextView.swift */; };
 		3E2FBCB72DCC5919007B9C24 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC922DCC5919007B9C24 /* TabBar.swift */; };
@@ -106,6 +105,8 @@
 		3E3C62592E04A6830035E466 /* SearchLanding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3C62582E04A6830035E466 /* SearchLanding.swift */; };
 		3E67DAF629B4CC8100B7DF82 /* APIInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */; };
 		3E7C162329C35777007C85EC /* omgapi in Frameworks */ = {isa = PBXBuildFile; productRef = 3E7C162229C35777007C85EC /* omgapi */; };
+		3EA49C752E706DAB008A99F1 /* DestinationConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA49C742E706DAB008A99F1 /* DestinationConstructor.swift */; };
+		3EA49C772E70D8F6008A99F1 /* AppClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA49C762E70D8F6008A99F1 /* AppClient.swift */; };
 		3EB190C02E2D6D8D00AD8397 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB190BE2E2D677D00AD8397 /* OptionsButton.swift */; };
 /* End PBXBuildFile section */
 
@@ -133,7 +134,6 @@
 		3E2FBC332DCC5919007B9C24 /* NavigationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationItem.swift; sourceTree = "<group>"; };
 		3E2FBC352DCC5919007B9C24 /* SceneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneModel.swift; sourceTree = "<group>"; };
 		3E2FBC362DCC5919007B9C24 /* SidebarModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarModel.swift; sourceTree = "<group>"; };
-		3E2FBC3B2DCC5919007B9C24 /* DestinationConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationConstructor.swift; sourceTree = "<group>"; };
 		3E2FBC3C2DCC5919007B9C24 /* FetchConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchConstructor.swift; sourceTree = "<group>"; };
 		3E2FBC3E2DCC5919007B9C24 /* Color+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+.swift"; sourceTree = "<group>"; };
 		3E2FBC3F2DCC5919007B9C24 /* DateFormatter+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+.swift"; sourceTree = "<group>"; };
@@ -219,6 +219,8 @@
 		3E2FBD042DCC591E007B9C24 /* OMGScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OMGScene.swift; sourceTree = "<group>"; };
 		3E3C62582E04A6830035E466 /* SearchLanding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLanding.swift; sourceTree = "<group>"; };
 		3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIInterface.swift; sourceTree = "<group>"; };
+		3EA49C742E706DAB008A99F1 /* DestinationConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationConstructor.swift; sourceTree = "<group>"; };
+		3EA49C762E70D8F6008A99F1 /* AppClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClient.swift; sourceTree = "<group>"; };
 		3EB190BE2E2D677D00AD8397 /* OptionsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsButton.swift; sourceTree = "<group>"; };
 		3EC12B2929BF92CA00367B45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -263,6 +265,7 @@
 				3EC12B2929BF92CA00367B45 /* Info.plist */,
 				3E0A744D29B4950200EFD8E4 /* appDOTlolApp.swift */,
 				3E67DAF529B4CC8100B7DF82 /* APIInterface.swift */,
+				3EA49C762E70D8F6008A99F1 /* AppClient.swift */,
 				3E0A745129B4950300EFD8E4 /* Assets.xcassets */,
 				3E0A745329B4950300EFD8E4 /* appDOTlol.entitlements */,
 				3E0A745429B4950300EFD8E4 /* Preview Content */,
@@ -317,7 +320,7 @@
 		3E2FBC3D2DCC5919007B9C24 /* Constructors */ = {
 			isa = PBXGroup;
 			children = (
-				3E2FBC3B2DCC5919007B9C24 /* DestinationConstructor.swift */,
+				3EA49C742E706DAB008A99F1 /* DestinationConstructor.swift */,
 				3E2FBC3C2DCC5919007B9C24 /* FetchConstructor.swift */,
 			);
 			path = Constructors;
@@ -702,7 +705,6 @@
 				3E2FBCB02DCC5919007B9C24 /* DirectoryView.swift in Sources */,
 				3E2FBCB22DCC5919007B9C24 /* EditableModels.swift in Sources */,
 				3E2FBCB32DCC5919007B9C24 /* StatusList.swift in Sources */,
-				3E2FBCB42DCC5919007B9C24 /* DestinationConstructor.swift in Sources */,
 				3E2FBCB52DCC5919007B9C24 /* SceneModel.swift in Sources */,
 				3E2FBCB62DCC5919007B9C24 /* ThemedTextView.swift in Sources */,
 				3E2FBCB72DCC5919007B9C24 /* TabBar.swift in Sources */,
@@ -752,6 +754,8 @@
 				3E2FBCD92DCC5919007B9C24 /* ModelBackedFetchers.swift in Sources */,
 				3E2FBCDA2DCC5919007B9C24 /* OnboardingView.swift in Sources */,
 				3E2FBCDC2DCC5919007B9C24 /* AddressPURLsView.swift in Sources */,
+				3EA49C752E706DAB008A99F1 /* DestinationConstructor.swift in Sources */,
+				3EA49C772E70D8F6008A99F1 /* AppClient.swift in Sources */,
 				3E2FBCDD2DCC5919007B9C24 /* AddressSummaryView.swift in Sources */,
 				3E2FBCDE2DCC5919007B9C24 /* Filterable.swift in Sources */,
 				3E2FBCDF2DCC5919007B9C24 /* ListView.swift in Sources */,

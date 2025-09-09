@@ -17,15 +17,12 @@ typealias AddressProfilePageDataFetcher = WebPageDataFetcher<AddressProfilePage>
 typealias AddressNowPageDataFetcher = WebPageDataFetcher<NowModel>
 
 @MainActor
+@Observable
 final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFetcher<M>, Sendable {
     let address: AddressName
     
     var html: String?
-    
-    @Published
     var page = WebPage()
-    
-    @Published
     var theme: ThemeModel?
     
     @MainActor
@@ -117,8 +114,6 @@ final class WebPageDataFetcher<M: RemoteBackedBlackbirdModel>: ModelBackedDataFe
 
 class URLContentDataFetcher: DataFetcher {
     let url: URL
-    
-    @Published
     var html: String?
     
     init(url: URL, html: String? = nil, interface: DataInterface) {

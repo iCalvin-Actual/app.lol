@@ -21,7 +21,7 @@ struct AddressSummaryView: View {
     @Environment(\.blackbird)
     var database
     
-    @StateObject
+    @State
     var addressSummaryFetcher: AddressSummaryDataFetcher
     
     @State var presentBio: Bool = false
@@ -52,9 +52,15 @@ struct AddressSummaryView: View {
     var body: some View {
         sizeAppropriateBody
             .toolbar {
+                #if os(macOS)
+                ToolbarItem(placement: .principal) {
+                    AddressPrincipalView(addressSummaryFetcher: addressSummaryFetcher, addressPage: $addressPage)
+                }
+                #else
                 ToolbarItem(placement: .topBarLeading) {
                     AddressPrincipalView(addressSummaryFetcher: addressSummaryFetcher, addressPage: $addressPage)
                 }
+                #endif
             }
             .environment(\.viewContext, .profile)
             .task { @MainActor [weak addressSummaryFetcher] in
@@ -96,7 +102,6 @@ struct AddressSummaryView: View {
 }
 
 struct AddressBioView: View {
-    @Environment(\.addressBook) var addressBook
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin
     @Environment(\.blockAddress) var block
@@ -106,8 +111,7 @@ struct AddressBioView: View {
     @Environment(\.presentListable) var present
     @Environment(\.viewContext) var viewContext
     
-    @ObservedObject
-    var fetcher: AddressSummaryDataFetcher
+    let fetcher: AddressSummaryDataFetcher
     let page: Binding<AddressContent>
     
     var address: AddressName { fetcher.addressName }
@@ -143,16 +147,9 @@ struct AddressBioView: View {
             HStack(alignment: .top, spacing: 4) {
                 AddressIconView(
                     address: address,
-                    addressBook: addressBook,
                     size: 66,
                     showMenu: false,
-                    contentShape:  UnevenRoundedRectangle(
-                        topLeadingRadius: containerCorner,
-                        bottomLeadingRadius: 8,
-                        bottomTrailingRadius: 8,
-                        topTrailingRadius: 8,
-                        style: .circular
-                    )
+                    contentShape:  RoundedRectangle(cornerRadius: containerCorner)
                 )
                 VStack {
                     HStack(alignment: .firstTextBaseline) {
@@ -163,7 +160,7 @@ struct AddressBioView: View {
                         Menu {
                             menuBuilder.contextMenu(
                                 for: .init(name: address),
-                                addressBook: addressBook,
+                                addressBook: fetcher.addressBook,
                                 menuFetchers: (
                                     navigate: present ?? { _ in },
                                     follow: follow,
@@ -303,8 +300,8 @@ struct AddressPrincipalView: View {
 }
 
 struct AddressBioButton: View {
-    @Environment(\.addressBook) var addressBook
     let address: AddressName
+    
     @Binding
     var page: AddressContent
     
@@ -312,7 +309,7 @@ struct AddressBioButton: View {
     
     var body: some View {
         HStack(spacing: 2) {
-            AddressIconView(address: address, addressBook: addressBook, size: 30, showMenu: false, contentShape: Circle())
+            AddressIconView(address: address, size: 30, showMenu: false, contentShape: Circle())
                 .frame(width: 30, height: 30)
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 AddressNameView(address, font: .headline)

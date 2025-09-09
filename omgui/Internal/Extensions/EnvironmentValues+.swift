@@ -38,86 +38,13 @@ extension EnvironmentValues {
     }
 }
 
-struct AddressBlockListFetcherKey: EnvironmentKey {
-    static var defaultValue: AddressBlockListDataFetcher? {
-        nil
-    }
-}
-extension EnvironmentValues {
-    var addressBlockListFetcher: AddressBlockListDataFetcher? {
-        get { self[AddressBlockListFetcherKey.self] }
-        set { self[AddressBlockListFetcherKey.self] = newValue }
-    }
-}
-
-struct AddressDirectoryFetcherKey: EnvironmentKey {
-    static var defaultValue: AddressDirectoryDataFetcher? {
-        nil
-    }
-}
-extension EnvironmentValues {
-    var addressDirectoryFetcher: AddressDirectoryDataFetcher? {
-        get { self[AddressDirectoryFetcherKey.self] }
-        set { self[AddressDirectoryFetcherKey.self] = newValue }
-    }
-}
-
-struct AddressFetcherKey: EnvironmentKey {
-    static var defaultValue: AccountAddressDataFetcher? {
-        nil
-    }
-}
-extension EnvironmentValues {
-    var addressFetcher: AccountAddressDataFetcher? {
-        get { self[AddressFetcherKey.self] }
-        set { self[AddressFetcherKey.self] = newValue }
-    }
-}
-
-struct SearchFetcherKey: EnvironmentKey {
-    static var defaultValue: SearchResultsDataFetcher? {
-        nil
-    }
-}
-extension EnvironmentValues {
-    var searchFetcher: SearchResultsDataFetcher? {
-        get { self[SearchFetcherKey.self] }
-        set { self[SearchFetcherKey.self] = newValue }
-    }
-}
-
-struct AddressFollowersFetcherKey: EnvironmentKey {
-    static var defaultValue: AddressFollowersDataFetcher? {
-        nil
-    }
-}
-struct AddressFollowingFetcherKey: EnvironmentKey {
-    static var defaultValue: AddressFollowingDataFetcher? {
-        nil
-    }
-}
-extension EnvironmentValues {
-    var addressFollowersFetcher: AddressFollowersDataFetcher? {
-        get {
-            self[AddressFollowersFetcherKey.self]
-        }
-        set {
-            self[AddressFollowersFetcherKey.self] = newValue
-        }
-    }
-    var addressFollowingFetcher: AddressFollowingDataFetcher? {
-        get { self[AddressFollowingFetcherKey.self] }
-        set { self[AddressFollowingFetcherKey.self] = newValue }
-    }
-}
-
 struct AddressSummaryFetcherKey: EnvironmentKey {
-    static var defaultValue: (AddressName) -> AddressSummaryDataFetcher? {
-        { _ in return nil }
+    static var defaultValue: (AddressName) -> AddressSummaryDataFetcher {
+        { _ in return .init(name: "", addressBook: .init(), interface: AppClient.interface) }
     }
 }
 extension EnvironmentValues {
-    var addressSummaryFetcher: (AddressName) -> AddressSummaryDataFetcher? {
+    var addressSummaryFetcher: (AddressName) -> AddressSummaryDataFetcher {
         get { self[AddressSummaryFetcherKey.self] }
         set { self[AddressSummaryFetcherKey.self] = newValue }
     }
@@ -280,27 +207,6 @@ extension EnvironmentValues {
     var localBlocklist: LocalBlockListDataFetcher? {
         get { self[LocalBlockedFetcherKey.self] }
         set { self[LocalBlockedFetcherKey.self] = newValue }
-    }
-}
-
-struct NowGardenFetcherKey: EnvironmentKey {
-    static var defaultValue: NowGardenDataFetcher? {
-        nil
-    }
-}
-struct StatusLogFetcherKey: EnvironmentKey {
-    static var defaultValue: StatusLogDataFetcher? {
-        nil
-    }
-}
-extension EnvironmentValues {
-    var nowGardenFetcher: NowGardenDataFetcher? {
-        get { self[NowGardenFetcherKey.self] }
-        set { self[NowGardenFetcherKey.self] = newValue }
-    }
-    var statusLogFetcher: StatusLogDataFetcher? {
-        get { self[StatusLogFetcherKey.self] }
-        set { self[StatusLogFetcherKey.self] = newValue }
     }
 }
 

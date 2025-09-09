@@ -27,49 +27,27 @@ struct AddressesRow: View {
     #endif
     }
     
-    let addresses: [AddressName]
-    let selection: Bool
+    let addresses: [AddressSummaryDataFetcher]
     
-    init(addresses: [AddressName], selection: Bool = false) {
+    init(addresses: [AddressSummaryDataFetcher]) {
         self.addresses = addresses
-        self.selection = selection
     }
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 0) {
-                ForEach(addresses, id: \.self) { address in
-                    if address == addressBook.me {
-                        standardCard(address, color)
-                    } else {
-                        if selection {
-                            addressSelectionCard(address)
-                        } else {
-                            standardCard(address)
-                        }
-                    }
-                }
+                ForEach(addresses, id: \.addressName) { standardCard($0) }
                 Spacer()
             }
         }
-        .animation(.default, value: addresses)
+        .animation(.default, value: addresses.map(\.addressName))
         .background(Material.regular)
     }
     
     @ViewBuilder
-    func addressSelectionCard(_ address: AddressName) -> some View {
-        Button {
-            withAnimation {
-                setAddress(address)
-            }
-        } label: {
-            card(address, nil)
-        }
-        .buttonStyle(.plain)
-    }
-    
-    @ViewBuilder
-    func standardCard(_ address: AddressName, _ colorToUse: Color? = nil) -> some View {
+    func standardCard(_ fetcher: AddressSummaryDataFetcher, _ colorToUse: Color? = nil) -> some View {
+        
+        let address = fetcher.addressName
         if let present {
             Button {
                 if sizeClass == .compact {
@@ -89,7 +67,7 @@ struct AddressesRow: View {
     
     @ViewBuilder
     func card(_ address: AddressName, _ colorToUse: Color?) -> some View {
-        AddressCard(address, addressBook: addressBook)
+        AddressCard(address)
             .background(colorToUse)
     }
 }
@@ -101,23 +79,26 @@ struct AccountView: View {
     var authFetcher
     @Environment(\.presentListable)
     var present
-    
-    @SceneStorage("lol.address")
-    var actingAddress: AddressName = ""
-    
-    @Environment(\.addressBook)
-    var addressBook
-    
-    @Environment(\.addressFollowingFetcher)
-    var followingFetcher
-    @Environment(\.addressFollowersFetcher)
-    var followersFetcher
+    @Environment(\.addressSummaryFetcher) var summaryFetcherCache
+    @Environment(\.setAddress) var setAddress
     
     @Environment(\.horizontalSizeClass)
     var sizeClass
     
     @State
     var confirmLogout: Bool = false
+    
+    var actingAddress: Binding<AddressName> {
+        .init(
+            get: { addressBook.me },
+            set: { setAddress($0) }
+        )
+    }
+    
+    let addressBook: AddressBook
+    
+    var followingFetcher: AddressFollowingDataFetcher
+    var followersFetcher: AddressFollowersDataFetcher
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
     
@@ -166,7 +147,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
                     
-                    AddressesRow(addresses: addressBook.mine.sorted())
+                    AddressesRow(addresses: addressBook.mine.sorted().map({ summaryFetcherCache($0) }))
                         .frame(maxWidth: .infinity)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -184,7 +165,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
                     
-                    AddressesRow(addresses: addressBook.following)
+                    AddressesRow(addresses: addressBook.following.sorted().map({ summaryFetcherCache($0) }))
                         .frame(maxWidth: .infinity)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -202,7 +183,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
                     
-                    AddressesRow(addresses: addressBook.followers)
+                    AddressesRow(addresses: addressBook.followers.sorted().map({ summaryFetcherCache($0) }))
                         .frame(maxWidth: .infinity)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -219,7 +200,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
                     
-                    AddressesRow(addresses: addressBook.pinned)
+                    AddressesRow(addresses: addressBook.pinned.sorted().map({ summaryFetcherCache($0) }))
                         .frame(maxWidth: .infinity)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -355,18 +336,16 @@ struct AuthenticateButton: View {
 
 struct AddressCard: View {
     let address: AddressName
-    let addressBook: AddressBook
     let embedInMenu: Bool
     
-    init(_ address: AddressName, addressBook: AddressBook, embedInMenu: Bool = false) {
+    init(_ address: AddressName, embedInMenu: Bool = false) {
         self.address = address
-        self.addressBook = addressBook
         self.embedInMenu = embedInMenu
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            AddressIconView(address: address, addressBook: addressBook, size: 55, showMenu: embedInMenu)
+            AddressIconView(address: address, size: 55, showMenu: embedInMenu)
             Text(address.addressDisplayString)
                 .font(.caption)
                 .fontDesign(.serif)

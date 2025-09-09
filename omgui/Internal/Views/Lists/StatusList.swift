@@ -15,10 +15,8 @@ struct StatusList: View {
     var addressBook
     @Environment(\.credentialFetcher)
     var credential
-    @Environment(\.addressSummaryFetcher)
-    var summary
     
-    @StateObject
+    @State
     var fetcher: StatusLogDataFetcher
     
     init(_ addresses: [AddressName], addressBook: AddressBook) {

@@ -41,7 +41,7 @@ struct PasteView: View {
     @State
     var detent: PresentationDetent = .draftDrawer
     
-    @StateObject
+    @State
     var fetcher: AddressPasteDataFetcher
     
     init(_ id: String, from address: AddressName) {
@@ -102,18 +102,16 @@ struct PasteView: View {
 #endif
         .tint(.secondary)
         .toolbar {
-            if let addressSummaryFetcher = summaryFetcher(fetcher.address) {
-                ToolbarItem(placement: .topBarLeading) {
-                    AddressPrincipalView(
-                        addressSummaryFetcher: addressSummaryFetcher,
-                        addressPage: .init(
-                            get: { .pastebin },
-                            set: {
-                                presentDestination?(.address(addressSummaryFetcher.addressName, page: $0))
-                            }
-                        )
+            ToolbarItem(placement: .safePrincipal) {
+                AddressPrincipalView(
+                    addressSummaryFetcher: summaryFetcher(fetcher.address),
+                    addressPage: .init(
+                        get: { .pastebin },
+                        set: {
+                            presentDestination?(.address(fetcher.address, page: $0))
+                        }
                     )
-                }
+                )
             }
         }
         .onReceive(fetcher.result.publisher, perform: { _ in

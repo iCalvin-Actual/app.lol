@@ -6,234 +6,86 @@ private let logger = Logger(subsystem: "OMGScene", category: "scene-events")
 
 public struct OMGScene: View {
     
-    @AppStorage("lol.auth")         var authKey: String = ""
-    @AppStorage("lol.terms")        var acceptedTerms: TimeInterval = 0
-    @AppStorage("lol.onboarding")   var showOnboarding: Bool = false
-    
-    @Environment(\.webAuthenticationSession) var webAuthSession
-    
-    @Environment(\.profileCache)var cache
-    @Environment(\.privateCache)var privateCache
-    
-    @StateObject var globalDirectoryFetcher: GlobalAddressDirectoryFetcher
-    @StateObject var globalStatusFetcher: GlobalStatusLogFetcher
-    
-    @StateObject var appSupportFetcher: AppSupportFetcher
-    @StateObject var appLatestFetcher: AppLatestFetcher
-    
-    @StateObject var appBlockedFetcher: AddressBlockListDataFetcher
-    @StateObject var localBlockedFetcher: LocalBlockListDataFetcher
-    @StateObject var pinnedFetcher: PinnedListDataFetcher
-    
-    @StateObject var addressFetcher: AccountAddressDataFetcher
-    
-    @StateObject var addressFollowingFetcher: AddressFollowingDataFetcher
-    @StateObject var addressFollowersFetcher: AddressFollowersDataFetcher
-    @StateObject var addressBlockedFetcher: AddressBlockListDataFetcher
-    
-    @StateObject var directoryFetcher: AddressDirectoryDataFetcher
-    @StateObject var gardenFetcher: NowGardenDataFetcher
-    @StateObject var statusFetcher: StatusLogDataFetcher
-    
     @SceneStorage("lol.address") var actingAddress: AddressName = ""
     
-    @State var confirmLogout = false
-    @State var destinationConstructor: DestinationConstructor = .init(addressBook: .init())
+    @Environment(\.credentialFetcher) var credential
+    
+    @Environment(\.profileCache) var cache
+    @Environment(\.privateCache) var privateCache
+    @Environment(\.unpinAddress) var removePin
+    
+    @Bindable
+    var addressFetcher: AccountAddressDataFetcher
+    
+    let globalDirectoryFetcher: GlobalAddressDirectoryFetcher
+    let globalStatusFetcher: GlobalStatusLogFetcher
+    
+    let appSupportFetcher: AppSupportFetcher
+    let localBlockedFetcher: LocalBlockListDataFetcher
+    let pinnedFetcher: PinnedListDataFetcher
+    
+    let appLatestFetcher: AppLatestFetcher
+    let appBlockedFetcher: AddressBlockListDataFetcher
     
     let dataInterface: DataInterface
+    
+    @State var destinationConstructor: DestinationConstructor = .init(addressBook: .init())
     var addressBook: AddressBook { destinationConstructor.addressBook }
     
-    var accountFetcher: AccountAuthDataFetcher {
-        return .init(
-            session: webAuthSession,
-            client: AppClient.info,
-            interface: dataInterface,
-            authenticate: {
-                Task { @MainActor [cred = $0] in
-                    authenticate(cred)
-                }
-            }
-        )
-    }
-    
-    var sceneModel: SceneModel? {
-        guard !showOnboarding else {
-            return nil
-        }
-        return .init(
-            addressBook: addressBook,
-            interface: AppClient.interface,
-            database: AppClient.database
-        )
-    }
-    
-    init(_ interface: DataInterface) {
-        dataInterface = interface
-        
-        _appSupportFetcher = .init(wrappedValue: .init())
-        _appLatestFetcher = .init(wrappedValue: .init(addressName: "app"))
-        
-        _addressFetcher = .init(wrappedValue: .init(credential: ""))
-        
-        _pinnedFetcher = .init(wrappedValue: .init())
-        
-        _globalDirectoryFetcher = .init(wrappedValue: .init())
-        _globalStatusFetcher = .init(wrappedValue: .init())
-        
-        _addressFollowingFetcher = .init(wrappedValue: .init(address: "", credential: ""))
-        _addressFollowersFetcher = .init(wrappedValue: .init(address: "", credential: ""))
-        _addressBlockedFetcher = .init(wrappedValue: .init(address: "", credential: ""))
-        
-        _statusFetcher = .init(wrappedValue: .init(addressBook: .init()))
-        _gardenFetcher = .init(wrappedValue: .init(addressBook: .init()))
-        
-        _appBlockedFetcher = .init(wrappedValue: .init(address: "app", credential: ""))
-        
-        _localBlockedFetcher = .init(wrappedValue: .init())
-        
-        _directoryFetcher = .init(wrappedValue: .init(addressBook: .init()))
-        
-    }
-    
     public var body: some View {
-        appState
-            .environment(accountFetcher)
-            .environment(\.globalDirectoryFetcher, globalDirectoryFetcher)
-            .environment(\.globalStatusLogFetcher, globalStatusFetcher)
-        
-            .environment(\.appLatestFetcher, appLatestFetcher)
-            .environment(\.appSupportFetcher, appSupportFetcher)
-            .environment(\.globalBlocklist, appBlockedFetcher)
-            .environment(\.localBlocklist, localBlockedFetcher)
-        
-            .environment(\.addressFetcher, addressFetcher)
-            .environment(\.addressDirectoryFetcher, directoryFetcher)
-            .environment(\.nowGardenFetcher, gardenFetcher)
-            .environment(\.statusLogFetcher, statusFetcher)
-        
-            .environment(\.addressFollowingFetcher, addressFollowingFetcher)
-            .environment(\.addressFollowersFetcher, addressFollowersFetcher)
-            .environment(\.addressBlockListFetcher, addressBlockedFetcher)
-        
-            .task { performFirstRun() }
-            .sheet(isPresented: $showOnboarding) { OnboardingView() }
-            .alert("log out?", isPresented: $confirmLogout, actions: {
-                Button("cancel", role: .cancel) { }
-                Button(
-                    "yes",
-                    role: .destructive,
-                    action: {
-                        authenticate("")
-                    }
-                )
-            }, message: {
-                Text("are you sure you want to sign out of omg.lol?")
-            })
-    }
-    
-    @ViewBuilder
-    private var appState: some View {
-        TabBar()
+        TabBar(addressBook: addressBook)
             .tint(Color.lolAccent)
-            .background(NavigationDestination.community.gradient)
+        //            .background(NavigationDestination.community.gradient)
+        
+            .task {
+                refreshLists()
+            }
         
             .environment(\.addressBook, addressBook)
-            .environment(\.credentialFetcher, credential(for:))
         
             .environment(\.addressSummaryFetcher, { appropriateFetcher(for: $0) })
         
             .environment(\.destinationConstructor, destinationConstructor)
         
             .environment(\.setAddress,      { updateAddress($0) })
-            .environment(\.authenticate,    { authenticate($0) })
-            .environment(\.pinAddress,      { pin($0) })
-            .environment(\.unpinAddress,    { removePin($0) })
         
             .environment(\.followAddress,       { Task { [address = $0] in await follow(address) } })
             .environment(\.unfollowAddress,     { Task { [address = $0] in await unfollow(address) } })
             .environment(\.blockAddress,        { Task { [address = $0] in await block(address) } })
             .environment(\.unblockAddress,      { Task { [address = $0] in await unblock(address) } })
         
-            .onChange(of: addressFetcher.results, { handleAddressesResults($1.map(\.owner)) })
-            .onChange(of: appBlockedFetcher.results) { handleAddressFetcherChanged() }
-            .onChange(of: localBlockedFetcher.results) { handleAddressFetcherChanged() }
-            .onChange(of: pinnedFetcher.results) { handleAddressFetcherChanged(forceChange: true) }
-            .onChange(of: addressFollowersFetcher.results) { handleAddressFetcherChanged() }
-            .onChange(of: addressBlockedFetcher.results) { handleAddressFetcherChanged() }
-            .onChange(of: addressFollowingFetcher.results) { handleAddressFetcherChanged() }
+            .onChange(of: addressFetcher.results) {
+                handleAddressesResults(addressFetcher.results.map(\.addressName))
+            }
+        
+            .onChange(of: appBlockedFetcher.results) {
+                refreshLists()
+            }
+            .onChange(of: localBlockedFetcher.results) {
+                refreshLists()
+            }
+            .onChange(of: pinnedFetcher.results) {
+                refreshLists()
+            }
+        
+            .onChange(of: destinationConstructor.addressFollowersFetcher.results) {
+                refreshLists()
+            }
+            .onChange(of: destinationConstructor.addressBlockedFetcher.results) {
+                refreshLists()
+            }
+            .onChange(of: destinationConstructor.addressFollowingFetcher.results) {
+                refreshLists()
+            }
     }
     
-    private func performFirstRun() {
-        logger.debug("First run")
-        if acceptedTerms < appDOTlolApp.termsUpdated.timeIntervalSince1970 {
-            showOnboarding = true
-        }
+    private func refreshLists() {
         configureAddressBook()
-        addressFetcher.configure(credential: authKey)
-        Task { [
-            weak addressFetcher,
-            weak appSupportFetcher,
-            weak pinnedFetcher,
-            weak appLatestFetcher,
-            weak addressFollowersFetcher,
-            weak addressFollowingFetcher,
-            weak globalDirectoryFetcher,
-            weak globalStatusFetcher,
-            weak statusFetcher,
-            weak gardenFetcher,
-            weak appBlockedFetcher,
-            weak localBlockedFetcher,
-            weak addressBlockedFetcher,
-            weak directoryFetcher
-        ] in
-            await addressFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("addressFetcher updated")
-            await appSupportFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("appSupportFetcher updated")
-            await pinnedFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("pinnedFetcher updated")
-            await globalDirectoryFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("globalDirectoryFetcher updated")
-            await globalStatusFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("globalStatusFetcher updated")
-            await addressFollowersFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("addressFollowersFetcher updated")
-            await addressFollowingFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("addressFollowingFetcher updated")
-            await statusFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("statusFetcher updated")
-            await gardenFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("gardenFetcher updated")
-            await appBlockedFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("appBlockedFetcher updated")
-            await localBlockedFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("localBlockedFetcher updated")
-            await addressBlockedFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("addressBlockedFetcher updated")
-            await directoryFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("directoryFetcher updated")
-            await appLatestFetcher?.updateIfNeeded(forceReload: true)
-            logger.debug("appLatestFetcher updated")
-        }
-    }
-
-    private func authenticate(_ credential: APICredential) {
-        guard credential != authKey else { return }
-        logger.debug("Authenticated")
-        authKey = credential
-        addressFetcher.configure(credential: credential)
-        
-        privateCache.removeAllObjects()
-        updateAddress("")
-        
-        Task { [addressFetcher] in
-            await addressFetcher.updateIfNeeded(forceReload: true)
-        }
     }
     
     private func handleAddressesResults(_ results: [AddressName]) {
         logger.debug("Received addresses")
-        if results.sorted() != addressBook.mine.sorted() || actingAddress.isEmpty {
+        if results.sorted() != addressBook.mine.sorted() || actingAddress.isEmpty || addressBook.auth.isEmpty {
             if actingAddress.isEmpty, let address = results.first {
                 updateAddress(address)
             } else if !actingAddress.isEmpty, results.isEmpty {
@@ -250,20 +102,17 @@ public struct OMGScene: View {
                     }
                 }
             }
-        } else if addressBook.signedIn {
-            addressFollowersFetcher.configure(address: actingAddress, credential: authKey)
-            addressFollowingFetcher.configure(address: actingAddress, credential: authKey)
         }
     }
     
     private func applyAddressesToCache() {
-        addressFetcher.results.forEach({
-            let name = NSString(string: $0.addressName)
-            if privateCache.object(forKey: name) == nil, let privateSummary = privateSummary(for: $0.addressName) {
+        addressBook.mine.forEach({
+            let name = NSString(string: $0)
+            if privateCache.object(forKey: name) == nil, let privateSummary = privateSummary(for: $0) {
                 privateCache.setObject(privateSummary, forKey: name)
             }
         })
-        let resultsToCache = addressFetcher.results + addressFollowersFetcher.results + addressFollowingFetcher.results
+        let resultsToCache = addressFetcher.results + destinationConstructor.addressFollowersFetcher.results + destinationConstructor.addressFollowingFetcher.results
         let names = resultsToCache.map({ $0.addressName }).filter { privateCache.object(forKey: NSString(string: $0)) == nil }
         names.forEach({
             let name = NSString(string: $0)
@@ -287,87 +136,105 @@ public struct OMGScene: View {
         logger.debug("Configuring fetcher for \(address.isEmpty ? "n/a" : address)")
         guard self.actingAddress != address else { return }
         actingAddress = address
-        addressFollowersFetcher.configure(address: address, credential: authKey)
-        addressFollowingFetcher.configure(address: address, credential: authKey)
-        addressBlockedFetcher.configure(address: address, credential: authKey)
-        
-        Task { [
-            weak addressFollowersFetcher,
-            weak addressFollowingFetcher,
-            weak addressBlockedFetcher,
-            weak localBlockedFetcher,
-            weak directoryFetcher,
-            weak gardenFetcher
-        ] in
-            await addressFollowersFetcher?.updateIfNeeded(forceReload: true)
-            await addressFollowingFetcher?.updateIfNeeded(forceReload: true)
-            await addressBlockedFetcher?.updateIfNeeded(forceReload: true)
-            await localBlockedFetcher?.updateIfNeeded(forceReload: true)
-            await directoryFetcher?.updateIfNeeded(forceReload: true)
-            await gardenFetcher?.updateIfNeeded(forceReload: true)
-        }
-        
-        handleAddressFetcherChanged(forceChange: true)
-    }
-    
-    private func handleAddressFetcherChanged(forceChange: Bool = false) {
-        let latest = createAddressBook()
-        var changeToApply = forceChange
-        if directoryFetcher.addressBook != latest {
-            changeToApply = true
-            directoryFetcher.configure(addressBook: latest)
-        }
-        if gardenFetcher.addressBook != latest {
-            changeToApply = true
-            gardenFetcher.configure(addressBook: latest)
-        }
-        if statusFetcher.addressBook != latest {
-            changeToApply = true
-            statusFetcher.configure(addressBook: latest)
-        }
-        if changeToApply {
-            logger.debug("Updating core fetchers")
-            configureAddressBook(latest)
-            Task { [weak directoryFetcher, weak gardenFetcher, weak statusFetcher] in
-                await directoryFetcher?.updateIfNeeded(forceReload: true)
-                await gardenFetcher?.updateIfNeeded(forceReload: true)
-                await statusFetcher?.updateIfNeeded(forceReload: true)
-            }
-        }
+        configureAddressBook()
     }
     
     private func configureAddressBook(_ book: AddressBook? = nil) {
         let book = book ?? createAddressBook()
-        self.destinationConstructor = .init(addressBook: book)
+        if book != addressBook {
+            destinationConstructor.configure(book)
+        }
     }
     
     private func createAddressBook() -> AddressBook {
-        .init(
-            auth: authKey,
+        let visibleBlocklist = Set(
+            destinationConstructor
+                .addressBlockedFetcher
+                .results +
+            localBlockedFetcher
+                .results
+        ).map(\.addressName)
+        let appliedBlocklist = Set(
+            appBlockedFetcher
+                .results
+                .map(\.addressName) +
+            visibleBlocklist
+        )
+        
+        return .init(
+            auth: credential(actingAddress) ?? "",
             me: actingAddress,
             mine: addressFetcher.myAddresses,
-            following: addressFollowingFetcher.results.map(\.addressName),
-            followers: addressFollowersFetcher.results.map(\.addressName),
-            pinned: pinnedFetcher.results.map(\.addressName),
-            blocked: Set(addressBlockedFetcher.results + localBlockedFetcher.results).map(\.addressName),
-            appliedBlocked: Set(addressBlockedFetcher.results + appBlockedFetcher.results + localBlockedFetcher.results).map(\.addressName)
+            following: destinationConstructor
+                .addressFollowingFetcher
+                .results
+                .map(\.addressName),
+            followers: destinationConstructor
+                .addressFollowersFetcher
+                .results
+                .map(\.addressName),
+            pinned: pinnedFetcher
+                .results
+                .map(\.addressName),
+            blocked: visibleBlocklist,
+            appliedBlocked: .init(appliedBlocklist)
         )
     }
 }
 
 extension OMGScene {
     
-    // MARK: Summaries
-    
-    func credential(for address: AddressName) -> APICredential? {
-        guard addressBook.mine.contains(address) else {
-            return nil
+    func block(_ address: AddressName) async {
+        let credential = credential(actingAddress)
+        if addressBook.pinned.contains(address) {
+            removePin(address)
         }
-        return authKey
+        Task { [weak addressBlockedFetcher = destinationConstructor.addressBlockedFetcher, weak localBlockedFetcher = localBlockedFetcher] in
+            if let credential {
+                await addressBlockedFetcher?.block(address, credential: credential)
+            }
+            await localBlockedFetcher?.insert(address)
+        }
+    }
+    func unblock(_ address: AddressName) async {
+        let credential = credential(actingAddress)
+        Task { [
+            weak addressBlockedFetcher = destinationConstructor.addressBlockedFetcher,
+            weak localBlockedFetcher
+        ] in
+            if let credential {
+                await addressBlockedFetcher?.unBlock(address, credential: credential)
+            }
+            await localBlockedFetcher?.remove(address)
+        }
     }
     
+    func follow(_ address: AddressName) async {
+        guard let credential = credential(actingAddress) else { return }
+        Task { [weak addressFollowingFetcher = destinationConstructor.addressFollowingFetcher] in
+            await addressFollowingFetcher?.follow(address, credential: credential)
+        }
+    }
+    func unfollow(_ address: AddressName) async {
+        guard let credential = credential(actingAddress) else { return }
+        Task { [weak addressFollowingFetcher = destinationConstructor.addressFollowingFetcher] in
+            await addressFollowingFetcher?.unFollow(address, credential: credential)
+        }
+    }
+}
+
+extension OMGScene {
+    
+    private var myAddresses: [AddressName] {
+        return addressBook
+            .mine
+            .map({ $0.lowercased() })
+    }
+    
+    // MARK: Summaries
+    
     func appropriateFetcher(for address: AddressName) -> AddressSummaryDataFetcher {
-        if addressBook.mine.contains(address) {
+        if myAddresses.contains(address.lowercased()) {
             do {
                 return try addressPrivateSummary(address)
             } catch {
@@ -376,20 +243,11 @@ extension OMGScene {
         }
         return addressSummary(address)
     }
-    func constructFetcher(for address: AddressName) -> AddressSummaryDataFetcher {
-        AddressSummaryDataFetcher(name: address, addressBook: addressBook, interface: dataInterface)
-    }
-    func privateSummary(for address: AddressName) -> AddressPrivateSummaryDataFetcher? {
-        guard credential(for: address) != nil else {
-            return nil
-        }
-        return AddressPrivateSummaryDataFetcher(name: address, addressBook: addressBook, interface: dataInterface)
-    }
     func addressSummary(_ address: AddressName) -> AddressSummaryDataFetcher {
-        let mine = addressBook.mine.contains(where: { $0.lowercased() == address.lowercased() })
+        let mine = myAddresses.contains(address.lowercased())
         let cachedProfile = cache.object(forKey: NSString(string: address))
         let privateCachedProfile = privateCache.object(forKey: NSString(string: address))
-        if let model = cachedProfile ?? (mine ? privateCachedProfile : nil) {
+        if let model = (mine ? privateCachedProfile : nil) ?? cachedProfile  {
             return model
         } else {
             let model = constructFetcher(for: address)
@@ -408,53 +266,14 @@ extension OMGScene {
             return model
         }
     }
-}
-
-extension OMGScene {
-    
-    func pin(_ address: AddressName) {
-        Task { [weak pinnedFetcher] in
-            await pinnedFetcher?.pin(address.lowercased())
+    func privateSummary(for address: AddressName) -> AddressPrivateSummaryDataFetcher? {
+        guard credential(address) != nil else {
+            return nil
         }
+        return AddressPrivateSummaryDataFetcher(name: address, addressBook: .init(), interface: AppClient.interface)
     }
-    func removePin(_ address: AddressName) {
-        Task { [weak pinnedFetcher] in
-            await pinnedFetcher?.removePin(address)
-        }
-    }
-    func block(_ address: AddressName) async {
-        let credential = credential(for: actingAddress)
-        if addressBook.pinned.contains(address) {
-            removePin(address)
-        }
-        Task { [weak addressBlockedFetcher, weak localBlockedFetcher] in
-            if let credential {
-                await addressBlockedFetcher?.block(address, credential: credential)
-            }
-            await localBlockedFetcher?.insert(address)
-        }
-    }
-    func unblock(_ address: AddressName) async {
-        let credential = credential(for: actingAddress)
-        Task { [weak addressBlockedFetcher, weak localBlockedFetcher] in
-            if let credential {
-                await addressBlockedFetcher?.unBlock(address, credential: credential)
-            }
-            await localBlockedFetcher?.remove(address)
-        }
-    }
-    
-    func follow(_ address: AddressName) async {
-        guard let credential = credential(for: actingAddress) else { return }
-        Task { [weak addressFollowingFetcher] in
-            await addressFollowingFetcher?.follow(address, credential: credential)
-        }
-    }
-    func unfollow(_ address: AddressName) async {
-        guard let credential = credential(for: actingAddress) else { return }
-        Task { [weak addressFollowingFetcher] in
-            await addressFollowingFetcher?.unFollow(address, credential: credential)
-        }
+    func constructFetcher(for address: AddressName) -> AddressSummaryDataFetcher {
+        AddressSummaryDataFetcher(name: address, addressBook: addressBook, interface: dataInterface)
     }
 }
 

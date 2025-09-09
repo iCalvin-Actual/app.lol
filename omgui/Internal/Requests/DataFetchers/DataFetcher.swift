@@ -20,6 +20,7 @@ class DataFetcher: Request {
     }
 }
 
+@Observable
 class ListFetcher<T: Listable>: Request {
     static var isModelBacked: Bool {
         T.self is any BlackbirdListable.Type
@@ -28,7 +29,6 @@ class ListFetcher<T: Listable>: Request {
         Self.isModelBacked ? 0 : nil
     }
     
-    @Published
     var results: [T] = []
     
     var items: Int { results.count }
@@ -50,7 +50,7 @@ class ListFetcher<T: Listable>: Request {
         }
     }
     
-    init(items: [T] = [], limit: Int = .max, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
+    init(items: [T] = [], limit: Int = 42, filters: [FilterOption] = .everyone, sort: Sort = T.defaultSort, automation: AutomationPreferences = .init()) {
         self.results = items
         self.limit = limit
         self.filters = filters
@@ -123,9 +123,7 @@ class AccountInfoDataFetcher: DataFetcher {
     private var name: String
     private var credential: String
     
-    @Published
     var accountName: String?
-    @Published
     var accountCreated: Date?
     
     override var requestNeeded: Bool {

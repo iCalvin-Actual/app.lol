@@ -6,9 +6,11 @@
 //
 
 import MarkdownUI
+import SafariServices
 import SwiftUI
 
 struct StatusRowView: View {
+    @Environment(\.addressBook) var addressBook
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin
     @Environment(\.blockAddress) var block
@@ -18,9 +20,7 @@ struct StatusRowView: View {
     @Environment(\.openURL) var openUrl
     
     @Environment(\.viewContext) var context: ViewContext
-    @Environment(\.addressBook) var addressBook
     @Environment(\.presentListable) var present
-    @Environment(\.addressSummaryFetcher) var summaryFetcher
     
     @GestureState private var zoom = 1.0
     
@@ -63,6 +63,11 @@ struct StatusRowView: View {
                                     openUrl(item.content)
                                     return
                                 }
+#if os(macOS)
+                                openUrl(item.content)
+#else
+                                presentURL = item.content
+#endif
                                 withAnimation {
                                     presentURL = item.content
                                 }
@@ -125,7 +130,9 @@ struct StatusRowView: View {
             }
         }
         .sheet(item: $presentURL) { url in
+            #if !os(macOS)
             SafariView(url: url)
+            #endif
         }
         .clipped()
     }
@@ -179,7 +186,11 @@ struct StatusRowView: View {
     @ViewBuilder
     func imagePreview(_ url: URL) -> some View {
         Button {
+            #if os(macOS)
+            openUrl(url)
+            #else
             presentURL = url
+            #endif
         } label: {
             // Async image thumbnail cropped to a square with rounded corners
             AsyncImage(url: url) { phase in
@@ -231,12 +242,20 @@ struct StatusRowView: View {
     var headerContent: some View {
         HStack(alignment: .bottom, spacing: 4) {
             if context != .profile {
-                AddressIconView(address: model.address, addressBook: addressBook, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal, 2)
+                AddressIconView(
+                    address: model.address,
+                    showMenu: context != .detail,
+                    contentShape: RoundedRectangle(cornerRadius: 12)
+                )
+                .padding(.horizontal, 2)
             }
             VStack(alignment: .leading, spacing: 2) {
-                AddressNameView(model.address, font: .headline)
-                    .foregroundStyle(.primary)
+                AddressNameView(
+                    model.address,
+                    font: .headline
+                )
+                .foregroundStyle(.primary)
+                
                 if let caption = context != .detail ? DateFormatter.relative.string(for: model.date) ?? model.listCaption : model.listCaption {
                     Text(caption)
                         .multilineTextAlignment(.leading)
@@ -246,6 +265,8 @@ struct StatusRowView: View {
                 }
             }
             Spacer()
+            
+            // Catches API Error where long string is saved as 'emoji'
             Text(model.displayEmoji.count > 1 ? "✨" : model.displayEmoji.prefix(1))
                 .font(.system(size: 35))
         }

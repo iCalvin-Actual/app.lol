@@ -30,11 +30,9 @@ class DraftPoster<D: SomeDraftable>: Request, @MainActor Identifiable {
     var address: AddressName
     let credential: APICredential
     
-    @Published
     var draft: D.Draft
     var originalDraft: D.Draft?
     
-    @Published
     var result: D?
     @Environment(\.blackbird)
     var db: Blackbird.Database

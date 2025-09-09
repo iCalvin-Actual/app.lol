@@ -33,7 +33,14 @@ struct OnboardingView: View {
     var menuBuilder: ContextMenuBuilder<AddressModel> = .init()
     
     @State
-    var blocked: [AddressName] = []
+    var fakeBlocklist: [AddressName] = []
+    var fakeDirectory: [AddressName] {
+        [
+            "crypt0pal",
+            "m3m3factry",
+            "ferdafan",
+        ]
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -96,7 +103,7 @@ struct OnboardingView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal)
 
-                            if blocked.count < 3 {
+                            if fakeBlocklist.count < 3 {
                                 Text("long press on the address and open the Safety menu for Block and Report options")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .fontDesign(.rounded)
@@ -104,28 +111,28 @@ struct OnboardingView: View {
                                     .padding(.bottom)
                                 
                                 VStack {
-                                    ForEach(["crypt0pal", "memefact0ry", "ferdafan$"]) { address in
-                                        if !blocked.contains(address) {
-                                            ListRow(model: AddressModel(name: address))
-                                                .environment(\.colorScheme, .light)
-                                                .contextMenu(menuItems: {
-                                                    Menu {
-                                                        Button(role: .destructive, action: {
-                                                            blocked.append(address)
-                                                        }, label: {
-                                                            Label("Block", systemImage: "eye.slash.circle")
-                                                        })
-                                                        
-                                                        ReportButton(addressInQuestion: address, overrideAction: { blocked.append(address) })
-                                                    } label: {
-                                                        Label("Safety", systemImage: "hand.raised")
-                                                    }
-                                                }) {
-                                                    ListRow(model: AddressModel(name:address), selected: .constant(nil))
-                                                        .environment(\.colorScheme, .light)
-                                                        .environment(sampleModel)
+                                    ForEach(
+                                        fakeDirectory
+                                            .filter({ address in
+                                                fakeBlocklist
+                                                    .contains(where: { $0 == address })
+                                            })
+                                    ) { address in
+                                        ListRow(model: AddressModel(name: address))
+                                            .environment(\.colorScheme, .light)
+                                            .contextMenu(menuItems: {
+                                                Menu {
+                                                    Button(role: .destructive, action: {
+                                                        fakeBlocklist.append(address)
+                                                    }, label: {
+                                                        Label("Block", systemImage: "eye.slash.circle")
+                                                    })
+                                                    
+                                                    ReportButton(addressInQuestion: address, overrideAction: { fakeBlocklist.append(address) })
+                                                } label: {
+                                                    Label("Safety", systemImage: "hand.raised")
                                                 }
-                                        }
+                                            })
                                     }
                                 }
                                 .background(NavigationDestination.directory.gradient)
@@ -135,7 +142,7 @@ struct OnboardingView: View {
                             }
                             
                             Button(action: acceptTerms) {
-                                Label(blocked.isEmpty ? "send me in" : "start exploring", systemImage: "heart.fill")
+                                Label(fakeBlocklist.isEmpty ? "send me in" : "start exploring", systemImage: "heart.fill")
                                     .font(.headline)
                                     .padding(.vertical, 8)
                                     .frame(maxWidth: 500)
@@ -262,7 +269,7 @@ struct OnboardingView: View {
         .animation(.smooth(duration: 0.75), value: preview)
         .animation(.smooth(duration: 0.25), value: appear)
         .animation(.smooth(duration: 0.25), value: safety)
-        .animation(.easeInOut(duration: 0.25), value: blocked)
+        .animation(.easeInOut(duration: 0.25), value: fakeBlocklist)
         .onAppear {
             Task {
                 try? await Task.sleep(nanoseconds: 1_750_000_000)

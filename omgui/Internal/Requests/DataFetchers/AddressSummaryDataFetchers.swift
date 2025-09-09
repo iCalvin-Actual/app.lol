@@ -15,8 +15,8 @@ class AddressSummaryDataFetcher: DataFetcher {
     let addressName: AddressName
     var addressBook: AddressBook
     
-    @Published var url: URL?
-    @Published var registered: Date?
+    var url: URL?
+    var registered: Date?
     
     var statuses: [String: StatusDataFetcher] = [:]
     var purls: [String: AddressPURLDataFetcher] = [:]
@@ -31,14 +31,14 @@ class AddressSummaryDataFetcher: DataFetcher {
         .init(addressName: addressName)
     }()
     
-    @Published var iconFetcher: AddressIconDataFetcher
-    @Published var purlFetcher: AddressPURLsDataFetcher
-    @Published var pasteFetcher: AddressPasteBinDataFetcher
-    @Published var statusFetcher: StatusLogDataFetcher
-    @Published var bioFetcher: AddressBioDataFetcher
+    var iconFetcher: AddressIconDataFetcher
+    var purlFetcher: AddressPURLsDataFetcher
+    var pasteFetcher: AddressPasteBinDataFetcher
+    var statusFetcher: StatusLogDataFetcher
+    var bioFetcher: AddressBioDataFetcher
     
-    @Published var followingFetcher: AddressFollowingDataFetcher
-    @Published var followersFetcher: AddressFollowersDataFetcher
+    var followingFetcher: AddressFollowingDataFetcher
+    var followersFetcher: AddressFollowersDataFetcher
     
     override var requestNeeded: Bool {
         loaded == nil && registered == nil
@@ -86,19 +86,31 @@ class AddressSummaryDataFetcher: DataFetcher {
             return
         }
         
-        await iconFetcher.updateIfNeeded()
-        await bioFetcher.updateIfNeeded()
-        await purlFetcher.updateIfNeeded()
-        await pasteFetcher.updateIfNeeded()
-        await statusFetcher.updateIfNeeded()
-        await followingFetcher.updateIfNeeded()
-        await followersFetcher.updateIfNeeded()
-        await profileFetcher?.updateIfNeeded()
-        await nowFetcher?.updateIfNeeded()
-        async let info = try AppClient.interface.fetchAddressInfo(addressName)
-        
-        registered = try await info.date
-        url = try await info.url
+        Task { [
+            weak iconFetcher,
+            weak bioFetcher,
+            weak profileFetcher,
+            weak nowFetcher,
+            weak followingFetcher,
+            weak followersFetcher,
+            weak pasteFetcher,
+            weak statusFetcher,
+            weak purlFetcher
+        ] in
+            async let icon: Void = iconFetcher?.updateIfNeeded() ?? {}()
+            async let bio: Void = bioFetcher?.updateIfNeeded() ?? {}()
+            async let profile: Void = profileFetcher?.updateIfNeeded() ?? {}()
+            async let now: Void = nowFetcher?.updateIfNeeded() ?? {}()
+            async let following: Void = followingFetcher?.updateIfNeeded() ?? {}()
+            async let followers: Void = followersFetcher?.updateIfNeeded() ?? {}()
+            async let paste: Void = pasteFetcher?.updateIfNeeded() ?? {}()
+            async let status: Void = statusFetcher?.updateIfNeeded() ?? {}()
+            async let purl: Void = purlFetcher?.updateIfNeeded() ?? {}()
+            async let info = try AppClient.interface.fetchAddressInfo(addressName)
+            let _ = await (icon, bio, purl, paste, status, following, followers, profile, now)
+            self.registered = try await info.date
+            self.url = try await info.url
+        }
     }
     
     func statusFetcher(for id: String) -> StatusDataFetcher {
@@ -126,7 +138,6 @@ class AddressSummaryDataFetcher: DataFetcher {
 
 class AddressPrivateSummaryDataFetcher: AddressSummaryDataFetcher {
     
-    @Published
     var blockedFetcher: AddressBlockListDataFetcher
     
     override init(

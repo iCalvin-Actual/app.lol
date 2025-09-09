@@ -3,6 +3,7 @@ import SwiftUI
 
 
 struct AddressIconView<S: Shape>: View {
+    @Environment(\.addressBook) var addressBook
     
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin
@@ -16,7 +17,6 @@ struct AddressIconView<S: Shape>: View {
     @Environment(\.addressSummaryFetcher) var summaryCache
     
     let address: AddressName
-    let addressBook: AddressBook
     let size: CGFloat
     
     let showMenu: Bool
@@ -24,10 +24,8 @@ struct AddressIconView<S: Shape>: View {
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
     
-    @StateObject var newSummaryFetcher: AddressSummaryDataFetcher
-    
     var summaryFetcher: AddressSummaryDataFetcher {
-        summaryCache(address) ?? newSummaryFetcher
+        summaryCache(address)
     }
     var iconFetcher: AddressIconDataFetcher {
         imageCache.object(forKey: NSString(string: address)) ?? summaryFetcher.iconFetcher
@@ -38,17 +36,14 @@ struct AddressIconView<S: Shape>: View {
     
     init(
         address: AddressName,
-        addressBook: AddressBook,
         size: CGFloat = 40.0,
         showMenu: Bool = true,
         contentShape: S = RoundedRectangle(cornerRadius: 8)
     ) {
         self.address = address
-        self.addressBook = addressBook
         self.size = size
         self.showMenu = showMenu
         self.contentShape = contentShape
-        self._newSummaryFetcher = .init(wrappedValue: .init(name: address, addressBook: addressBook, interface: APIDataInterface()))
     }
     
     var body: some View {

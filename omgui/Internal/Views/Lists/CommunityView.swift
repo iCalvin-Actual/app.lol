@@ -8,11 +8,6 @@
 import SwiftUI
 
 struct CommunityView: View {
-    @Environment(\.statusLogFetcher)
-    var communityFetcher: StatusLogDataFetcher?
-    @Environment(\.addressBook)
-    var addressBook
-    
     enum Timeline {
         case today
         case week
@@ -25,17 +20,19 @@ struct CommunityView: View {
         "community"
     }
     
+    let communityFetcher: StatusLogDataFetcher
+    
+    init(communityFetcher: StatusLogDataFetcher) {
+        self.communityFetcher = communityFetcher
+    }
+    
     var body: some View {
-        if let communityFetcher {
-            ListView<StatusModel>(
-                filters: .everyone,
-                dataFetcher: communityFetcher
-            )
-            .task { [weak communityFetcher] in
-                guard let communityFetcher else { return }
-                communityFetcher.configure(addressBook: addressBook)
-                await communityFetcher.updateIfNeeded()
-            }
+        ListView<StatusModel>(
+            filters: .everyone,
+            dataFetcher: communityFetcher
+        )
+        .task { [weak communityFetcher] in
+            await communityFetcher?.updateIfNeeded()
         }
     }
 }

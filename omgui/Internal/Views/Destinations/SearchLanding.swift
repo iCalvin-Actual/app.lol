@@ -13,15 +13,18 @@ struct SearchLanding: View {
     @Environment(\.isSearching) var searching
     @Environment(\.searchActive) var searchActive
     @Environment(\.addressBook) var addressBook
-    @Environment(\.searchFetcher) var dataFetcher
     @Environment(\.setSearchFilters) var updateFilters
+    @Environment(\.addressSummaryFetcher) var summaryFetcher
     
     @State var sort: Sort = .newestFirst
     @State var filterOptions: [FilterOption] = []
     
+    @Bindable
+    var dataFetcher: SearchResultsDataFetcher
+    
     var filter: Binding<Set<SearchFilter>> {
         .init(
-            get: { dataFetcher?.filters ?? [] },
+            get: { dataFetcher.filters },
             set: { updateFilters($0) }
         )
     }
@@ -57,7 +60,7 @@ struct SearchLanding: View {
                     pinnedViews: [.sectionHeaders, .sectionFooters]
                 ) {
                     Section {
-                        ForEach(dataFetcher?.results ?? [], content: row(_:))
+                        ForEach(dataFetcher.results, content: row(_:))
                     } header: {
                         headerToUse(proxy.size.width)
                             .padding(.bottom, 8)
@@ -68,16 +71,16 @@ struct SearchLanding: View {
             .scrollContentBackground(.hidden)
 #endif
         }
-        .onChange(of: sort, {
-            dataFetcher?.configure(sort: sort)
-            Task { [dataFetcher] in
-                await dataFetcher?.updateIfNeeded(forceReload: true)
-            }
-        })
         .task { [weak dataFetcher] in
             dataFetcher?.configure(sort: sort)
             await dataFetcher?.perform()
         }
+        .onChange(of: sort, {
+            dataFetcher.configure(sort: sort)
+            Task { [weak dataFetcher] in
+                await dataFetcher?.updateIfNeeded(forceReload: true)
+            }
+        })
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 SortOrderMenu(sort: $sort, sortOptions: [.alphabet, .newestFirst, .oldestFirst])
@@ -220,16 +223,29 @@ enum SearchResult: AllSortable, Identifiable {
     case paste(PasteModel)
     case purl(PURLModel)
     
-    var id: String {
+    var owner: AddressName {
         switch self {
         case .address(let model):
             return model.addressName
         case .status(let model):
-            return model.id
+            return model.addressName
         case .paste(let model):
-            return model.name
+            return model.addressName
         case .purl(let model):
-            return model.name
+            return model.addressName
+        }
+    }
+    
+    var id: String {
+        switch self {
+        case .address(let model):
+            return NavigationDestination.address(model.addressName, page: .profile).rawValue
+        case .status(let model):
+            return NavigationDestination.status(model.addressName, id: model.id).rawValue
+        case .paste(let model):
+            return NavigationDestination.paste(model.addressName, id: model.name).rawValue
+        case .purl(let model):
+            return NavigationDestination.purl(model.addressName, id: model.name).rawValue
         }
     }
     
@@ -269,12 +285,13 @@ enum SearchResult: AllSortable, Identifiable {
     }
 }
 
+@Observable
 class SearchResultsDataFetcher: DataFetcher {
     
-    @Published var directoryFetcher: AddressDirectoryDataFetcher
-    @Published var statusFetcher: StatusLogDataFetcher
-    @Published var pasteFetcher: AddressPasteBinDataFetcher
-    @Published var purlFetcher: AddressPURLsDataFetcher
+    var directoryFetcher: AddressDirectoryDataFetcher
+    var statusFetcher: StatusLogDataFetcher
+    var pasteFetcher: AddressPasteBinDataFetcher
+    var purlFetcher: AddressPURLsDataFetcher
     
     var addressBook: AddressBook
     var filters: Set<SearchLanding.SearchFilter>
@@ -283,34 +300,10 @@ class SearchResultsDataFetcher: DataFetcher {
     var sort: Sort
     
     // Results debouncing
-    private var resultsDebounceInterval: RunLoop.SchedulerTimeType.Stride = .milliseconds(600)
+    private var resultsDebounceInterval: Duration = .milliseconds(600)
+    private var debounceTask: Task<Void, Never>?
     
-    @Published
     var results: [SearchResult] = []
-    
-    func constructResults() {
-        var result = [SearchResult]()
-        
-        let includeAddresses: Bool = filters.isEmpty
-        let includeStatuses: Bool = filters.contains(.status)
-        let includePastes: Bool = filters.contains(.paste)
-        let includePURLs: Bool = filters.contains(.purl)
-        
-        if includeAddresses {
-            result.append(contentsOf: directoryFetcher.results.map({ .address($0) }))
-        }
-        if includeStatuses {
-            result.append(contentsOf: statusFetcher.results.map({ .status($0) }))
-        }
-        if includePastes {
-            result.append(contentsOf: pasteFetcher.results.map({ .paste($0) }))
-        }
-        if includePURLs {
-            result.append(contentsOf: purlFetcher.results.map({ .purl($0) }))
-        }
-        
-        self.results = result.sorted(with: sort)
-    }
     
     init(addressBook: AddressBook, filters: Set<SearchLanding.SearchFilter>, query: String, sort: Sort = .newestFirst, interface: DataInterface) {
         self.filters = filters
@@ -323,8 +316,6 @@ class SearchResultsDataFetcher: DataFetcher {
         self.pasteFetcher = .init(name: "", credential: nil, addressBook: .init())
         self.purlFetcher = .init(name: "", credential: nil, addressBook: .init())
         super.init()
-        bindFetchers()
-        constructResults()
     }
     
     func configure(
@@ -363,40 +354,6 @@ class SearchResultsDataFetcher: DataFetcher {
         super.configure()
     }
     
-    // Observe fetcher results and rebuild our aggregated results, debounced to avoid flicker.
-    private func bindFetchers() {
-        // Clear any prior subscriptions related to this binding
-        requests.removeAll()
-        
-        directoryFetcher.$results
-            .debounce(for: resultsDebounceInterval, scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.constructResults()
-            }
-            .store(in: &requests)
-        
-        statusFetcher.$results
-            .debounce(for: resultsDebounceInterval, scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.constructResults()
-            }
-            .store(in: &requests)
-        
-        pasteFetcher.$results
-            .debounce(for: resultsDebounceInterval, scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.constructResults()
-            }
-            .store(in: &requests)
-        
-        purlFetcher.$results
-            .debounce(for: resultsDebounceInterval, scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.constructResults()
-            }
-            .store(in: &requests)
-    }
-    
     @MainActor
     override func throwingRequest() async throws {
         try? await search()
@@ -404,19 +361,33 @@ class SearchResultsDataFetcher: DataFetcher {
     
     @MainActor
     func search() async throws {
-        Task { [directoryFetcher] in
-            await directoryFetcher.updateIfNeeded(forceReload: true)
+        Task { [weak directoryFetcher, weak statusFetcher, weak pasteFetcher, weak purlFetcher] in
+            async let address: Void = directoryFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let status: Void = statusFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let paste: Void = pasteFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let purl: Void = purlFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            let _ = await (address, status, paste, purl)
+            var result = [SearchResult]()
+            
+            let includeAddresses: Bool = filters.isEmpty || filters.contains(.address)
+            let includeStatuses: Bool = filters.contains(.status)
+            let includePastes: Bool = filters.contains(.paste)
+            let includePURLs: Bool = filters.contains(.purl)
+            
+            if includeAddresses, let directoryFetcher {
+                result.append(contentsOf: directoryFetcher.results.map({ .address($0) }))
+            }
+            if includeStatuses, let statusFetcher {
+                result.append(contentsOf: statusFetcher.results.map({ .status($0) }))
+            }
+            if includePastes, let pasteFetcher {
+                result.append(contentsOf: pasteFetcher.results.map({ .paste($0) }))
+            }
+            if includePURLs, let purlFetcher {
+                result.append(contentsOf: purlFetcher.results.map({ .purl($0) }))
+            }
+            
+            self.results = result.sorted(with: sort)
         }
-        Task { [statusFetcher] in
-            await statusFetcher.updateIfNeeded(forceReload: true)
-        }
-        Task { [pasteFetcher] in
-            await pasteFetcher.updateIfNeeded(forceReload: true)
-        }
-        Task { [purlFetcher] in
-            await purlFetcher.updateIfNeeded(forceReload: true)
-        }
-        
-        objectWillChange.send()
     }
 }

@@ -19,7 +19,7 @@ struct StatusView: View {
     @State var shareURL: URL?
     @State var presentURL: URL?
     
-    @StateObject
+    @State
     var fetcher: StatusDataFetcher
     
     init(address: AddressName, id: String) {
@@ -69,20 +69,28 @@ struct StatusView: View {
 #endif
         .tint(.secondary)
         .toolbar {
-            if let addressSummaryFetcher = summaryFetcher(fetcher.address) {
-                ToolbarItem(placement: .topBarTrailing) {
-                    AddressPrincipalView(
-                        addressSummaryFetcher: addressSummaryFetcher,
-                        addressPage: .init(
-                            get: { .statuslog },
-                            set: {
-                                presentDestination?(.address(addressSummaryFetcher.addressName, page: $0))
-                            }
-                        )
+            ToolbarItem(placement: .safePrincipal) {
+                AddressPrincipalView(
+                    addressSummaryFetcher: summaryFetcher(fetcher.address),
+                    addressPage: .init(
+                        get: { .statuslog },
+                        set: {
+                            presentDestination?(.address(fetcher.address, page: $0))
+                        }
                     )
-                }
+                )
             }
         }
+    }
+}
+
+extension ToolbarItemPlacement {
+    static var safePrincipal: ToolbarItemPlacement {
+        #if os(macOS)
+        return .principal
+        #else
+        return .topBarLeading
+        #endif
     }
 }
 

@@ -8,9 +8,100 @@
 import SwiftUI
 
 @MainActor
-struct DestinationConstructor {
+@Observable
+class DestinationConstructor {
     
-    let addressBook: AddressBook
+    var addressBook: AddressBook = .init()
+    
+    var directoryFetcher: AddressDirectoryDataFetcher = .init(addressBook: .init())
+    var gardenFetcher: NowGardenDataFetcher = .init(addressBook: .init())
+    var statusFetcher: StatusLogDataFetcher = .init(addressBook: .init())
+    
+    var addressFollowingFetcher: AddressFollowingDataFetcher = .init(address: "", credential: "")
+    var addressFollowersFetcher: AddressFollowersDataFetcher = .init(address: "", credential: "")
+    var addressBlockedFetcher: AddressBlockListDataFetcher = .init(address: "", credential: "")
+    
+    var searchFetcher: SearchResultsDataFetcher = .init(
+        addressBook: .init(),
+        filters: [.address],
+        query: "",
+        interface: APIDataInterface()
+    )
+    
+    init(addressBook: AddressBook) {
+        self.configure(addressBook)
+    }
+    
+    func refresh() {
+        Task { [
+            weak directoryFetcher,
+            weak gardenFetcher,
+            weak statusFetcher,
+            weak addressFollowingFetcher,
+            weak addressFollowersFetcher,
+            weak addressBlockedFetcher,
+            weak searchFetcher
+        ] in
+            async let directory: Void = directoryFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let garden: Void = gardenFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let status: Void = statusFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let following: Void = addressFollowingFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let followers: Void = addressFollowersFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let blocked: Void = addressBlockedFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let search: Void = searchFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            let _ = await (directory, garden, status, following, followers, blocked, search)
+        }
+    }
+    
+    func search(
+        searchFilters: Set<SearchLanding.SearchFilter>? = nil,
+        searchQuery: String? = nil,
+        refresh: Bool = false
+    ) {
+        guard refresh || (searchFilters != searchFetcher.filters || searchQuery != searchFetcher.query) else { return }
+        searchFetcher.configure(
+            filters: searchFilters ?? searchFetcher.filters,
+            query: searchQuery ?? searchFetcher.query
+        )
+        
+        Task { [weak searchFetcher] in
+            await searchFetcher?.updateIfNeeded(forceReload: true)
+        }
+    }
+    
+    func configure(
+        _ book: AddressBook
+    ) {
+        if book != addressBook {
+            let oldBook = addressBook
+            addressBook = book
+            directoryFetcher = .init(addressBook: addressBook)
+            gardenFetcher = .init(addressBook: addressBook)
+            statusFetcher = .init(addressBook: addressBook)
+            searchFetcher = .init(
+                addressBook: addressBook,
+                filters: searchFetcher.filters,
+                query: searchFetcher.query,
+                interface: APIDataInterface()
+            )
+            
+            if oldBook.me != addressBook.me || oldBook.auth != addressBook.auth {
+                addressFollowingFetcher = .init(
+                    address: addressBook.me,
+                    credential: addressBook.auth
+                )
+                addressFollowersFetcher = .init(
+                    address: addressBook.me,
+                    credential: addressBook.auth
+                )
+                addressBlockedFetcher = .init(
+                    address: addressBook.me,
+                    credential: addressBook.auth
+                )
+            }
+            refresh()
+        }
+    }
     
     @ViewBuilder
     func destination(_ destination: NavigationDestination? = nil) -> some View {
@@ -36,7 +127,7 @@ struct DestinationConstructor {
         let destination = destination ?? .community
         switch destination {
         case .community:
-            CommunityView()
+            CommunityView(communityFetcher: statusFetcher)
         case .address(let name, let page):
             AddressSummaryView(name, addressBook: addressBook, page: page)
                 .environment(\.visibleAddress, name)
@@ -47,7 +138,7 @@ struct DestinationConstructor {
         case .safety:
             SafetyView()
         case .nowGarden:
-            GardenView()
+            GardenView(gardenFetcher: gardenFetcher)
         case .pastebin(let address):
             AddressPastesView(address, addressBook: addressBook)
         case .paste(let address, id: let title):
@@ -64,11 +155,19 @@ struct DestinationConstructor {
             StatusView(address: address, id: id)
                 .environment(\.viewContext, .detail)
         case .account:
-            AccountView()
+            AccountView(
+                addressBook: addressBook,
+                followingFetcher: addressFollowingFetcher,
+                followersFetcher: addressFollowersFetcher
+            )
         case .lists:
-            AccountView()
+            AccountView(
+                addressBook: addressBook,
+                followingFetcher: addressFollowingFetcher,
+                followersFetcher: addressFollowersFetcher
+            )
         case .search:
-            SearchLanding()
+            SearchLanding(dataFetcher: searchFetcher)
         case .latest:
             AddressNowView("app")
                 .environment(\.viewContext, .detail)

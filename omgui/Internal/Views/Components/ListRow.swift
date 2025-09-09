@@ -9,8 +9,8 @@ import SwiftUI
 import Foundation
 
 struct ListRow<T: Listable>: View {
-    @Environment(\.viewContext) var context
     @Environment(\.addressBook) var addressBook
+    @Environment(\.viewContext) var context
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin
     @Environment(\.blockAddress) var block
@@ -130,15 +130,19 @@ struct ListRow<T: Listable>: View {
                     .font(.subheadline)
             }
             
-            Text(model.listSubtitle.isEmpty ? "\(model.addressName).omg.lol" : String(model.listSubtitle.replacingOccurrences(of: "https://", with: "")))
-                .font(.callout)
-                .foregroundStyle(.primary)
-                .fontDesign(.monospaced)
-                .bold()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(8)
-                .asCard(material: .regular, padding: 0, radius: cardRadius)
-                .padding(.horizontal, 4)
+            Text(
+                model.listSubtitle.isEmpty
+                    ? "\(model.addressName).omg.lol"
+                    : String(model.listSubtitle.replacingOccurrences(of: "https://", with: ""))
+            )
+            .font(.callout)
+            .foregroundStyle(.primary)
+            .fontDesign(.monospaced)
+            .bold()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(8)
+            .asCard(material: .regular, padding: 0, radius: cardRadius)
+            .padding(.horizontal, 4)
             
             RowFooter(model: model) { EmptyView() }
         }

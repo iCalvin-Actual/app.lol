@@ -14,8 +14,8 @@ import WebKit
 struct AddressProfilePageView: View {
     @Environment(\.visibleAddress)
     var visibleAddress
-    @ObservedObject
-    var fetcher: AddressProfilePageDataFetcher
+    
+    let fetcher: AddressProfilePageDataFetcher
     
     let htmlContent: String?
     let baseURL: URL?
@@ -47,7 +47,7 @@ struct AddressProfilePageView: View {
 
 
 struct AddressNowPageView: View {
-    @ObservedObject
+    @State
     var fetcher: AddressNowPageDataFetcher
     
     let htmlContent: String?
@@ -78,7 +78,7 @@ struct HTMLFetcherView: View {
     @Environment(\.horizontalSizeClass)
     var sizeClass
     
-    @ObservedObject
+    @State
     var fetcher: Request
     
     let activeAddress: AddressName?

@@ -10,6 +10,8 @@ import SwiftUI
 struct SafetyView: View {
     @Environment(\.addressBook)
     var addressBook
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetcher
     
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin
@@ -44,9 +46,9 @@ struct SafetyView: View {
                     ForEach(addressBook.blocked.map({ AddressModel(name: $0) })) { item in
                         ListRow(model: item)
                             .tag(item)
-                        #if !os(tvOS)
+#if !os(tvOS)
                             .listRowSeparator(.hidden, edges: .all)
-                        #endif
+#endif
                             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                             .contextMenu(menuItems: {
                                 menuBuilder.contextMenu(

@@ -17,9 +17,7 @@ struct PasteRowView: View {
     @Environment(\.unfollowAddress) var unfollow
     
     @Environment(\.viewContext) var context: ViewContext
-    @Environment(\.addressBook) var addressBook
     @Environment(\.presentListable) var present
-    @Environment(\.addressSummaryFetcher) var summaryFetcher
     
     let model: PasteModel
     

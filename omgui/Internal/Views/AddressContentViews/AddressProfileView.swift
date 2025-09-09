@@ -18,7 +18,7 @@ struct AddressProfileView: View {
     @State
     var showDrafts: Bool = false
     
-    @StateObject
+    @State
     var fetcher: AddressProfilePageDataFetcher
     @State
     var draftPoster: ProfileMarkdownDraftPoster?
