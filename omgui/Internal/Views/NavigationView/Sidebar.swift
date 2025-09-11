@@ -26,7 +26,7 @@ struct Sidebar: View {
     @State
     var expandAddresses: Bool = false
     
-    var sidebarModel: SidebarModel {
+    var sidebarModel: NavigationModel {
         .init(addressBook: addressBook)
     }
     

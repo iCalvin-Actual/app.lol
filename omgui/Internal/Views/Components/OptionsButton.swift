@@ -15,7 +15,7 @@ struct OptionsButton: View {
     var pin
     @Environment(\.addressBook)
     var addressBook
-    @Environment(AccountAuthDataFetcher.self)
+    @Environment(AccountAuthFetcher.self)
     var accountFetcher
     
     var body: some View {

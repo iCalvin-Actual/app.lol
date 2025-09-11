@@ -35,10 +35,9 @@ struct TabBar: View {
     @State
     var selected: NavigationItem?
     
-    let addressBook: AddressBook
+    @Environment(\.addressBook)
+    var addressBook
     
-    @Environment(\.addressSummaryFetcher)
-    var addressSummaryFetcher
     @Environment(\.destinationConstructor)
     var destinationConstructor
     @Environment(\.horizontalSizeClass)
@@ -68,7 +67,7 @@ struct TabBar: View {
         }
     }
     
-    var tabModel: SidebarModel {
+    var tabModel: NavigationModel {
         .init(addressBook: addressBook)
     }
     
@@ -205,6 +204,7 @@ struct TabBar: View {
             #if os(iOS)
                 .tabViewBottomAccessory {
                     PinnedAddressesView(addAddress: $addAddress)
+                        .environment(\.addressBook, addressBook)
                         .id(addressBook.hashValue)
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -269,9 +269,9 @@ struct TabBar: View {
     }
     
     @State
-    var collapsed: Set<SidebarModel.Section> = []
+    var collapsed: Set<NavigationModel.Section> = []
     
-    func isExpanded(_ section: SidebarModel.Section) -> Binding<Bool> {
+    func isExpanded(_ section: NavigationModel.Section) -> Binding<Bool> {
         .init {
             !collapsed.contains(section)
         } set: { newValue in
@@ -291,16 +291,16 @@ struct TabBar: View {
                 ThemedTextView(text: "app", font: .largeTitle, design: .serif, suffix: ".lol")
                     .foregroundStyle(Color.lolAccent)
                 
-                // Sections from SidebarModel
+                // Sections from NavigationModel
                 Section {
-                    ForEach(tabModel.items(for: SidebarModel.Section.more, sizeClass: .regular, context: .column), id: \.self) { item in
+                    ForEach(tabModel.items(for: NavigationModel.Section.more, sizeClass: .regular, context: .column), id: \.self) { item in
                         NavigationLink(value: item) {
                             Label(item.displayString, systemImage: item.iconName)
                         }
                     }
                 }
                 Section {
-                    ForEach(tabModel.items(for: SidebarModel.Section.app, sizeClass: .regular, context: .column), id: \.self) { item in
+                    ForEach(tabModel.items(for: NavigationModel.Section.app, sizeClass: .regular, context: .column), id: \.self) { item in
                         NavigationLink(value: item) {
                             Label(item.displayString, systemImage: item.iconName)
                         }
@@ -316,7 +316,7 @@ struct TabBar: View {
                             Image(systemName: "plus.circle")
                         }
                     }
-                    ForEach(tabModel.items(for: SidebarModel.Section.directory, sizeClass: .regular, context: .column), id: \.self) { item in
+                    ForEach(tabModel.items(for: NavigationModel.Section.directory, sizeClass: .regular, context: .column), id: \.self) { item in
                         NavigationLink(value: item) {
                             if item == tabModel.items(for: .directory, sizeClass: .regular, context: .column).first {
                                 Label(item.displayString, systemImage: item.iconName)
@@ -338,6 +338,7 @@ struct TabBar: View {
             .frame(minWidth: 180)
             .safeAreaInset(edge: .bottom) {
                 PinnedAddressesView(addAddress: $addAddress)
+                    .environment(\.addressBook, addressBook)
                     .frame(maxHeight: 44)
                     .glassEffect(.regular, in: .capsule)
                     .id(addressBook.hashValue)
@@ -349,7 +350,7 @@ struct TabBar: View {
         } detail: {
             if let selected {
                 tabContent(selected)
-                    .background(selected.destination.gradient)
+//                    .background(selected.destination.gradient)
             }
         }
         .searchable(text: $searchQuery)
@@ -362,9 +363,9 @@ struct TabBar: View {
     func tabContent(_ item: NavigationItem) -> some View {
         NavigationStack(path: $path) {
             navigationContent(item.destination)
-                .background(
-                    item.destination.gradient
-                )
+//                .background(
+//                    item.destination.gradient
+//                )
                 .navigationDestination(for: NavigationDestination.self) { destination in
                     destinationConstructor?.destination(destination)
                 }
@@ -399,7 +400,6 @@ struct PinnedAddressesView: View {
     @Environment(\.setAddress) var set
     @Environment(\.pinAddress) var pin
     @Environment(\.authenticate) var authenticate
-    @Environment(\.addressBook) var addressBook
     
     @Binding var addAddress: Bool
     
@@ -417,6 +417,9 @@ struct PinnedAddressesView: View {
     
     @State
     var hasShownLoginPrompt: Bool = false
+    
+    @Environment(\.addressBook)
+    var addressBook
     
     init(addAddress: Binding<Bool>) {
         self._addAddress = addAddress
@@ -589,7 +592,7 @@ struct PinnedAddressesView: View {
                         if highlights.count > 2 {
                             AddressIconView(address: highlights[2], size: 24, showMenu: false, contentShape: Circle())
                         }
-                        if addressBook.pinned.count > 1 {
+                        if highlights.count > 1 {
                             AddressIconView(address: highlights[1], size: 32, showMenu: false, contentShape: Circle())
                                 .padding(.trailing, -4)
                         }

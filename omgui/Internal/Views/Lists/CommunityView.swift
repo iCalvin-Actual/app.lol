@@ -20,9 +20,9 @@ struct CommunityView: View {
         "community"
     }
     
-    let communityFetcher: StatusLogDataFetcher
+    let communityFetcher: StatusLogFetcher
     
-    init(communityFetcher: StatusLogDataFetcher) {
+    init(communityFetcher: StatusLogFetcher) {
         self.communityFetcher = communityFetcher
     }
     

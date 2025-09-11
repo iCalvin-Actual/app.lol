@@ -17,8 +17,6 @@ struct PURLView: View {
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.viewContext) var context
     @Environment(\.addressBook) var addressBook
-    @Environment(\.addressSummaryFetcher)
-    var summaryFetcher
     @Environment(\.presentListable)
     var presentDestination
     
@@ -29,7 +27,7 @@ struct PURLView: View {
     
     @State var presented: URL? = nil
     
-    @State var fetcher: AddressPURLDataFetcher
+    @State var fetcher: AddressPURLFetcher
     
     init(id: String, from address: AddressName) {
         _fetcher = .init(wrappedValue: .init(name: address, title: id))

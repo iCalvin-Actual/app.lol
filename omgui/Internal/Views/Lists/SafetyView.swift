@@ -10,8 +10,6 @@ import SwiftUI
 struct SafetyView: View {
     @Environment(\.addressBook)
     var addressBook
-    @Environment(\.addressSummaryFetcher)
-    var summaryFetcher
     
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin

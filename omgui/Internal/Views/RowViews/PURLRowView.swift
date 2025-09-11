@@ -105,7 +105,6 @@ struct PURLRowView: View {
     
     @Environment(\.viewContext) var context: ViewContext
     @Environment(\.presentListable) var present
-    @Environment(\.addressSummaryFetcher) var summaryFetcher
     
     let model: PURLModel
     

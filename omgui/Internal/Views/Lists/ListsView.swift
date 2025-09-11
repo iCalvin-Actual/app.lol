@@ -27,9 +27,9 @@ struct AddressesRow: View {
     #endif
     }
     
-    let addresses: [AddressSummaryDataFetcher]
+    let addresses: [AddressSummaryFetcher]
     
-    init(addresses: [AddressSummaryDataFetcher]) {
+    init(addresses: [AddressSummaryFetcher]) {
         self.addresses = addresses
     }
     
@@ -45,7 +45,7 @@ struct AddressesRow: View {
     }
     
     @ViewBuilder
-    func standardCard(_ fetcher: AddressSummaryDataFetcher, _ colorToUse: Color? = nil) -> some View {
+    func standardCard(_ fetcher: AddressSummaryFetcher, _ colorToUse: Color? = nil) -> some View {
         
         let address = fetcher.addressName
         if let present {
@@ -75,7 +75,7 @@ struct AddressesRow: View {
 struct AccountView: View {
     @Environment(\.authenticate)
     var authenticate
-    @Environment(AccountAuthDataFetcher.self)
+    @Environment(AccountAuthFetcher.self)
     var authFetcher
     @Environment(\.presentListable)
     var present
@@ -97,8 +97,8 @@ struct AccountView: View {
     
     let addressBook: AddressBook
     
-    var followingFetcher: AddressFollowingDataFetcher
-    var followersFetcher: AddressFollowersDataFetcher
+    var followingFetcher: AddressFollowingFetcher
+    var followersFetcher: AddressFollowersFetcher
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
     
@@ -147,7 +147,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
                     
-                    AddressesRow(addresses: addressBook.mine.sorted().map({ summaryFetcherCache($0) }))
+                    AddressesRow(addresses: addressBook.mine.sorted().compactMap({ summaryFetcherCache($0) }))
                         .frame(maxWidth: .infinity)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -165,7 +165,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
                     
-                    AddressesRow(addresses: addressBook.following.sorted().map({ summaryFetcherCache($0) }))
+                    AddressesRow(addresses: addressBook.following.sorted().compactMap({ summaryFetcherCache($0) }))
                         .frame(maxWidth: .infinity)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -183,7 +183,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
                     
-                    AddressesRow(addresses: addressBook.followers.sorted().map({ summaryFetcherCache($0) }))
+                    AddressesRow(addresses: addressBook.followers.sorted().compactMap({ summaryFetcherCache($0) }))
                         .frame(maxWidth: .infinity)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -200,7 +200,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowSeparator(.hidden)
                     
-                    AddressesRow(addresses: addressBook.pinned.sorted().map({ summaryFetcherCache($0) }))
+                    AddressesRow(addresses: addressBook.pinned.sorted().compactMap({ summaryFetcherCache($0) }))
                         .frame(maxWidth: .infinity)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -276,8 +276,7 @@ struct AccountView: View {
 }
 
 struct AuthenticateButton: View {
-    @Environment(AccountAuthDataFetcher.self)
-    var accountFetcher
+    @Environment(AccountAuthFetcher.self) var accountFetcher
     @Environment(\.addressBook) var addressBook
     @Environment(\.authenticate) var authenticate
     

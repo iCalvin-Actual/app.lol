@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct GardenView: View {
-    let fetcher: NowGardenDataFetcher
+    let fetcher: NowGardenFetcher
     
-    init(gardenFetcher: NowGardenDataFetcher) {
+    init(gardenFetcher: NowGardenFetcher) {
         self.fetcher = gardenFetcher
     }
     

@@ -207,6 +207,5 @@ struct ListRow<T: Listable>: View {
         }
         .padding(.horizontal)
     }
-    .environment(SceneModel.sample)
     .background(Color.lolPurple)
 }

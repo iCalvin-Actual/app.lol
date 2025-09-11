@@ -10,7 +10,7 @@ import SwiftUI
 struct AddressPastesView: View {
     @Environment(\.credentialFetcher) var credential
     @State
-    var fetcher: AddressPasteBinDataFetcher
+    var fetcher: AddressPasteBinFetcher
     
     init(_ address: AddressName, addressBook: AddressBook) {
         _fetcher = .init(wrappedValue: .init(name: address, credential: "", addressBook: addressBook))

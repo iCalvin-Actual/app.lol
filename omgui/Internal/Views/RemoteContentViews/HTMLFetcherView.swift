@@ -15,7 +15,7 @@ struct AddressProfilePageView: View {
     @Environment(\.visibleAddress)
     var visibleAddress
     
-    let fetcher: AddressProfilePageDataFetcher
+    let fetcher: AddressProfilePageFetcher
     
     let htmlContent: String?
     let baseURL: URL?
@@ -48,7 +48,7 @@ struct AddressProfilePageView: View {
 
 struct AddressNowPageView: View {
     @State
-    var fetcher: AddressNowPageDataFetcher
+    var fetcher: AddressNowPageFetcher
     
     let htmlContent: String?
     let baseURL: URL?

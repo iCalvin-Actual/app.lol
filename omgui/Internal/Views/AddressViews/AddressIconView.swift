@@ -24,11 +24,11 @@ struct AddressIconView<S: Shape>: View {
     
     let menuBuilder = ContextMenuBuilder<AddressModel>()
     
-    var summaryFetcher: AddressSummaryDataFetcher {
+    var summaryFetcher: AddressSummaryFetcher? {
         summaryCache(address)
     }
-    var iconFetcher: AddressIconDataFetcher {
-        imageCache.object(forKey: NSString(string: address)) ?? summaryFetcher.iconFetcher
+    var iconFetcher: AddressIconFetcher {
+        imageCache.object(forKey: NSString(string: address)) ?? summaryFetcher?.iconFetcher ?? .init(address: address)
     }
     
     @State
@@ -64,17 +64,19 @@ struct AddressIconView<S: Shape>: View {
             iconView
         }
         .popover(isPresented: $showPopover) {
-            AddressBioView(
-                fetcher: summaryFetcher,
-                page: .init(
-                    get: { .profile },
-                    set: {
-                        showPopover = false
-                        present?(.address(address, page: $0))
-                    }
+            if let summaryFetcher {
+                AddressBioView(
+                    fetcher: summaryFetcher,
+                    page: .init(
+                        get: { .profile },
+                        set: {
+                            showPopover = false
+                            present?(.address(address, page: $0))
+                        }
+                    )
                 )
-            )
-            .padding(2)
+                .padding(2)
+            }
         }
     }
     
@@ -118,7 +120,7 @@ struct AddressIconView<S: Shape>: View {
                     .clipShape(contentShape)
             }
             .task {
-                await summaryFetcher.updateIfNeeded()
+                await summaryFetcher?.updateIfNeeded()
                 if imageCache.object(forKey: NSString(string: address)) == nil {
                     imageCache.setObject(iconFetcher, forKey: NSString(string: address))
                 }

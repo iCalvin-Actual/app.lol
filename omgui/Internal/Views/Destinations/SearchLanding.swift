@@ -14,13 +14,12 @@ struct SearchLanding: View {
     @Environment(\.searchActive) var searchActive
     @Environment(\.addressBook) var addressBook
     @Environment(\.setSearchFilters) var updateFilters
-    @Environment(\.addressSummaryFetcher) var summaryFetcher
     
     @State var sort: Sort = .newestFirst
     @State var filterOptions: [FilterOption] = []
     
     @Bindable
-    var dataFetcher: SearchResultsDataFetcher
+    var dataFetcher: SearchResultsFetcher
     
     var filter: Binding<Set<SearchFilter>> {
         .init(
@@ -204,7 +203,7 @@ struct SearchNavigationButtonStyle: ButtonStyle {
 }
 
 struct SearchResultsView: View {
-    let dataFetcher: SearchResultsDataFetcher
+    let dataFetcher: SearchResultsFetcher
     
     var body: some View {
         ForEach(dataFetcher.results) { result in
@@ -286,12 +285,12 @@ enum SearchResult: AllSortable, Identifiable {
 }
 
 @Observable
-class SearchResultsDataFetcher: DataFetcher {
+class SearchResultsFetcher: Request {
     
-    var directoryFetcher: AddressDirectoryDataFetcher
-    var statusFetcher: StatusLogDataFetcher
-    var pasteFetcher: AddressPasteBinDataFetcher
-    var purlFetcher: AddressPURLsDataFetcher
+    let directoryFetcher: AddressDirectoryFetcher
+    let statusFetcher: StatusLogFetcher
+    let pasteFetcher: AddressPasteBinFetcher
+    let purlFetcher: AddressPURLsFetcher
     
     var addressBook: AddressBook
     var filters: Set<SearchLanding.SearchFilter>
@@ -305,7 +304,7 @@ class SearchResultsDataFetcher: DataFetcher {
     
     var results: [SearchResult] = []
     
-    init(addressBook: AddressBook, filters: Set<SearchLanding.SearchFilter>, query: String, sort: Sort = .newestFirst, interface: DataInterface) {
+    init(addressBook: AddressBook, filters: Set<SearchLanding.SearchFilter>, query: String, sort: Sort = .newestFirst, interface: OMGInterface) {
         self.filters = filters
         self.query = query
         self.addressBook = addressBook

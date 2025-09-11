@@ -82,7 +82,7 @@ struct MarkdownContentView: View {
     }
 }
 
-extension AddressNowDataFetcher: MarkdownSourceProvider {
+extension AddressNowFetcher: MarkdownSourceProvider {
     var updated: Date? {
         result?.date
     }

@@ -20,7 +20,7 @@ struct StatusView: View {
     @State var presentURL: URL?
     
     @State
-    var fetcher: StatusDataFetcher
+    var fetcher: StatusFetcher
     
     init(address: AddressName, id: String) {
         _fetcher = .init(wrappedValue: .init(id: id, from: address))
@@ -70,15 +70,17 @@ struct StatusView: View {
         .tint(.secondary)
         .toolbar {
             ToolbarItem(placement: .safePrincipal) {
-                AddressPrincipalView(
-                    addressSummaryFetcher: summaryFetcher(fetcher.address),
-                    addressPage: .init(
-                        get: { .statuslog },
-                        set: {
-                            presentDestination?(.address(fetcher.address, page: $0))
-                        }
+                if let summaryFetcher = summaryFetcher(fetcher.address) {
+                    AddressPrincipalView(
+                        addressSummaryFetcher: summaryFetcher,
+                        addressPage: .init(
+                            get: { .statuslog },
+                            set: {
+                                presentDestination?(.address(fetcher.address, page: $0))
+                            }
+                        )
                     )
-                )
+                }
             }
         }
     }

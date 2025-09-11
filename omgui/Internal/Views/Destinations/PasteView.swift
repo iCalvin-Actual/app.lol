@@ -42,7 +42,7 @@ struct PasteView: View {
     var detent: PresentationDetent = .draftDrawer
     
     @State
-    var fetcher: AddressPasteDataFetcher
+    var fetcher: AddressPasteFetcher
     
     init(_ id: String, from address: AddressName) {
         _fetcher = .init(wrappedValue: .init(name: address, title: id))
@@ -103,15 +103,17 @@ struct PasteView: View {
         .tint(.secondary)
         .toolbar {
             ToolbarItem(placement: .safePrincipal) {
-                AddressPrincipalView(
-                    addressSummaryFetcher: summaryFetcher(fetcher.address),
-                    addressPage: .init(
-                        get: { .pastebin },
-                        set: {
-                            presentDestination?(.address(fetcher.address, page: $0))
-                        }
+                if let summaryFetcher = summaryFetcher(fetcher.address) {
+                    AddressPrincipalView(
+                        addressSummaryFetcher: summaryFetcher,
+                        addressPage: .init(
+                            get: { .pastebin },
+                            set: {
+                                presentDestination?(.address(fetcher.address, page: $0))
+                            }
+                        )
                     )
-                )
+                }
             }
         }
         .onReceive(fetcher.result.publisher, perform: { _ in
@@ -130,78 +132,6 @@ struct PasteView: View {
                 }
             }
         })
-    }
-    
-    @ViewBuilder
-    private func linksSection(_ items: [SharePacket]) -> some View {
-        Text("links")
-            .font(.subheadline)
-        
-        LazyVStack {
-            ForEach(items) { item in
-                linkPreviewBuilder(item)
-                    .frame(maxWidth: .infinity)
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func linkPreviewBuilder(_ item: SharePacket) -> some View {
-        Button {
-            guard item.content.scheme?.contains("http") ?? false else {
-                openUrl(item.content)
-                return
-            }
-            withAnimation {
-                presentURL = item.content
-            }
-        } label: {
-            HStack {
-                VStack(alignment: .leading) {
-                    if !item.name.isEmpty {
-                        Text(item.name)
-                            .font(.subheadline)
-                            .bold()
-                            .fontDesign(.rounded)
-                    }
-                    
-                    Text(item.content.absoluteString)
-                        .font(.caption)
-                        .fontDesign(.monospaced)
-                }
-                .multilineTextAlignment(.leading)
-                .lineLimit(3)
-                
-                Spacer()
-                
-                if item.content.scheme?.contains("http") ?? false {
-                    ZStack {
-                        #if canImport(UIKit) && !os(tvOS)
-                        RemoteHTMLContentView(activeAddress: fetcher.address, startingURL: item.content, activeURL: $presentURL, scrollEnabled: .constant(false))
-                        #endif
-                            
-                        LinearGradient(
-                            stops: [
-                                .init(color: .lolBackground, location: 0.1),
-                                .init(color: .clear, location: 0.5)
-                            ],
-                            startPoint: .bottom,
-                            endPoint: .top
-                        )
-                    }
-                    .frame(width: 144, height: 144)
-                    .mask {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    }
-                }
-            }
-            .foregroundStyle(Color.primary)
-            .padding(4)
-            .background(Material.thin)
-            .mask {
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-            }
-        }
     }
     
     @ViewBuilder

@@ -11,7 +11,7 @@ struct AddressPURLsView: View {
     @Environment(\.credentialFetcher) var credential
     
     @State
-    var fetcher: AddressPURLsDataFetcher
+    var fetcher: AddressPURLsFetcher
     
     init(_ address: AddressName, addressBook: AddressBook) {
         _fetcher = .init(wrappedValue: .init(name: address, credential: nil, addressBook: addressBook))

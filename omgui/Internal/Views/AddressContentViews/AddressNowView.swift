@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddressNowView: View {
     @State
-    var fetcher: AddressNowPageDataFetcher
+    var fetcher: AddressNowPageFetcher
     
     init(_ address: AddressName) {
         _fetcher = .init(wrappedValue: .init(addressName: address))

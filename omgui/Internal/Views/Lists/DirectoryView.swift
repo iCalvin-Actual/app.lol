@@ -10,7 +10,7 @@ import SwiftUI
 
 struct DirectoryView: View {
     
-    let fetcher: AddressDirectoryDataFetcher
+    let fetcher: AddressDirectoryFetcher
     
     var body: some View {
         ListView<AddressModel>(

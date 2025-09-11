@@ -17,7 +17,7 @@ struct StatusList: View {
     var credential
     
     @State
-    var fetcher: StatusLogDataFetcher
+    var fetcher: StatusLogFetcher
     
     init(_ addresses: [AddressName], addressBook: AddressBook) {
         _fetcher = .init(wrappedValue: .init(addresses: addresses, addressBook: addressBook))

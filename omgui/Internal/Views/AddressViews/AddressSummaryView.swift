@@ -22,7 +22,7 @@ struct AddressSummaryView: View {
     var database
     
     @State
-    var addressSummaryFetcher: AddressSummaryDataFetcher
+    var addressSummaryFetcher: AddressSummaryFetcher
     
     @State var presentBio: Bool = false
     @State var expandBio: PresentationDetent = .medium
@@ -46,7 +46,7 @@ struct AddressSummaryView: View {
         self.address = addressName
         self.addressBook = addressBook
         self.addressPage = page
-        self._addressSummaryFetcher = .init(wrappedValue: .init(name: addressName, addressBook: .init(), interface: AppClient.interface))
+        self._addressSummaryFetcher = .init(wrappedValue: .init(name: addressName, addressBook: .init()))
     }
     
     var body: some View {
@@ -87,14 +87,16 @@ struct AddressSummaryView: View {
     
     func fetcherForContent(_ content: AddressContent) -> Request {
         switch content {
+        case .pic:
+            return addressSummaryFetcher.pasteFetcher
         case .now:
-            return addressSummaryFetcher.nowFetcher ?? .init(addressName: addressSummaryFetcher.nowFetcher?.address ?? "")
+            return addressSummaryFetcher.nowFetcher
         case .pastebin:
             return addressSummaryFetcher.pasteFetcher
         case .purl:
             return addressSummaryFetcher.purlFetcher
         case .profile:
-            return addressSummaryFetcher.profileFetcher ?? .init(addressName: addressSummaryFetcher.profileFetcher?.address ?? "")
+            return addressSummaryFetcher.profileFetcher
         case .statuslog:
             return addressSummaryFetcher.statusFetcher
         }
@@ -111,7 +113,7 @@ struct AddressBioView: View {
     @Environment(\.presentListable) var present
     @Environment(\.viewContext) var viewContext
     
-    let fetcher: AddressSummaryDataFetcher
+    let fetcher: AddressSummaryFetcher
     let page: Binding<AddressContent>
     
     var address: AddressName { fetcher.addressName }
@@ -261,7 +263,7 @@ struct AddressPrincipalView: View {
     @Environment(\.addressBook) var addressBook
     @Environment(\.dismiss) var dismiss
     
-    let addressSummaryFetcher: AddressSummaryDataFetcher
+    let addressSummaryFetcher: AddressSummaryFetcher
     
     @Binding var addressPage: AddressContent
     
@@ -275,7 +277,7 @@ struct AddressPrincipalView: View {
                 presentBio.toggle()
             }
         } label: {
-            AddressBioButton(address: address, page: $addressPage, theme: addressSummaryFetcher.profileFetcher?.theme)
+            AddressBioButton(address: address, page: $addressPage, theme: addressSummaryFetcher.profileFetcher.theme)
         }
         .padding(.horizontal, 4)
         .padding(.vertical, 5)

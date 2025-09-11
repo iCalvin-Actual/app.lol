@@ -274,7 +274,7 @@ struct StatusRowView: View {
 }
 
 #Preview {
-    @Previewable @State var fetcher: StatusLogDataFetcher?
+    @Previewable @State var fetcher: StatusLogFetcher?
     
     let db = AppClient.database
     
@@ -314,6 +314,5 @@ struct StatusRowView: View {
         .padding(.vertical)
     }
     .environment(\.viewContext, .column)
-    .environment(SceneModel.sample)
 }
 
