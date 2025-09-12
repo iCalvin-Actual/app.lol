@@ -23,8 +23,6 @@ struct OnboardingView: View {
     @State var showDetails: Bool = false
     @State var safetyTraining: Bool = false
     
-    var menuBuilder: ContextMenuBuilder<AddressModel> = .init()
-    
     @State
     var fakeBlocklist: [AddressName] = []
     var fakeDirectory: [AddressName] {
@@ -34,6 +32,8 @@ struct OnboardingView: View {
             "ferdafan",
         ]
     }
+    
+    let menuBuilder: ContextMenuBuilder<AddressModel> = .init()
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -47,7 +47,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .padding(.top)
             
-            Text("an omg.lol client")
+            Text("An omg.lol client")
                 .font(.headline)
                 .fontDesign(.serif)
                 .frame(maxWidth: .infinity)
@@ -63,7 +63,7 @@ struct OnboardingView: View {
                             }
                         }
                     }
-                ThemedTextView(text: "welcome to the omg.lol community", font: .title2)
+                ThemedTextView(text: "Welcome to the omg.lol community", font: .title2)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                 if !showDetails {
@@ -71,11 +71,7 @@ struct OnboardingView: View {
                     Spacer()
                 } else {
                     ScrollView(.vertical) {
-                        if safetyTraining {
-                            safetyTrainingView()
-                        } else {
-                            termsAndConditionsView()
-                        }
+                        termsAndConditionsView()
                     }
                 }
             }
@@ -97,14 +93,14 @@ struct OnboardingView: View {
     
     @ViewBuilder
     func termsAndConditionsView() -> some View {
-        Text("before you start exploring")
+        Text("Before you start exploring")
             .font(.headline)
             .fontDesign(.serif)
             .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundStyle(.secondary)
             .padding(.horizontal)
         
-        Text("please review our community guidelines and expectiations")
+        Text("Please review our community guidelines and expectiations")
             .frame(maxWidth: .infinity, alignment: .leading)
             .fontDesign(.rounded)
             .padding(.horizontal)
@@ -188,10 +184,7 @@ struct OnboardingView: View {
         Text("By using app.lol, you agree to comply with this Terms of Service and help maintain a positive community.")
             .padding(.horizontal)
         
-        Button(action: {
-            acceptedTerms = Date().timeIntervalSince1970
-            safetyTraining = true
-        }) {
+        Button(action: acceptTerms) {
             Label("accept community terms", systemImage: "checkmark")
                 .font(.headline)
                 .padding(.vertical, 8)
@@ -202,72 +195,84 @@ struct OnboardingView: View {
         .padding()
     }
     
-    @ViewBuilder
-    func safetyTrainingView() -> some View {
-        Text("a moment for safety")
-            .font(.headline)
-            .fontDesign(.serif)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(.secondary)
-            .padding(.horizontal)
-        
-        
-        Text("practice blocking and reporting addresses below")
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal)
-
-        if fakeBlocklist.count < 3 {
-            Text("long press on the address and open the Safety menu for Block and Report options")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .fontDesign(.rounded)
-                .padding(.horizontal)
-                .padding(.bottom)
-            
-            VStack {
-                ForEach(
-                    fakeDirectory
-                        .filter({ address in
-                            fakeBlocklist
-                                .contains(where: { $0 == address })
-                        })
-                ) { address in
-                    ListRow(model: AddressModel(name: address))
-                        .environment(\.colorScheme, .light)
-                        .contextMenu(menuItems: {
-                            Menu {
-                                Button(role: .destructive, action: {
-                                    fakeBlocklist.append(address)
-                                }, label: {
-                                    Label("Block", systemImage: "eye.slash.circle")
-                                })
-                                
-                                ReportButton(addressInQuestion: address, overrideAction: { fakeBlocklist.append(address) })
-                            } label: {
-                                Label("Safety", systemImage: "hand.raised")
-                            }
-                        })
-                }
-            }
-            .background(NavigationDestination.directory.gradient)
-            .frame(maxWidth: 425)
-        } else {
-            Spacer()
-        }
-        
-        Button(action: acceptTerms) {
-            Label(fakeBlocklist.isEmpty ? "send me in" : "start exploring", systemImage: "heart.fill")
-                .font(.headline)
-                .padding(.vertical, 8)
-                .frame(maxWidth: 500)
-        }
-        .buttonStyle(.borderedProminent)
-        .padding(.vertical, 16)
-        .padding(.top)
-        .padding()
-    }
+//    @ViewBuilder
+//    func safetyTrainingView() -> some View {
+//        Text("A moment for safety")
+//            .font(.headline)
+//            .fontDesign(.serif)
+//            .frame(maxWidth: .infinity, alignment: .leading)
+//            .foregroundStyle(.secondary)
+//            .padding(.horizontal)
+//        
+//        
+//        Text("Practice blocking and reporting addresses below")
+//            .frame(maxWidth: .infinity, alignment: .leading)
+//            .padding(.horizontal)
+//
+//        if fakeBlocklist.count < 3 {
+//            Text("long press on the address and open the Safety menu for Block and Report options")
+//                .frame(maxWidth: .infinity, alignment: .leading)
+//                .fontDesign(.rounded)
+//                .padding(.horizontal)
+//                .padding(.bottom)
+//            
+//            VStack {
+//                ForEach(
+//                    fakeDirectory
+//                        .filter({ address in
+//                            !fakeBlocklist
+//                                .contains(where: { $0 == address.lowercased() })
+//                        })
+//                ) { address in
+//                    ListRow(model: AddressModel(name: address))
+//                        .environment(\.colorScheme, .light)
+//                        .contextMenu(menuItems: {
+//                            Menu {
+//                                Button(role: .destructive, action: {
+//                                    fakeBlocklist.append(address)
+//                                }, label: {
+//                                    Label("Block", systemImage: "eye.slash.circle")
+//                                })
+//                                
+//                                ReportButton(addressInQuestion: address, overrideAction: { fakeBlocklist.append(address) })
+//                            } label: {
+//                                Label("Safety", systemImage: "hand.raised")
+//                            }
+//                        })
+//                }
+//            }
+//            .background(NavigationDestination.directory.gradient)
+//            .frame(maxWidth: 425)
+//        } else {
+//            Spacer()
+//        }
+//        
+//        Button(action: acceptTerms) {
+//            Label(fakeBlocklist.isEmpty ? "send me in" : "start exploring", systemImage: "heart.fill")
+//                .font(.headline)
+//                .padding(.vertical, 8)
+//                .frame(maxWidth: 500)
+//        }
+//        .buttonStyle(.borderedProminent)
+//        .padding(.vertical, 16)
+//        .padding(.top)
+//        .padding()
+//    }
     
     private func acceptTerms() {
         acceptedTerms = Date().timeIntervalSince1970
         dismiss()
     }
+}
+
+#Preview {
+    
+    @Previewable
+    @State
+    var sheet = true
+    
+    Text("Body")
+        .sheet(isPresented: $sheet) {
+            OnboardingView()
+        }
 }
