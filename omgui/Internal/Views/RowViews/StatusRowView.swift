@@ -148,14 +148,6 @@ struct StatusRowView: View {
     @ViewBuilder
     var rowBody: some View {
         VStack(alignment: .leading, spacing: 8) {
-            /*
-             This was tricky to set up
-             so I'm leaving it here
-             
-//                    Text(model.displayEmoji)
-//                        .font(.system(size: 44))
-//                    + Text(" ").font(.largeTitle) +
-             */
             appropriateMarkdown
                 .tint(.lolAccent)
                 .fontWeight(.medium)

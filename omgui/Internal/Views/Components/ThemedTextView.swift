@@ -21,32 +21,25 @@ struct ThemedTextView: View {
     }
     
     var body: some View {
-        appropriateText
+        Text(makeAttributedText(text: text, suffix: suffix))
             .truncationMode(.tail)
             .font(font)
             .fontDesign(design)
             .foregroundStyle(.primary)
     }
     
-    @ViewBuilder
-    var appropriateText: some View {
-        if let suffix {
-            suffixedText(suffix: suffix)
-        } else {
-            soloText
+    private func makeAttributedText(text: String, suffix: String?) -> AttributedString {
+        var result = AttributedString(text)
+        // Apply bold to the base text only
+        result.inlinePresentationIntent = [.stronglyEmphasized]
+
+        if let suffix, !suffix.isEmpty {
+            var tail = AttributedString(suffix)
+            // Ensure suffix is not bold
+            tail.inlinePresentationIntent = []
+            result.append(tail)
         }
-    }
-    
-    @ViewBuilder
-    var soloText: Text {
-        Text(text)
-            .bold()
-    }
-    
-    @ViewBuilder
-    func suffixedText(suffix: String) -> some View {
-        soloText
-        +
-        Text(suffix)
+
+        return result
     }
 }
