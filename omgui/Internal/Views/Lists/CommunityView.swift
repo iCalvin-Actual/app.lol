@@ -32,7 +32,7 @@ struct CommunityView: View {
             dataFetcher: communityFetcher
         )
         .task { [weak communityFetcher] in
-            await communityFetcher?.updateIfNeeded()
+            let _ = await communityFetcher?.updateIfNeeded()
         }
     }
 }

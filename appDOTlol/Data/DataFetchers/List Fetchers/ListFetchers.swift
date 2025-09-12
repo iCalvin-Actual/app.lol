@@ -65,7 +65,6 @@ class AddressFollowingFetcher: ListFetcher<AddressModel> {
     @MainActor
     override func throwingRequest() async throws {
         guard !address.isEmpty else {
-            results = []
             return
         }
         let fetched = try await interface.fetchAddressFollowing(address).map({ AddressModel(name: $0) })

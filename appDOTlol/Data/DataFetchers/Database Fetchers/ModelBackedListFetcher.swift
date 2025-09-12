@@ -22,15 +22,33 @@ class ModelBackedListFetcher<T: BlackbirdListable>: ListFetcher<T> {
         super.init(items: [], limit: limit, filters: filters, sort: sort, automation: automation)
     }
     
+    override func throwingRequest() async throws {
+        try await fetchModels()
+        let nextHash = try await fetchRemote()
+        guard nextHash != lastHash else {
+            return
+        }
+        lastHash = nextHash
+        try await fetchModels()
+    }
+    
+    override func refresh() {
+        loaded = nil
+        nextPage = Self.nextPage
+        Task { [weak self] in
+            async let _ = self?.updateIfNeeded(forceReload: true)
+        }
+    }
+    
     @MainActor
     override func fetchNextPageIfNeeded() {
         if loaded == nil {
             Task { [weak self] in
-                await self?.updateIfNeeded()
+                let _ = await self?.updateIfNeeded(forceReload: true)
             }
         } else if !loading {
             Task { [weak self] in
-                try? await self?.fetchModels()
+                let _ = try? await self?.fetchModels()
             }
         }
     }

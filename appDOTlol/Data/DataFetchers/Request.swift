@@ -91,6 +91,7 @@ class Request {
     
     @MainActor
     func fetchFinished() async {
+        requestLevelLogger.debug("Finished fetching on \(String(describing: self))")
         loaded = .init()
         loading = false
     }

@@ -82,12 +82,12 @@ class SceneModel {
             weak addressBlockedFetcher,
             weak searchFetcher
         ] in
-            async let directory: Void = directoryFetcher?.updateIfNeeded(forceReload: true) ?? {}()
-            async let garden: Void = gardenFetcher?.updateIfNeeded(forceReload: true) ?? {}()
-            async let status: Void = statusFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let following: Void = addressFollowingFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let followers: Void = addressFollowersFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let blocked: Void = addressBlockedFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let directory: Void = directoryFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let garden: Void = gardenFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let status: Void = statusFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let search: Void = searchFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             let _ = await (directory, garden, status, following, followers, blocked, search)
         }

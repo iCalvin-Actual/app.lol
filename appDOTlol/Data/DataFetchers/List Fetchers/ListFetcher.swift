@@ -53,20 +53,6 @@ class ListFetcher<T: Listable>: Request {
         self.loaded = items.isEmpty ? nil : .init()
     }
     
-    override func updateIfNeeded(forceReload: Bool = false) async {
-        guard !loading else {
-            listLevelLogger.debug("Not set up for fetching: \(String(describing: self))")
-            return
-        }
-        guard forceReload || requestNeeded else {
-            listLevelLogger.debug("Not performing on: \(String(describing: self))")
-            return
-        }
-        listLevelLogger.debug("Performing on: \(String(describing: self))")
-        nextPage = Self.nextPage
-        await perform()
-    }
-    
     var hasContent: Bool {
         !results.isEmpty && loaded != nil
     }
@@ -80,13 +66,17 @@ class ListFetcher<T: Listable>: Request {
     
     @MainActor
     func fetchNextPageIfNeeded() {
+        Task { [weak self] in
+            async let _ = self?.updateIfNeeded()
+        }
     }
     
     @MainActor
     func refresh() {
-        results = []
         loaded = nil
-        fetchNextPageIfNeeded()
+        Task { [weak self] in
+            async let _ = self?.updateIfNeeded(forceReload: true)
+        }
     }
 }
 

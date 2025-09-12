@@ -25,9 +25,6 @@ struct AddressProfilePageView: View {
     
     var body: some View {
         WebView(url: fetcher.baseURL)
-            .onChange(of: visibleAddress, { oldValue, newValue in
-                print("Do a thing")
-            })
             .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
             .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
             #if os(iOS)

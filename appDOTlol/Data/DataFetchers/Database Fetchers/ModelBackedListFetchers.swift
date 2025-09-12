@@ -15,9 +15,6 @@ class AddressDirectoryFetcher: ModelBackedListFetcher<AddressModel> {
     }
     
     func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
-        if self.addressBook != addressBook {
-            results = []
-        }
         if let filters {
             self.filters = filters
         }
@@ -38,9 +35,6 @@ class NowGardenFetcher: ModelBackedListFetcher<NowListing> {
     }
     
     func configure(addressBook: AddressBook, automation: AutomationPreferences = .init()) {
-        if self.addressBook != addressBook {
-            results = []
-        }
         self.addressBook = addressBook
         super.configure(automation)
     }
@@ -65,9 +59,6 @@ class AddressPasteBinFetcher: ModelBackedListFetcher<PasteModel> {
     }
     
     func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
-        if self.addressBook != addressBook {
-            results = []
-        }
         if let filters {
             self.filters = filters
         }
@@ -114,9 +105,6 @@ class AddressPURLsFetcher: ModelBackedListFetcher<PURLModel> {
     }
     
     func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
-        if self.addressBook != addressBook {
-            results = []
-        }
         if let filters {
             self.filters = filters
         }
@@ -180,9 +168,6 @@ class StatusLogFetcher: ModelBackedListFetcher<StatusModel> {
     }
     
     func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
-        if self.addressBook != addressBook {
-            results = []
-        }
         if let addressBook {
             self.addressBook = addressBook
         }

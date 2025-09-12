@@ -232,10 +232,8 @@ extension OMGScene {
         return addressSummary(address)
     }
     func addressSummary(_ address: AddressName) -> AddressSummaryFetcher {
-        let mine = myAddresses.contains(address.lowercased())
         let cachedProfile = cache.object(forKey: NSString(string: address))
-        let privateCachedProfile = privateCache.object(forKey: NSString(string: address))
-        if let model = (mine ? privateCachedProfile : nil) ?? cachedProfile  {
+        if let model = cachedProfile  {
             return model
         } else {
             let model = constructFetcher(for: address)
