@@ -7,6 +7,7 @@
 
 import Foundation
 
+@Observable
 class AccountAddressFetcher: ListFetcher<AddressModel> {
     override var title: String {
         "my addresses"

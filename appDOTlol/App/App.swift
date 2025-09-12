@@ -20,7 +20,7 @@ struct omgApp: App {
     @AppStorage("lol.onboarding")
     var showOnboarding: Bool = false
     
-    @State var appModel: AppModel = .init()
+    @State var appModel: AppModel?
     
     @ViewBuilder
     func loadingView() -> some View {
@@ -29,26 +29,33 @@ struct omgApp: App {
     
     var body: some Scene {
         WindowGroup {
-            OMGScene(appModel: appModel)
-                .task {
-                    appModel = .init(
-                        authKey: $authKey,
-                        acceptedTerms: $acceptedTerms,
-                        showOnboarding: $showOnboarding
-                    )
-                    appModel.performFirstRun()
-                }
-            
-                .environment(\.authenticate,        appModel.authenticate(_:))
-                .environment(\.credentialFetcher,   appModel.credential(for:))
-            
-                .environment(\.pinAddress, appModel.pin(_:))
-                .environment(\.unpinAddress, appModel.removePin(_:))
-            
-                .environment(\.imageCache, appModel.imageCache)
-                .environment(\.profileCache, appModel.profileCache)
-            
-                .sheet(isPresented: $showOnboarding) { OnboardingView() }
+            if let appModel {
+                OMGScene(appModel: appModel)
+                    .task {
+                        appModel.performFirstRun()
+                    }
+                
+                    .environment(\.authenticate,        appModel.authenticate(_:))
+                    .environment(\.credentialFetcher,   appModel.credential(for:))
+                
+                    .environment(\.pinAddress, appModel.pin(_:))
+                    .environment(\.unpinAddress, appModel.removePin(_:))
+                
+                    .environment(\.imageCache, appModel.imageCache)
+                    .environment(\.profileCache, appModel.profileCache)
+                    .environment(\.privateCache, appModel.privateCache)
+                
+                    .sheet(isPresented: $showOnboarding) { OnboardingView() }
+            } else {
+                loadingView()
+                    .task {
+                        appModel = .init(
+                            authKey: $authKey,
+                            acceptedTerms: $acceptedTerms,
+                            showOnboarding: $showOnboarding
+                        )
+                    }
+            }
         }
     }
 }

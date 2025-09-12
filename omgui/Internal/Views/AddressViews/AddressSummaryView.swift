@@ -283,9 +283,6 @@ struct AddressPrincipalView: View {
         } label: {
             AddressBioButton(address: address, page: $addressPage, theme: addressSummaryFetcher.profileFetcher.theme)
         }
-        .padding(.horizontal, 4)
-        .padding(.vertical, 5)
-        .glassEffect()
         .popover(isPresented: $presentBio) {
             AddressBioView(
                 fetcher: addressSummaryFetcher,
@@ -327,8 +324,6 @@ struct AddressBioButton: View {
                 }
             }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 4)
     }
 }
 

@@ -97,7 +97,7 @@ extension AppModel {
         guard credential != addressFetcher.credential else { return }
         appLevelLogger.debug("Updating authenticated fetchers")
         authKey.wrappedValue = credential
-        addressFetcher = .init(credential: authKey.wrappedValue)
+        addressFetcher.configure(credential)
         
         privateCache.removeAllObjects()
         
