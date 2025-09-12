@@ -346,11 +346,11 @@ struct TabBar: View {
                         selected = .account
                     }
                     .padding(.horizontal, 8)
+                    .padding(.bottom, 8)
             }
         } detail: {
             if let selected {
                 tabContent(selected)
-//                    .background(selected.destination.gradient)
             }
         }
         .searchable(text: $searchQuery)
@@ -363,9 +363,6 @@ struct TabBar: View {
     func tabContent(_ item: NavigationItem) -> some View {
         NavigationStack(path: $path) {
             navigationContent(item.destination)
-//                .background(
-//                    item.destination.gradient
-//                )
                 .navigationDestination(for: NavigationDestination.self) { destination in
                     destinationConstructor?.destination(destination)
                 }
@@ -519,6 +516,7 @@ struct PinnedAddressesView: View {
                 }
                 if !addressBook.me.isEmpty {
                     AddressNameView(addressBook.me)
+                        .foregroundStyle(.primary)
                 } else {
                     Spacer()
                 }

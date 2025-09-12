@@ -171,7 +171,12 @@ extension NavigationDestination {
     }
     
     public var secondaryColor: Color {
-        .lolRandom(rawValue, not: color)
+        switch self {
+        case .community:
+            return .lolPurple
+        default:
+            return .lolRandom(rawValue, not: color)
+        }
     }
     
     public var gradient: Gradient {

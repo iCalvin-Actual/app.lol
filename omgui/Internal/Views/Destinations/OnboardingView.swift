@@ -47,7 +47,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .padding(.top)
             
-            Text("An omg.lol client")
+            Text("an omg.lol client")
                 .font(.headline)
                 .fontDesign(.serif)
                 .frame(maxWidth: .infinity)
@@ -112,63 +112,70 @@ struct OnboardingView: View {
     
         VStack(alignment: .leading, spacing: 16) {
             
-            Text("**Last updated**: Oct 02, 2024")
+            Text("**Last updated**: Sep 12, 2025")
                 .font(.subheadline)
-            
-            ThemedTextView(text: "Welcome to app.lol!", font: .headline)
-            Text("""
-            By using this application, which accesses and displays data from the [omg.lol platform](https://home.omg.lol), you agree to comply with the following Terms of Service. 
-            
-            These terms are intended to ensure a safe and respectful environment for all users and are based on the community guidelines set forth by omg.lol.
-            """)
-            
-            ThemedTextView(text: "1. Acceptance of Terms", font: .headline)
-            Text("""
-             By downloading, installing, or using app.lol, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service, the Acceptable Use Policy, and the Code of Conduct of omg.lol. If you do not agree to these terms, you must discontinue use of the app.
-             """)
-            
-            ThemedTextView(text: "2. Access to omg.lol Data", font: .headline)
-            Text("app.lol provides third-party access to certain public data available on omg.lol. While we strive to ensure the data displayed is accurate and current, we are not responsible for the completeness, accuracy, or availability of data from omg.lol. The use of this data is subject to omg.lol’s terms and conditions.")
-            
-            ThemedTextView(text: "3. User Conduct", font: .headline)
-            Text("""
-             Users are expected to follow the same community expectations and standards set by omg.lol when using app.lol. This includes, but is not limited to:
-             
-             No harassment, abuse, or hateful behavior
-             No spamming or engaging in malicious activities
-             No use of the app to violate any local, state, or federal laws
-             """)
 
-            
-            ThemedTextView(text: "4. Reporting Abuse", font: .headline)
+            ThemedTextView(text: "Welcome to app.lol", font: .headline)
             Text("""
-            We take reports of abuse seriously. If you encounter abuse or violations of these terms while using app.lol, please report it by emailing us at app@omg.lol. We will promptly investigate any reported incidents within 24 hours and take appropriate action in accordance with our policies.
-            """)
-            
-            ThemedTextView(text: "5. Blocking Accounts", font: .headline)
-            Text("app.lol allows users to block certain accounts from displaying within the app. This feature is intended to give users more control over their experience. Blocking an account in app.lol does not block or affect that account on omg.lol directly.")
-            
-            ThemedTextView(text: "6. Authentication and Additional Features", font: .headline)
-            Text("""
-            Authenticated users gain access to additional features such as following other omg.lol addresses, viewing their followers, and editing their profile. All interactions and content updates, including profile changes, must comply with the omg.lol Terms of Service, Acceptable Use Policy, and Code of Conduct.
+            app.lol is an independent third-party client for viewing and updating content on the [omg.lol](https://home.omg.lol) platform. It is not owned by or affiliated with omg.lol. By using this app, you agree to these Terms of Service (“these terms”).
             """)
 
-            ThemedTextView(text: "7. Responsibility of Content", font: .headline)
+            ThemedTextView(text: "1. Acceptance of terms", font: .headline)
             Text("""
-            While we strive to maintain a safe and respectful environment, you acknowledge that app.lol is not responsible for user-generated content or interactions within the app. All content accessed and displayed, including authenticated profile updates, is the responsibility of the original omg.lol account holders and must comply with omg.lol’s community guidelines.
+            Your use of app.lol requires compliance with omg.lol’s **Terms of Service**, **Acceptable Use Policy**, and **Code of Conduct**. See https://home.omg.lol/info/legal for details. If you do not agree, discontinue use of the app.
             """)
+
+            ThemedTextView(text: "2. Access to omg.lol data", font: .headline)
+            Text("""
+            The app displays omg.lol data and, if you sign in, can perform actions through the omg.lol API. We make no guarantees about completeness, accuracy, or availability. Use of omg.lol data remains subject to omg.lol’s terms.
+            """)
+
+            ThemedTextView(text: "3. User conduct", font: .headline)
+            Text("""
+            When using app.lol, you must follow omg.lol’s community standards. Prohibited conduct includes harassment, abuse, hateful behavior, spam, malicious activity, or unlawful use. Violations may result in loss of access.
+            """)
+
+            ThemedTextView(text: "4. Reporting abuse", font: .headline)
+            Text("""
+            To report abuse related to omg.lol, email **abuse@omg.lol**. For issues specific to this app, email **app@omg.lol**. Reports will be reviewed and addressed as quickly as possible.
+            """)
+
+            ThemedTextView(text: "5. Blocking accounts", font: .headline)
+            Text("""
+            You may block accounts in app.lol to hide their content. This does not affect the blocked account on omg.lol directly.
+            """)
+
+            ThemedTextView(text: "6. Authentication and features", font: .headline)
+            Text("""
+            Signing in enables features such as following addresses, viewing followers, and editing your profile. All authenticated actions and content remain subject to omg.lol’s Terms of Service, Acceptable Use Policy, and Code of Conduct.
+            """)
+
+            ThemedTextView(text: "7. Content responsibility", font: .headline)
+            Text("""
+            All user-generated content is the responsibility of the omg.lol account holders who created it. app.lol does not create, control, or endorse such content and is not responsible for it. Content must comply with omg.lol’s community guidelines.
+            """)
+
+            ThemedTextView(text: "8. Privacy", font: .headline)
+            Text("""
+            app.lol does not collect personal information beyond what is required for authentication. OAuth tokens are stored to identify your session. We do not sell, share, or track your activity. For details, see our Privacy Policy.
+            """)
+
+            ThemedTextView(text: "9. Changes to these terms", font: .headline)
+            Text("""
+            We may revise these terms from time to time. Updates will be posted here, with the “Last updated” date reflecting the current version. Continued use of app.lol constitutes acceptance of changes.
+            """)
+
+            ThemedTextView(text: "10. Limitation of liability", font: .headline)
+            Text("""
+            app.lol and it's developers are not liable for indirect, incidental, special, or consequential damages arising from use of the app or reliance on displayed information.
+            """)
+
+            ThemedTextView(text: "Contact us", font: .headline)
+            Text("""
+            For questions or issues regarding app.lol, email **app@omg.lol**. 
             
-            ThemedTextView(text: "8. Changes to These Terms", font: .headline)
-            Text("We may update these Terms of Service from time to time. When we do, we will post the updated terms here, and the 'Last updated' date at the top of this document will reflect the date of the most recent changes. Continued use of app.lol following any updates constitutes your acceptance of those changes.")
-            
-            ThemedTextView(text: "9. Limitation of Liability", font: .headline)
-            Text("app.lol and its developers are not liable for any indirect, incidental, or consequential damages resulting from the use of the app or reliance on the information provided.")
-            
-            ThemedTextView(text: "10. Termination", font: .headline)
-            Text("We reserve the right to terminate or suspend access to app.lol without prior notice for users who violate these terms or engage in prohibited behavior.")
-            
-            ThemedTextView(text: "Contact Us", font: .headline)
-            Text("If you have any questions about these Terms of Service or encounter issues while using app.lol, please contact us at app@omg.lol")
+            For omg.lol platform policies and abuse reporting, visit https://home.omg.lol/info/legal and https://home.omg.lol/info/abuse
+            """)
         }
         .multilineTextAlignment(.leading)
         .padding()

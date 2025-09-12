@@ -16,7 +16,7 @@ let appLevelLogger = Logger(subsystem: "OMGApp", category: "app-events")
 @Observable
 class AppModel {
     
-    static let termsUpdated: Date = .init(timeIntervalSince1970: 1727921377)
+    static let termsUpdated: Date = .init(timeIntervalSince1970: 1757719870)
     
     let imageCache: ImageCache = .init()
     let profileCache: ProfileCache = .init()
