@@ -174,7 +174,7 @@ struct StatusRowView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .lineLimit(context == .column ? 5 : nil)
+        .lineLimit(context != .detail ? 5 : nil)
         .multilineTextAlignment(.leading)
     }
     
@@ -229,7 +229,6 @@ struct StatusRowView: View {
             })
         } else {
             Markdown(model.displayStatus, hideImages: true)
-                .lineLimit(4)
         }
     }
     

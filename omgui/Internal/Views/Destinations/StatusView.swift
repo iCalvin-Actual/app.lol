@@ -30,8 +30,8 @@ struct StatusView: View {
         Group {
             if let model = fetcher.result {
                 StatusRowView(model: model, cardPadding: 16)
+                    .environment(\.viewContext, .detail)
                     .padding(.horizontal, 8)
-                    .frame(maxHeight: .infinity, alignment: .top)
             } else if fetcher.loading {
                 LoadingView()
                     .padding()

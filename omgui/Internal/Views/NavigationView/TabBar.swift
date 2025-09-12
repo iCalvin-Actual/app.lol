@@ -405,10 +405,10 @@ struct PinnedAddressesView: View {
     
     @State var confirmLogout: Bool = false
     
-    @SceneStorage("lol.highlightFollows") var highlightFollows: Bool = false
+    @SceneStorage("lol.highlightFollows") var highlightFollows: Bool = true
     
     var shouldHighlightFollows: Bool {
-        highlightFollows && addressBook.signedIn
+        highlightFollows && addressBook.signedIn && !addressBook.following.isEmpty
     }
     
     var highlights: [AddressName] {
@@ -535,56 +535,58 @@ struct PinnedAddressesView: View {
                         Image(systemName: "plus.circle")
                     }
                 }
-                Menu {
-                    ForEach(addressBook.pinned) { address in
-                        Button {
-                            withAnimation {
-                                presentListable?(.address(address, page: .profile))
-                            }
-                        } label: {
-                            Text(address.addressDisplayString)
-                        }
-                    }
-                } label: {
-                    Label("Pins", systemImage: "pin")
-                }
-                if !addressBook.following.isEmpty {
-                    Section("Following") {
+                if addressBook.following.isEmpty {
+                    Menu {
                         ForEach(addressBook.following) { address in
                             Button {
                                 withAnimation {
                                     presentListable?(.address(address, page: .profile))
                                 }
                             } label: {
-                                Label {
-                                    Text(address.addressDisplayString)
-                                } icon: {
-                                    if address == addressBook.following.last {
-                                        Image(systemName: "binoculars")
-                                    }
+                                Text(address.addressDisplayString)
+                            }
+                        }
+                    } label: {
+                        Label("Following", systemImage: "binoculars")
+                    }
+                }
+                Section("Pins") {
+                    ForEach(addressBook.pinned) { address in
+                        Button {
+                            withAnimation {
+                                presentListable?(.address(address, page: .profile))
+                            }
+                        } label: {
+                            Label {
+                                Text(address.addressDisplayString)
+                            } icon: {
+                                if address == addressBook.pinned.last {
+                                    Image(systemName: "pin")
                                 }
                             }
                         }
                     }
                 }
                 Divider()
-                Menu {
-                    Button {
-                        highlightFollows = true
+                if !addressBook.following.isEmpty {
+                    Menu {
+                        Button {
+                            highlightFollows = true
+                        } label: {
+                            Label("Follows", systemImage: shouldHighlightFollows ? "checkmark" : "binoculars")
+                                .bold(shouldHighlightFollows)
+                        }
+                        .bold(shouldHighlightFollows)
+                        .disabled(!addressBook.signedIn)
+                        Button {
+                            highlightFollows = false
+                        } label: {
+                            Label("Pinned", systemImage: shouldHighlightFollows ? "pin" : "checkmark")
+                        }
+                        .bold(shouldHighlightFollows)
                     } label: {
-                        Label("Follows", systemImage: shouldHighlightFollows ? "checkmark" : "binoculars")
-                            .bold(shouldHighlightFollows)
+                        Label("Highlight", systemImage: "star")
                     }
-                    .bold(shouldHighlightFollows)
-                    .disabled(!addressBook.signedIn)
-                    Button {
-                        highlightFollows = false
-                    } label: {
-                        Label("Pinned", systemImage: shouldHighlightFollows ? "pin" : "checkmark")
-                    }
-                    .bold(shouldHighlightFollows)
-                } label: {
-                    Label("Highlight", systemImage: "star")
                 }
             } label: {
                 HStack(spacing: 2) {
