@@ -12,6 +12,8 @@ struct AddressProfileView: View {
     
     @Environment(\.addressBook)
     var addressBook
+    @Environment(\.addressSummaryFetcher)
+    var cachedAddresses
     
     @State
     var showEditor: Bool = false
@@ -19,30 +21,47 @@ struct AddressProfileView: View {
     var showDrafts: Bool = false
     
     @State
-    var fetcher: AddressProfilePageFetcher
+    var fetcher: AddressProfilePageFetcher = .init(addressName: "")
     @State
     var draftPoster: ProfileMarkdownDraftPoster?
     @State
     var selectedDraft: ProfileMarkdown.Draft?
     
+    @State
+    var presentedURL: URL? = nil
+    
+    let addressName: AddressName
+    
     init(_ name: AddressName) {
-        _fetcher = .init(wrappedValue: .init(addressName: name))
+        self.addressName = name
     }
     
     var body: some View {
         htmlBody
-            .task { [weak fetcher] in
-                await fetcher?.updateIfNeeded()
+            .task {
+                let newFetcher: AddressProfilePageFetcher = cachedAddresses(addressName)?.profileFetcher ?? .init(addressName: addressName)
+                fetcher = newFetcher
+                await fetcher.updateIfNeeded()
             }
     }
     
     @ViewBuilder
     var htmlBody: some View {
-        AddressProfilePageView(
-            fetcher: fetcher,
-            htmlContent: fetcher.result?.content,
-            baseURL: nil
-        )
+        WebView(url: fetcher.baseURL)
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+            .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
+            #if os(iOS)
+            .sheet(item: $presentedURL, content: { url in
+                SafariView(url: url)
+                    .ignoresSafeArea(.container, edges: .all)
+            })
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    ShareLink(item: fetcher.baseURL)
+                        .tint(.primary)
+                }
+            }
         .toolbar {
 //            if let markdown = mdFetcher.result, sceneModel.addressBook.myAddresses.contains(fetcher.addressName) {
 //                ToolbarItem(placement: .primaryAction) {

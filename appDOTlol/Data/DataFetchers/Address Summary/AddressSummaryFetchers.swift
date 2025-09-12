@@ -27,7 +27,6 @@ class AddressSummaryFetcher: Request {
     let profileFetcher: AddressProfilePageFetcher
     let nowFetcher: AddressNowPageFetcher
     
-    let iconFetcher: AddressIconFetcher
     let purlFetcher: AddressPURLsFetcher
     let pasteFetcher: AddressPasteBinFetcher
     let statusFetcher: StatusLogFetcher
@@ -48,7 +47,6 @@ class AddressSummaryFetcher: Request {
         self.addressName = name
         let isMine = addressBook.mine.contains(name)
         let credential: APICredential? = isMine ? addressBook.auth : nil
-        self.iconFetcher = .init(address: name)
         self.bioFetcher = .init(address: name)
         self.statusFetcher = .init(addresses: [name], addressBook: addressBook)
         
@@ -71,29 +69,24 @@ class AddressSummaryFetcher: Request {
         }
         
         Task { [
-            weak iconFetcher,
             weak bioFetcher,
-            weak profileFetcher,
-            weak nowFetcher,
             weak followingFetcher,
             weak followersFetcher,
             weak pasteFetcher,
             weak statusFetcher,
             weak purlFetcher
         ] in
-            async let icon: Void = iconFetcher?.updateIfNeeded() ?? {}()
-            async let bio: Void = bioFetcher?.updateIfNeeded() ?? {}()
-            async let profile: Void = profileFetcher?.updateIfNeeded() ?? {}()
-            async let now: Void = nowFetcher?.updateIfNeeded() ?? {}()
-            async let following: Void = followingFetcher?.updateIfNeeded() ?? {}()
-            async let followers: Void = followersFetcher?.updateIfNeeded() ?? {}()
-            async let paste: Void = pasteFetcher?.updateIfNeeded() ?? {}()
-            async let status: Void = statusFetcher?.updateIfNeeded() ?? {}()
-            async let purl: Void = purlFetcher?.updateIfNeeded() ?? {}()
             async let info = try AppClient.interface.fetchAddressInfo(addressName)
-            let _ = await (icon, bio, purl, paste, status, following, followers, profile, now)
             self.registered = try await info.date
             self.url = try await info.url
+            
+            await pasteFetcher?.updateIfNeeded()
+            await statusFetcher?.updateIfNeeded()
+            await purlFetcher?.updateIfNeeded()
+            
+            await bioFetcher?.updateIfNeeded()
+            await followingFetcher?.updateIfNeeded()
+            await followersFetcher?.updateIfNeeded()
         }
     }
     

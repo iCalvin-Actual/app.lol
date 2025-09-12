@@ -20,9 +20,11 @@ struct AddressSummaryView: View {
     var apiInterface
     @Environment(\.blackbird)
     var database
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetchers
     
     @State
-    var addressSummaryFetcher: AddressSummaryFetcher
+    var addressSummaryFetcher: AddressSummaryFetcher = .init(name: "", addressBook: .init())
     
     @State var presentBio: Bool = false
     @State var expandBio: PresentationDetent = .medium
@@ -46,7 +48,6 @@ struct AddressSummaryView: View {
         self.address = addressName
         self.addressBook = addressBook
         self.addressPage = page
-        self._addressSummaryFetcher = .init(wrappedValue: .init(name: addressName, addressBook: .init()))
     }
     
     var body: some View {
@@ -63,8 +64,10 @@ struct AddressSummaryView: View {
                 #endif
             }
             .environment(\.viewContext, .profile)
-            .task { @MainActor [weak addressSummaryFetcher] in
-                await addressSummaryFetcher?.updateIfNeeded()
+            .task { @MainActor in
+                let newFetcher = summaryFetchers(address) ?? .init(name: address, addressBook: addressBook)
+                self.addressSummaryFetcher = newFetcher
+                await newFetcher.updateIfNeeded()
             }
     }
     
@@ -81,6 +84,7 @@ struct AddressSummaryView: View {
     func destination(_ item: AddressContent? = nil) -> some View {
         let workingItem = item ?? .profile
         destinationConstructor?.destination(workingItem.destination(addressSummaryFetcher.addressName))
+            .id(addressSummaryFetcher.addressName)
             .background(Color.clear)
             .navigationSplitViewColumnWidth(min: 250, ideal: 600)
     }

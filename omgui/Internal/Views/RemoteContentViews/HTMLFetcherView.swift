@@ -11,38 +11,6 @@ import WebKit
 #endif
 
 
-struct AddressProfilePageView: View {
-    @Environment(\.visibleAddress)
-    var visibleAddress
-    
-    let fetcher: AddressProfilePageFetcher
-    
-    let htmlContent: String?
-    let baseURL: URL?
-    
-    @State
-    var presentedURL: URL? = nil
-    
-    var body: some View {
-        WebView(url: fetcher.baseURL)
-            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
-            .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
-            #if os(iOS)
-            .sheet(item: $presentedURL, content: { url in
-                SafariView(url: url)
-                    .ignoresSafeArea(.container, edges: .all)
-            })
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    ShareLink(item: fetcher.baseURL)
-                        .tint(.primary)
-                }
-            }
-    }
-}
-
-
 struct AddressNowPageView: View {
     @State
     var fetcher: AddressNowPageFetcher

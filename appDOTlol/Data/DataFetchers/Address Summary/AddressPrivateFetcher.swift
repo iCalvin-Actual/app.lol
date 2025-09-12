@@ -43,6 +43,7 @@ class AddressPrivateSummaryFetcher: AddressSummaryFetcher {
     
     override func perform() async {
         guard !addressName.isEmpty else {
+            await fetchFinished()
             return
         }
         await super.perform()
