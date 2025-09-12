@@ -340,6 +340,7 @@ struct TabBar: View {
                 PinnedAddressesView(addAddress: $addAddress)
                     .environment(\.addressBook, addressBook)
                     .frame(maxHeight: 44)
+                    .glassEffect(.regular, in: .capsule)
                     .id(addressBook.hashValue)
                     .onTapGesture {
                         selected = .account

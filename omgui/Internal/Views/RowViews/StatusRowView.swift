@@ -160,22 +160,17 @@ struct StatusRowView: View {
                 .tint(.lolAccent)
                 .fontWeight(.medium)
                 .fontDesign(.rounded)
-//                .frame(maxHeight: context == .detail ? .infinity : nil, alignment: .top)
             
             if !model.imageLinks.isEmpty {
-                if let singleImage = model.imageLinks.first, model.imageLinks.count == 1 {
-                    imagePreview(singleImage.content)
-                } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(alignment: .center) {
-                            ForEach(model.imageLinks) { image in
-                                imagePreview(image.content)
-                            }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .center) {
+                        ForEach(model.imageLinks) { image in
+                            imagePreview(image.content)
                         }
-                        .padding(8)
                     }
-                    .padding(-8)
+                    .padding(8)
                 }
+                .padding(-8)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -198,7 +193,8 @@ struct StatusRowView: View {
                 case .success(let image):
                     image
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
+                        .aspectRatio(1.0, contentMode: .fill)
+                        .frame(maxWidth: 375)
                 case .failure(_):
                     // Fallback placeholder on failure
                     Color.secondary.opacity(0.2)
@@ -214,7 +210,6 @@ struct StatusRowView: View {
                     Color.secondary.opacity(0.2)
                 }
             }
-            .frame(height: nil)
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(.plain)

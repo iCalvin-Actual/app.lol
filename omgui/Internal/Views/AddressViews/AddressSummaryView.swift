@@ -53,15 +53,9 @@ struct AddressSummaryView: View {
     var body: some View {
         sizeAppropriateBody
             .toolbar {
-                #if os(macOS)
-                ToolbarItem(placement: .principal) {
+                ToolbarItem(placement: .safePrincipal) {
                     AddressPrincipalView(addressSummaryFetcher: addressSummaryFetcher, addressPage: $addressPage)
                 }
-                #else
-                ToolbarItem(placement: .topBarLeading) {
-                    AddressPrincipalView(addressSummaryFetcher: addressSummaryFetcher, addressPage: $addressPage)
-                }
-                #endif
             }
             .environment(\.viewContext, .profile)
             .task { @MainActor in

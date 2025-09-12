@@ -53,6 +53,7 @@ struct PasteView: View {
             if let model = fetcher.result {
                 PasteRowView(model: model, cardPadding: 16)
                     .padding(.horizontal, 8)
+                    .frame(maxHeight: .infinity, alignment: .top)
             } else if fetcher.loading {
                 LoadingView()
                     .padding()
@@ -103,7 +104,7 @@ struct PasteView: View {
         .tint(.secondary)
         .toolbar {
             ToolbarItem(placement: .safePrincipal) {
-                if let summaryFetcher = summaryFetcher(fetcher.address) {
+                if let summaryFetcher = summaryFetcher(fetcher.address), viewContext != .profile {
                     AddressPrincipalView(
                         addressSummaryFetcher: summaryFetcher,
                         addressPage: .init(

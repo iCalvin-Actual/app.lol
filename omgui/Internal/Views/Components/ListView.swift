@@ -222,7 +222,7 @@ struct ListView<T: Listable>: View {
                         .listRowBackground(Color.clear)
                     
                     if dataFetcher.nextPage != nil {
-                        LoadingView()
+                        Color.clear
                             .padding(32)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .listRowBackground(Color.clear)

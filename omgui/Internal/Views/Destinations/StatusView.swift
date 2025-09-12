@@ -30,6 +30,7 @@ struct StatusView: View {
         Group {
             if let model = fetcher.result {
                 StatusRowView(model: model, cardPadding: 16)
+                    .padding(.horizontal, 8)
                     .frame(maxHeight: .infinity, alignment: .top)
             } else if fetcher.loading {
                 LoadingView()
@@ -70,7 +71,7 @@ struct StatusView: View {
         .tint(.secondary)
         .toolbar {
             ToolbarItem(placement: .safePrincipal) {
-                if let summaryFetcher = summaryFetcher(fetcher.address) {
+                if let summaryFetcher = summaryFetcher(fetcher.address), viewContext != .profile {
                     AddressPrincipalView(
                         addressSummaryFetcher: summaryFetcher,
                         addressPage: .init(

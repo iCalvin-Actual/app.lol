@@ -49,13 +49,11 @@ struct PasteRowView: View {
             RowFooter(model: model) { EmptyView() }
         }
         .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
-        .frame(maxWidth: .infinity, maxHeight: context == .detail ? .infinity : 250)
     }
     
     @ViewBuilder
     var mainBody: some View {
         rowBody
-            .frame(maxHeight: context == .detail ? .infinity : nil, alignment: .top)
             .asCard(material: .regular, radius: cardRadius)
             .padding(.horizontal, 4)
     }

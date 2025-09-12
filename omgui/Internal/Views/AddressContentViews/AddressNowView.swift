@@ -10,6 +10,12 @@ import SwiftUI
 struct AddressNowView: View {
     @State
     var fetcher: AddressNowPageFetcher
+    @Environment(\.viewContext)
+    var viewContext
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetcher
+    @Environment(\.presentListable)
+    var presentDestination
     
     init(_ address: AddressName) {
         _fetcher = .init(wrappedValue: .init(addressName: address))
@@ -24,6 +30,19 @@ struct AddressNowView: View {
             }
         #if !os(tvOS)
             .toolbar {
+                ToolbarItem(placement: .safePrincipal) {
+                    if let summaryFetcher = summaryFetcher(fetcher.address), viewContext != .profile {
+                        AddressPrincipalView(
+                            addressSummaryFetcher: summaryFetcher,
+                            addressPage: .init(
+                                get: { .pastebin },
+                                set: {
+                                    presentDestination?(.address(fetcher.address, page: $0))
+                                }
+                            )
+                        )
+                    }
+                }
                 ToolbarItem(placement: .automatic) {
                     if let url = fetcher.result?.shareURLs.first?.content {
                         ShareLink(item: url)

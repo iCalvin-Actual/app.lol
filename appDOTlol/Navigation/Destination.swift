@@ -162,7 +162,7 @@ extension NavigationDestination {
     public var color: Color {
         switch self {
         case .community:
-            return .lolPink
+            return .lolTeal
         case .lists:
             return .lolPurple
         default:
