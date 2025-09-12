@@ -27,9 +27,7 @@ struct AddressIconView<S: Shape>: View {
     var summaryFetcher: AddressSummaryFetcher? {
         summaryCache(address)
     }
-    var iconFetcher: AddressIconFetcher {
-        imageCache.object(forKey: NSString(string: address)) ?? summaryFetcher?.iconFetcher ?? .init(address: address)
-    }
+    @State var iconFetcher: AddressIconFetcher?
     
     @State
     var showPopover: Bool = false
@@ -47,10 +45,23 @@ struct AddressIconView<S: Shape>: View {
     }
     
     var body: some View {
-        if showMenu {
-            menu
-        } else {
-            iconView
+        Group {
+            if showMenu {
+                menu
+            } else {
+                iconView
+            }
+        }
+        .task {
+            if let cachedFetcher = imageCache.object(forKey: NSString(string: address)) {
+                iconFetcher = cachedFetcher
+            } else {
+                let newFetcher = AddressIconFetcher(address: address)
+                iconFetcher = newFetcher
+                imageCache.setObject(newFetcher, forKey: NSString(string: address))
+            }
+            guard let iconFetcher else { return }
+            await iconFetcher.updateIfNeeded()
         }
     }
     
@@ -82,7 +93,7 @@ struct AddressIconView<S: Shape>: View {
     
     @ViewBuilder
     var iconView: some View {
-        if let result = iconFetcher.result?.data, !result.isEmpty {
+        if let result = iconFetcher?.result?.data, !result.isEmpty {
             #if canImport(UIKit)
             if let image = UIImage(data: result) {
                 Image(uiImage: image)
@@ -118,12 +129,6 @@ struct AddressIconView<S: Shape>: View {
                 Color.lolRandom(address)
                     .frame(width: size, height: size)
                     .clipShape(contentShape)
-            }
-            .task {
-                await summaryFetcher?.updateIfNeeded()
-                if imageCache.object(forKey: NSString(string: address)) == nil {
-                    imageCache.setObject(iconFetcher, forKey: NSString(string: address))
-                }
             }
         }
     }

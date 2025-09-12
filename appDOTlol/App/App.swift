@@ -20,36 +20,34 @@ struct omgApp: App {
     @AppStorage("lol.onboarding")
     var showOnboarding: Bool = false
     
-    @State var appModel: AppModel?
+    @State var appModel: AppModel = .init()
     
     @ViewBuilder
     func loadingView() -> some View {
         LoadingView()
-            .task {
-                appModel = .init(
-                    authKey: $authKey,
-                    acceptedTerms: $acceptedTerms,
-                    showOnboarding: $showOnboarding
-                )
-            }
     }
     
     var body: some Scene {
         WindowGroup {
-            if let appModel {
-                OMGScene(appModel: appModel)
-                    .task { appModel.performFirstRun() }
-                
-                    .environment(\.authenticate,        appModel.authenticate(_:))
-                    .environment(\.credentialFetcher,   appModel.credential(for:))
-                
-                    .environment(\.pinAddress, appModel.pin(_:))
-                    .environment(\.unpinAddress, appModel.removePin(_:))
-                
-                    .sheet(isPresented: $showOnboarding) { OnboardingView() }
-            } else {
-                loadingView()
-            }
+            OMGScene(appModel: appModel)
+                .task {
+                    appModel = .init(
+                        authKey: $authKey,
+                        acceptedTerms: $acceptedTerms,
+                        showOnboarding: $showOnboarding
+                    )
+                    appModel.performFirstRun()
+                }
+            
+                .environment(\.authenticate,        appModel.authenticate(_:))
+                .environment(\.credentialFetcher,   appModel.credential(for:))
+            
+                .environment(\.pinAddress, appModel.pin(_:))
+                .environment(\.unpinAddress, appModel.removePin(_:))
+            
+                .environment(\.imageCache, appModel.imageCache)
+            
+                .sheet(isPresented: $showOnboarding) { OnboardingView() }
         }
     }
 }
