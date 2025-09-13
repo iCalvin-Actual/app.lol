@@ -1,6 +1,6 @@
 {
   "fill" : {
-    "automatic-gradient" : "display-p3:0.70557,0.72119,0.86182,1.00000"
+    "automatic-gradient" : "display-p3:0.81569,0.74902,1.00000,1.00000"
   },
   "groups" : [
     {
@@ -8,10 +8,18 @@
       "hidden" : false,
       "layers" : [
         {
+          "fill" : {
+            "automatic-gradient" : "srgb:0.96863,0.50980,0.67451,1.00000"
+          },
+          "glass" : true,
+          "hidden" : false,
           "image-name" : "front.png",
           "name" : "front"
         },
         {
+          "fill" : {
+            "automatic-gradient" : "srgb:0.39608,0.84706,0.90588,1.00000"
+          },
           "image-name" : "middle.png",
           "name" : "middle"
         }
@@ -20,7 +28,7 @@
         "scale" : 1,
         "translation-in-points" : [
           0,
-          -20
+          -10
         ]
       },
       "shadow" : {
