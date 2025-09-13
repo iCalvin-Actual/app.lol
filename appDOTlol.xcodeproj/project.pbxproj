@@ -116,7 +116,7 @@
 		3EA49C752E706DAB008A99F1 /* SceneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA49C742E706DAB008A99F1 /* SceneModel.swift */; };
 		3EA49C772E70D8F6008A99F1 /* AppClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA49C762E70D8F6008A99F1 /* AppClient.swift */; };
 		3EB190C02E2D6D8D00AD8397 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB190BE2E2D677D00AD8397 /* OptionsButton.swift */; };
-		3EB4F6022E751AD3002FCDF9 /* omgIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 3EB4F6012E751AD3002FCDF9 /* omgIcon.icon */; };
+		3EB4F6042E75D4AA002FCDF9 /* omgIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 3EB4F6032E75D4AA002FCDF9 /* omgIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -239,7 +239,7 @@
 		3EA49C742E706DAB008A99F1 /* SceneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneModel.swift; sourceTree = "<group>"; };
 		3EA49C762E70D8F6008A99F1 /* AppClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClient.swift; sourceTree = "<group>"; };
 		3EB190BE2E2D677D00AD8397 /* OptionsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsButton.swift; sourceTree = "<group>"; };
-		3EB4F6012E751AD3002FCDF9 /* omgIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = omgIcon.icon; sourceTree = "<group>"; };
+		3EB4F6032E75D4AA002FCDF9 /* omgIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = omgIcon.icon; sourceTree = "<group>"; };
 		3EC12B2929BF92CA00367B45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -282,7 +282,7 @@
 			isa = PBXGroup;
 			children = (
 				3EC12B2929BF92CA00367B45 /* Info.plist */,
-				3EB4F6012E751AD3002FCDF9 /* omgIcon.icon */,
+				3EB4F6032E75D4AA002FCDF9 /* omgIcon.icon */,
 				3E0A745129B4950300EFD8E4 /* Assets.xcassets */,
 				3E0A745329B4950300EFD8E4 /* appDOTlol.entitlements */,
 				3E337F382E732B0400119B95 /* App */,
@@ -743,8 +743,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3E0A745629B4950300EFD8E4 /* Preview Assets.xcassets in Resources */,
+				3EB4F6042E75D4AA002FCDF9 /* omgIcon.icon in Resources */,
 				3E0A745229B4950300EFD8E4 /* Assets.xcassets in Resources */,
-				3EB4F6022E751AD3002FCDF9 /* omgIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

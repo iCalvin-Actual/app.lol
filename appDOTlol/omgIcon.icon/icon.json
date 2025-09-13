@@ -1,36 +1,57 @@
 {
   "fill" : {
-    "automatic-gradient" : "display-p3:0.81569,0.74902,1.00000,1.00000"
+    "linear-gradient" : [
+      "srgb:0.64706,0.84706,1.00000,1.00000",
+      "display-p3:0.81569,0.74902,1.00000,1.00000"
+    ]
   },
   "groups" : [
     {
-      "blend-mode" : "normal",
-      "hidden" : false,
       "layers" : [
         {
+          "blend-mode" : "overlay",
           "fill" : {
-            "automatic-gradient" : "srgb:0.96863,0.50980,0.67451,1.00000"
+            "solid" : "srgb:0.00000,0.53333,1.00000,1.00000"
           },
-          "glass" : true,
-          "hidden" : false,
-          "image-name" : "front.png",
-          "name" : "front"
+          "hidden" : true,
+          "image-name" : "front26.png",
+          "name" : "front26",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              4,
+              -70
+            ]
+          }
         },
         {
           "fill" : {
-            "automatic-gradient" : "srgb:0.39608,0.84706,0.90588,1.00000"
+            "linear-gradient" : [
+              "display-p3:0.81569,0.74902,1.00000,1.00000",
+              "srgb:0.96863,0.50980,0.67451,1.00000"
+            ]
           },
-          "image-name" : "middle.png",
-          "name" : "middle"
+          "glass" : true,
+          "image-name" : "middle26.png",
+          "name" : "middle26"
+        },
+        {
+          "blend-mode" : "darken",
+          "fill" : {
+            "solid" : "srgb:0.39608,0.84706,0.90588,1.00000"
+          },
+          "image-name" : "back26.png",
+          "name" : "back26",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              4,
+              0
+            ]
+          }
         }
       ],
-      "position" : {
-        "scale" : 1,
-        "translation-in-points" : [
-          0,
-          -10
-        ]
-      },
+      "name" : "Hearts",
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5
