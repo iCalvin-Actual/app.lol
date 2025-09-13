@@ -12,6 +12,7 @@ enum ViewContext {
     case column
     case detail
     case profile
+    case focus
 }
 
 typealias ProfileCache = NSCache<NSString, AddressSummaryFetcher>

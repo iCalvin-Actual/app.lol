@@ -105,7 +105,6 @@ extension ToolbarItemPlacement {
     NavigationStack {
         if let model {
             StatusView(address: model.addressName, id: model.id)
-                .background(NavigationDestination.account.gradient)
         }
     }
     .task {

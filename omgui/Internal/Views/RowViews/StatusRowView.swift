@@ -86,7 +86,7 @@ struct StatusRowView: View {
                 }
             }
         }
-        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
+        .asCard(destination: model.rowDestination(), padding: cardPadding, radius: cardRadius, selected: showSelection)
         .contextMenu(menuItems: {
             menuBuilder.contextMenu(
                 for: model,

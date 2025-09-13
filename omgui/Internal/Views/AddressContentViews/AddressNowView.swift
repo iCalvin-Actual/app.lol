@@ -30,17 +30,19 @@ struct AddressNowView: View {
             }
         #if !os(tvOS)
             .toolbar {
-                ToolbarItem(placement: .safePrincipal) {
-                    if let summaryFetcher = summaryFetcher(fetcher.address), viewContext != .profile {
-                        AddressPrincipalView(
-                            addressSummaryFetcher: summaryFetcher,
-                            addressPage: .init(
-                                get: { .pastebin },
-                                set: {
-                                    presentDestination?(.address(fetcher.address, page: $0))
-                                }
+                if viewContext != .focus {
+                    ToolbarItem(placement: .safePrincipal) {
+                        if let summaryFetcher = summaryFetcher(fetcher.address), viewContext != .profile {
+                            AddressPrincipalView(
+                                addressSummaryFetcher: summaryFetcher,
+                                addressPage: .init(
+                                    get: { .pastebin },
+                                    set: {
+                                        presentDestination?(.address(fetcher.address, page: $0))
+                                    }
+                                )
                             )
-                        )
+                        }
                     }
                 }
                 ToolbarItem(placement: .automatic) {

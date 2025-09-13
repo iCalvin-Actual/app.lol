@@ -103,17 +103,19 @@ struct PasteView: View {
 #endif
         .tint(.secondary)
         .toolbar {
-            ToolbarItem(placement: .safePrincipal) {
-                if let summaryFetcher = summaryFetcher(fetcher.address), viewContext != .profile {
-                    AddressPrincipalView(
-                        addressSummaryFetcher: summaryFetcher,
-                        addressPage: .init(
-                            get: { .pastebin },
-                            set: {
-                                presentDestination?(.address(fetcher.address, page: $0))
-                            }
+            if viewContext != .focus {
+                ToolbarItem(placement: .safePrincipal) {
+                    if let summaryFetcher = summaryFetcher(fetcher.address), viewContext != .profile {
+                        AddressPrincipalView(
+                            addressSummaryFetcher: summaryFetcher,
+                            addressPage: .init(
+                                get: { .pastebin },
+                                set: {
+                                    presentDestination?(.address(fetcher.address, page: $0))
+                                }
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

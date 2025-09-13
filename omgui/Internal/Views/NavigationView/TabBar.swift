@@ -197,6 +197,7 @@ struct TabBar: View {
         }
     }
     
+    @Environment(\.colorSchemeContrast) var contrast
     @ViewBuilder
     var appropriateBody: some View {
         if !Self.usingRegularTabBar(sizeClass: horizontalSizeClass) {
@@ -214,7 +215,7 @@ struct TabBar: View {
                             NavigationStack(path: $presentedPath) {
                                 navigationContent(.account)
                                     .navigationDestination(for: NavigationDestination.self) { destination in
-                                        destinationConstructor?.destination(destination)
+                                        destinationConstructor?.destination(destination, contrast: contrast)
                                     }
                             }
                             .environment(\.setAddress, setAddress)
@@ -364,7 +365,7 @@ struct TabBar: View {
         NavigationStack(path: $path) {
             navigationContent(item.destination)
                 .navigationDestination(for: NavigationDestination.self) { destination in
-                    destinationConstructor?.destination(destination)
+                    destinationConstructor?.destination(destination, contrast: contrast)
                 }
         }
         .id(item.id)
@@ -387,7 +388,7 @@ struct TabBar: View {
     
     @ViewBuilder
     func navigationContent(_ destination: NavigationDestination) -> some View {
-        destinationConstructor?.destination(destination)
+        destinationConstructor?.destination(destination, contrast: contrast)
             .environment(\.addressBook, addressBook)
     }
 }

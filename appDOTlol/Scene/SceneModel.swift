@@ -110,10 +110,12 @@ class SceneModel {
     }
     
     @ViewBuilder
-    func destination(_ destination: NavigationDestination? = nil) -> some View {
+    func destination(_ destination: NavigationDestination? = nil, contrast: ColorSchemeContrast) -> some View {
         if let destination {
             viewContent(destination)
+                .background(contrast == .increased ? Material.thick.opacity(100) : Material.thin.opacity(0))
                 .background(destination.gradient)
+            
             #if os(macOS)
                 .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
             #endif
@@ -170,12 +172,12 @@ class SceneModel {
             SearchLanding(dataFetcher: searchFetcher)
         case .latest:
             AddressNowView("app")
-                .environment(\.viewContext, .detail)
+                .environment(\.viewContext, .focus)
                 .navigationTitle("@app /now")
                 .toolbarTitleDisplayMode(.inline)
         case .support:
             PasteView("support", from: "app")
-                .environment(\.viewContext, .detail)
+                .environment(\.viewContext, .focus)
                 .navigationTitle("support")
                 .toolbarTitleDisplayMode(.inline)
 //        case .editWebpage(let name):
