@@ -11,6 +11,12 @@ import SwiftUI
 extension AddressModel: Manageable { }
 extension NowListing: Manageable { }
 
+extension PicModel: Editable {
+    var editingDestination: NavigationDestination {
+        .pic(addressName, id: id)
+    }
+}
+
 extension PURLModel: Editable {
     var editingDestination: NavigationDestination {
         .purl(addressName, id: name)

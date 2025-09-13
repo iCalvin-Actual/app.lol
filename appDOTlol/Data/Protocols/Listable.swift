@@ -74,3 +74,10 @@ extension NowListing     {
         }
     }
 }
+extension PicModel     {
+    var listTitle: String     { owner }
+    var listSubtitle: String  { description }
+    var displayDate: Date?    { date }
+    var listCaption: String?  { DateFormatter.short.string(for: date) }
+    func rowDestination(detailPage: Bool = false) -> NavigationDestination { .pic(owner, id: id) }
+}

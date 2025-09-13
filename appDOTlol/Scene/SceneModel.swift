@@ -19,6 +19,7 @@ class SceneModel {
     var directoryFetcher: AddressDirectoryFetcher = .init(addressBook: .init())
     var gardenFetcher: NowGardenFetcher = .init(addressBook: .init())
     var statusFetcher: StatusLogFetcher = .init(addressBook: .init())
+    var picsFetcher: PhotoFeedFetcher = .init(addressBook: .init())
     
     var addressFollowingFetcher: AddressFollowingFetcher = .init(address: "", credential: "")
     var addressFollowersFetcher: AddressFollowersFetcher = .init(address: "", credential: "")
@@ -44,6 +45,7 @@ class SceneModel {
         directoryFetcher = .init(addressBook: addressBook)
         gardenFetcher = .init(addressBook: addressBook)
         statusFetcher = .init(addressBook: addressBook)
+        picsFetcher = .init(addressBook: addressBook)
         searchFetcher = .init(
             addressBook: addressBook,
             filters: searchFetcher.filters,
@@ -77,6 +79,7 @@ class SceneModel {
             weak directoryFetcher,
             weak gardenFetcher,
             weak statusFetcher,
+            weak picsFetcher,
             weak addressFollowingFetcher,
             weak addressFollowersFetcher,
             weak addressBlockedFetcher,
@@ -88,8 +91,9 @@ class SceneModel {
             async let directory: Void = directoryFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let garden: Void = gardenFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let status: Void = statusFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            async let pics: Void = picsFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let search: Void = searchFetcher?.updateIfNeeded(forceReload: true) ?? {}()
-            let _ = await (directory, garden, status, following, followers, blocked, search)
+            let _ = await (directory, garden, status, pics, following, followers, blocked, search)
         }
     }
     
@@ -130,6 +134,8 @@ class SceneModel {
         switch destination {
         case .community:
             CommunityView(communityFetcher: statusFetcher)
+        case .somePics:
+            SomePicsView(photoFetcher: picsFetcher)
         case .address(let name, let page):
             AddressSummaryView(
                 name,
@@ -148,6 +154,8 @@ class SceneModel {
             AddressPastesView(address, addressBook: addressBook)
         case .paste(let address, id: let title):
             PasteView(title, from: address)
+        case .photoRoll(let address):
+            AddressPicsView(address, addressBook: addressBook)
         case .purls(let address):
             AddressPURLsView(address, addressBook: addressBook)
         case .purl(let address, id: let title):
@@ -156,6 +164,8 @@ class SceneModel {
             StatusList([address], addressBook: addressBook)
         case .status(let address, id: let id):
             StatusView(address: address, id: id)
+        case .pic(let address, id: let id):
+            PicView(address: address, id: id)
         case .account:
             AccountView(
                 addressBook: addressBook,

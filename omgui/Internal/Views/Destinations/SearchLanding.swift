@@ -33,15 +33,15 @@ struct SearchLanding: View {
         case status
         case paste
         case purl
+        case pics
     }
 
     func gridColumns(_ width: CGFloat) -> [GridItem] {
-        return Array(repeating: GridItem(.flexible()), count: 3)
-//        if TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
-//            return Array(repeating: GridItem(.flexible()), count: 4)
-//        } else {
-//            return Array(repeating: GridItem(.flexible()), count: 2)
-//        }
+        if TabBar.usingRegularTabBar(sizeClass: horizontalSizeClass, width: width) {
+            return Array(repeating: GridItem(.flexible()), count: 4)
+        } else {
+            return Array(repeating: GridItem(.flexible()), count: 2)
+        }
     }
     
     var usingCompact: Bool {
@@ -114,6 +114,8 @@ struct SearchLanding: View {
             ListRow(model: model)
         case .address(let model):
             ListRow(model: model)
+        case .pic(let model):
+            ListRow(model: model)
         }
     }
 
@@ -140,6 +142,16 @@ struct SearchLanding: View {
                 }
             })
             .buttonStyle(SearchNavigationButtonStyle(selected: filter.wrappedValue.contains(.paste)))
+            Button(action : {
+                toggle(.pics)
+            }, label: {
+                Label {
+                    Text("Pic")
+                } icon: {
+                    Image(systemName: "camera.macro")
+                }
+            })
+            .buttonStyle(SearchNavigationButtonStyle(selected: filter.wrappedValue.contains(.pics)))
             Button(action : {
                 toggle(.purl)
             }, label: {
@@ -221,6 +233,7 @@ enum SearchResult: AllSortable, Identifiable {
     case status(StatusModel)
     case paste(PasteModel)
     case purl(PURLModel)
+    case pic(PicModel)
     
     var owner: AddressName {
         switch self {
@@ -231,6 +244,8 @@ enum SearchResult: AllSortable, Identifiable {
         case .paste(let model):
             return model.addressName
         case .purl(let model):
+            return model.addressName
+        case .pic(let model):
             return model.addressName
         }
     }
@@ -245,6 +260,8 @@ enum SearchResult: AllSortable, Identifiable {
             return NavigationDestination.paste(model.addressName, id: model.name).rawValue
         case .purl(let model):
             return NavigationDestination.purl(model.addressName, id: model.name).rawValue
+        case .pic(let model):
+            return NavigationDestination.pic(model.addressName, id: model.id).rawValue
         }
     }
     
@@ -257,6 +274,8 @@ enum SearchResult: AllSortable, Identifiable {
         case .paste(let model):
             return model.dateValue
         case .purl(let model):
+            return model.filterDate
+        case .pic(let model):
             return model.filterDate
         }
     }
@@ -271,6 +290,8 @@ enum SearchResult: AllSortable, Identifiable {
             return model.name
         case .purl(let model):
             return model.name
+        case .pic(let model):
+            return model.owner
         }
     }
     
@@ -280,6 +301,7 @@ enum SearchResult: AllSortable, Identifiable {
         case .paste: return "Paste"
         case .purl: return "Purl"
         case .status: return "Status"
+        case .pic: return "Pic"
         }
     }
 }
@@ -291,6 +313,7 @@ class SearchResultsFetcher: Request {
     let statusFetcher: StatusLogFetcher
     let pasteFetcher: AddressPasteBinFetcher
     let purlFetcher: AddressPURLsFetcher
+    let picFetcher: PhotoFeedFetcher
     
     var addressBook: AddressBook
     var filters: Set<SearchLanding.SearchFilter>
@@ -311,6 +334,7 @@ class SearchResultsFetcher: Request {
         self.sort = sort
         self.directoryFetcher = .init(addressBook: .init(), limit: .max)
         self.statusFetcher = .init(addressBook: .init(), limit: .max)
+        self.picFetcher = .init(addressBook: .init(), limit: .max)
         // Initialize with neutral values; filters will be applied in configure below
         self.pasteFetcher = .init(name: "", credential: nil, addressBook: .init())
         self.purlFetcher = .init(name: "", credential: nil, addressBook: .init())
@@ -348,6 +372,7 @@ class SearchResultsFetcher: Request {
             statusFetcher.configure(addressBook: addressBook)
             pasteFetcher.configure(addressBook: addressBook)
             purlFetcher.configure(addressBook: addressBook)
+            picFetcher.configure(addressBook: addressBook)
         }
         
         super.configure()
@@ -360,18 +385,20 @@ class SearchResultsFetcher: Request {
     
     @MainActor
     func search() async throws {
-        Task { [weak directoryFetcher, weak statusFetcher, weak pasteFetcher, weak purlFetcher] in
+        Task { [weak directoryFetcher, weak statusFetcher, weak pasteFetcher, weak purlFetcher, weak picFetcher] in
             async let address: Void = directoryFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let status: Void = statusFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let paste: Void = pasteFetcher?.updateIfNeeded(forceReload: true) ?? {}()
             async let purl: Void = purlFetcher?.updateIfNeeded(forceReload: true) ?? {}()
-            let _ = await (address, status, paste, purl)
+            async let pic: Void = picFetcher?.updateIfNeeded(forceReload: true) ?? {}()
+            let _ = await (address, status, paste, purl, pic)
             var result = [SearchResult]()
             
             let includeAddresses: Bool = filters.isEmpty || filters.contains(.address)
             let includeStatuses: Bool = filters.contains(.status)
             let includePastes: Bool = filters.contains(.paste)
             let includePURLs: Bool = filters.contains(.purl)
+            let includePics: Bool = filters.contains(.pics)
             
             if includeAddresses, let directoryFetcher {
                 result.append(contentsOf: directoryFetcher.results.map({ .address($0) }))
@@ -384,6 +411,9 @@ class SearchResultsFetcher: Request {
             }
             if includePURLs, let purlFetcher {
                 result.append(contentsOf: purlFetcher.results.map({ .purl($0) }))
+            }
+            if includePics, let picFetcher {
+                result.append(contentsOf: picFetcher.results.map({ .pic($0) }))
             }
             
             self.results = result.sorted(with: sort)

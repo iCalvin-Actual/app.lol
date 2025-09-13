@@ -29,6 +29,9 @@ protocol OMGInterface: Sendable {
     func fetchCompleteStatusLog()
     async throws -> [StatusModel]
     
+    func fetchPhotoFeed()
+    async throws -> [PicModel]
+    
     // MARK: Address Content
     
     func fetchAddressAvailability(
@@ -118,6 +121,23 @@ protocol OMGInterface: Sendable {
         credential: APICredential?
     )
     async throws -> String?
+    
+    func fetchAddressPics(
+        _ addresses: [AddressName]
+    )
+    async throws -> [PicModel]
+    
+    func fetchPic(
+        _ id: String,
+        from address: AddressName
+    )
+    async throws -> PicModel?
+    
+    func fetchPicContent(
+        _ id: String,
+        from address: AddressName
+    )
+    async throws -> Data?
     
     func fetchAddressStatuses(
         addresses: [AddressName]

@@ -17,7 +17,9 @@ enum ViewContext {
 
 typealias ProfileCache = NSCache<NSString, AddressSummaryFetcher>
 typealias PrivateCache = NSCache<NSString, AddressPrivateSummaryFetcher>
-typealias ImageCache = NSCache<NSString, AddressIconFetcher>
+typealias AvatarCache = NSCache<NSString, AddressIconFetcher>
+typealias ImageCache = NSCache<NSString, PicFetcher>
+
 
 struct SceneModelKey: EnvironmentKey {
     static var defaultValue: SceneModel? { nil }
@@ -251,14 +253,26 @@ extension EnvironmentValues {
 }
 
 struct AddressIconKey: EnvironmentKey {
+    static var defaultValue: AvatarCache {
+        .init()
+    }
+}
+extension EnvironmentValues {
+    var avatarCache: AvatarCache {
+        get { self[AddressIconKey.self] }
+        set { self[AddressIconKey.self] = newValue }
+    }
+}
+
+struct PicCacheKey: EnvironmentKey {
     static var defaultValue: ImageCache {
         .init()
     }
 }
 extension EnvironmentValues {
-    var imageCache: ImageCache {
-        get { self[AddressIconKey.self] }
-        set { self[AddressIconKey.self] = newValue }
+    var picCache: ImageCache {
+        get { self[PicCacheKey.self] }
+        set { self[PicCacheKey.self] = newValue }
     }
 }
 

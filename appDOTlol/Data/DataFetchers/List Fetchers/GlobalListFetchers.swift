@@ -76,6 +76,15 @@ class GlobalStatusLogFetcher: GlobalListFetcher<StatusModel> {
         }
     }
 }
+class GlobalPicFeedFetcher: GlobalListFetcher<StatusModel> {
+    @MainActor
+    override func throwingRequest() async throws {
+        let statusLog = try await interface.fetchPhotoFeed()
+        for model in statusLog {
+            try await model.write(to: db)
+        }
+    }
+}
 
 class AppSupportFetcher: AddressPasteFetcher {
     init() {

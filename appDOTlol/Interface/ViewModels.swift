@@ -661,6 +661,105 @@ struct StatusModel: BlackbirdListable, Identifiable, Sendable {
     }
 }
 
+struct PicModel: BlackbirdListable, Identifiable, Sendable {
+    var rowDestination: NavigationDestination { .pic(owner, id: id) }
+    
+    static var sortingKey: BlackbirdColumnKeyPath { \.$owner }
+    static var ownerKey: BlackbirdColumnKeyPath { \.$owner }
+    static var primaryKey: [BlackbirdColumnKeyPath] { [\.$id] }
+    static var dateKey: BlackbirdColumnKeyPath { \.$date }
+    
+    static var separator: String { "{PIC}" }
+    
+    var rawValue: String {
+        [owner, id].joined(separator: Self.separator)
+    }
+    
+    @BlackbirdColumn
+    var owner: AddressName
+    @BlackbirdColumn
+    var id: String
+    @BlackbirdColumn
+    var description: String
+    @BlackbirdColumn
+    var content: URL
+    @BlackbirdColumn
+    var date: Date
+    @BlackbirdColumn
+    var listed: Bool
+    
+    var url: URL? {
+        content
+    }
+    
+    var picURL: URL {
+        URL(string: "https://\(owner).some.pics/\(id)")!
+    }
+    
+    enum CodingKeys: String, BlackbirdCodingKey {
+        case owner
+        case id
+        case description
+        case content
+        case date
+        case listed
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        owner = try container.decode(AddressName.self, forKey: .owner).punified
+        id = try container.decode(String.self, forKey: .id)
+        description = try container.decode(String.self, forKey: .description)
+        content = try container.decode(URL.self, forKey: .content)
+        date = try container.decode(Date.self, forKey: .date)
+        listed = try container.decode(Bool.self, forKey: .listed)
+    }
+    
+    init(_ row: Blackbird.ModelRow<PicModel>) {
+        self.init(
+            id: row[\.$id],
+            owner: row[\.$owner],
+            description: row[\.$description],
+            content: row[\.$content],
+            date: row[\.$date],
+            listed: row[\.$listed]
+        )
+    }
+    
+    init?(rawValue: String) {
+        let split = rawValue.split(separator: Self.separator)
+        guard split.count > 1 else {
+            return nil
+        }
+        let owner = String(split[0]).punified
+        self.owner = owner
+        let finalPath = String(split[1]).split(separator: ".")
+        guard finalPath.count > 1 else { return nil }
+        self.id = String(finalPath[0])
+        guard let cdnURL = URL(string: "https://cdn.some.pics/\(owner)/\(split[1])") else { return nil }
+        self.content = cdnURL
+        self.description = ""
+        self.date = .init(timeIntervalSince1970: 0)
+        self.listed = true
+    }
+    
+    init(
+        id: String,
+        owner: AddressName,
+        description: String,
+        content: URL,
+        date: Date = .now,
+        listed: Bool = true
+    ) {
+        self.owner = owner.punified
+        self.id = id
+        self.description = description
+        self.content = content
+        self.date = date
+        self.listed = listed
+    }
+}
+
 struct AddressSummaryModel: BlackbirdModel, Sendable {
     
     @BlackbirdColumn

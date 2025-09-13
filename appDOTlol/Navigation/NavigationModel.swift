@@ -45,6 +45,7 @@ class NavigationModel {
     var tabs: [NavigationItem] {
         [
             .community,
+            .somePics,
             .nowGarden,
             .search
         ]
@@ -88,7 +89,7 @@ class NavigationModel {
             }
             
         case .more:
-            return [.search, .community, .nowGarden]
+            return [.search, .community, .somePics, .nowGarden]
             
         default:
             return []

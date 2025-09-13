@@ -111,6 +111,30 @@ extension StatusModel: Sharable {
     }
 }
 
+extension PicModel: Sharable {
+    var primaryCopy: CopyPacket? {
+        .init(name: "pic URL", content: content.absoluteString)
+    }
+    var copyText: [CopyPacket] {
+        [
+            .init(name: "description", content: description),
+            .init(name: "address", content: owner)
+        ]
+    }
+    
+    var primaryURL: SharePacket? {
+        return .init(name: "Image URL", content: content)
+    }
+    var shareURLs: [SharePacket] {
+        [
+            .init(name: "Some.Pic URL", content: URL(string: "https://some.pics/\(id)")!),
+            .init(name: "\(owner.addressDisplayString) pics", content: URL(string: "https://\(owner).some.pics")!),
+            .init(name: "profile url", content: URL(string: "https://\(owner).omg.lol")!),
+            .init(name: "/now url", content: URL(string: "https://\(owner).omg.lol/now")!)
+        ]
+    }
+}
+
 extension PURLModel: Sharable {
     private var address: CopyPacket {
         .init(name: "Address", content: owner)

@@ -108,3 +108,18 @@ extension StatusModel: Menuable {
         }
     }
 }
+
+extension PicModel: Menuable {
+    @ViewBuilder
+    func contextMenu(
+        with book: AddressBook,
+        fetcher: Request?,
+        menuFetchers: ContextMenuClosures
+    ) -> some View {
+        Group {
+            self.manageSection(book, fetcher: fetcher, menuFetchers: menuFetchers)
+            self.editingSection(with: book)
+            self.shareSection()
+        }
+    }
+}

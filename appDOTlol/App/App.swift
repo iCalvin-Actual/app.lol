@@ -41,9 +41,10 @@ struct omgApp: App {
                     .environment(\.pinAddress, appModel.pin(_:))
                     .environment(\.unpinAddress, appModel.removePin(_:))
                 
-                    .environment(\.imageCache, appModel.imageCache)
+                    .environment(\.avatarCache, appModel.avatarCache)
                     .environment(\.profileCache, appModel.profileCache)
                     .environment(\.privateCache, appModel.privateCache)
+                    .environment(\.picCache, appModel.imageCache)
                 
                     .sheet(isPresented: $showOnboarding) { OnboardingView() }
             } else {

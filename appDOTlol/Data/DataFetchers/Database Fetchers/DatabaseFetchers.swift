@@ -99,6 +99,60 @@ class StatusFetcher: DatabaseFetcher<StatusModel> {
     }
 }
 
+@Observable
+class PicFetcher: DatabaseFetcher<PicModel> {
+    let address: AddressName
+    let id: String
+    
+    var imageData: Data?
+    
+    init(id: String, from address: String) {
+        self.address = address
+        self.id = id
+        super.init()
+    }
+    
+    @MainActor
+    override func fetchModels() async throws {
+        do {
+            result = try await PicModel.read(from: db, id: id)
+        } catch {
+            throw(error)
+        }
+    }
+    
+    @MainActor
+    override func fetchRemote() async throws -> Int {
+        do {
+            let pic = try await interface.fetchPic(id, from: address)
+            try await pic?.write(to: db)
+            try await fetchImage()
+            
+            return pic?.hashValue ?? 0
+        } catch {
+            throw error
+        }
+    }
+    
+    @MainActor
+    func fetchImage() async throws {
+        if let content = result?.content {
+            self.imageData = try await URLSession.shared.data(from: content).0
+        } else {
+            let pic = try await interface.fetchPic(id, from: address)
+            try await pic?.write(to: db)
+            if let pic {
+                self.imageData = try await URLSession.shared.data(from: pic.content).0
+            }
+        }
+    }
+    
+    override func handle(_ incomingError: any Error) {
+        // Check error
+        super.handle(incomingError)
+    }
+}
+
 class AddressPasteFetcher: DatabaseFetcher<PasteModel> {
     let address: AddressName
     let title: String

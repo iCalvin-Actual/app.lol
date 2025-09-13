@@ -7,6 +7,8 @@
   },
   "groups" : [
     {
+      "blend-mode" : "plus-darker",
+      "blur-material" : null,
       "layers" : [
         {
           "blend-mode" : "overlay",
@@ -25,6 +27,7 @@
           }
         },
         {
+          "blend-mode" : "normal",
           "fill" : {
             "linear-gradient" : [
               "display-p3:0.81569,0.74902,1.00000,1.00000",
@@ -36,9 +39,9 @@
           "name" : "middle26"
         },
         {
-          "blend-mode" : "darken",
+          "blend-mode" : "plus-darker",
           "fill" : {
-            "solid" : "srgb:0.39608,0.84706,0.90588,1.00000"
+            "solid" : "srgb:0.93333,0.93333,0.93333,1.00000"
           },
           "image-name" : "back26.png",
           "name" : "back26",
@@ -51,11 +54,20 @@
           }
         }
       ],
+      "lighting" : "individual",
       "name" : "Hearts",
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
+      "position" : {
+        "scale" : 1.1,
+        "translation-in-points" : [
+          0,
+          20
+        ]
       },
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "specular" : true,
       "translucency" : {
         "enabled" : true,
         "value" : 0.5

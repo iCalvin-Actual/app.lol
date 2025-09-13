@@ -185,8 +185,8 @@ struct StatusRowView: View {
                 case .success(let image):
                     image
                         .resizable()
-                        .aspectRatio(1.0, contentMode: .fill)
-                        .frame(maxWidth: 375)
+                        .scaledToFit()
+                        .clipped()
                 case .failure(_):
                     // Fallback placeholder on failure
                     Color.secondary.opacity(0.2)

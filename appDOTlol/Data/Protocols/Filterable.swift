@@ -140,6 +140,18 @@ extension StatusModel: Filterable {
     }
 }
 
+extension PicModel: Filterable {
+    static var defaultFilter: [FilterOption] { .everyone }
+    static var filterOptions: [FilterOption] {[ .mine, .following ]}
+    
+    var addressName: AddressName { owner }
+    var filterDate: Date? { nil }
+    var queryCheckStrings: [String] {
+        [addressName, description]
+            .compactMap({ $0 })
+    }
+}
+
 extension Array<FilterOption> {
     @MainActor
     func applyFilters<T: Filterable>(to inputModels: [T], with book: AddressBook) -> [T] {

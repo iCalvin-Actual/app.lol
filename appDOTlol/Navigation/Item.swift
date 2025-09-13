@@ -15,6 +15,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
     case safety
     case community
     case nowGarden
+    case somePics
     case search
     case lists
     case learn
@@ -32,6 +33,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case .account:                  return "account"
         case .safety:                   return "safety"
         case .community:                return "community"
+        case .somePics:                 return "pics"
         case .nowGarden:                return "garden"
         case .search:                   return "search"
         case .lists:                    return "lists"
@@ -55,6 +57,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case "account":     self = .account
         case "safety":      self = .safety
         case "community":   self = .community
+        case "pics":        self = .somePics
         case "garden":      self = .nowGarden
         case "search":      self = .search
         case "lists":       self = .lists
@@ -84,6 +87,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case .account:      return "/me"
         case .safety:       return "/safety"
         case .community:    return "/social"
+        case .somePics:     return "/pics"
         case .nowGarden:    return "/now"
         case .search:       return "/directory"
         case .lists:        return "/me"
@@ -108,6 +112,8 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
             return "magnifyingglass"
         case .nowGarden:
             return "sun.horizon"
+        case .somePics:
+            return "camera.macro"
         case .community:
             return "star.bubble"
         case .pinnedAddress:
@@ -146,6 +152,8 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
             return .nowGarden
         case .community:
             return .community
+        case .somePics:
+            return .somePics
         case .pinnedAddress(let name):
             return .address(name, page: .profile)
         case .safety:

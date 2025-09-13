@@ -88,6 +88,19 @@ final class APIDataInterface: OMGInterface, Sendable {
         }
     }
     
+    public func fetchPhotoFeed() async throws -> [PicModel] {
+        let log = try await api.picsFeed()
+        return log.map { pic in
+            PicModel(
+                id: pic.id,
+                owner: pic.address,
+                description: pic.description,
+                content: pic.url,
+                date: pic.created
+            )
+        }
+    }
+    
     // MARK: Address Content
     
     public func fetchAddressAvailability(_ address: AddressName) async throws -> AddressAvailabilityModel {
@@ -270,6 +283,54 @@ final class APIDataInterface: OMGInterface, Sendable {
         } catch {
             throw error
         }
+    }
+    
+    func fetchAddressPics(_ addresses: [AddressName]) async throws -> [PicModel] {
+        var pics: [PicModel] = []
+        try await withThrowingTaskGroup(of: [PicModel].self, body: { group in
+            for address in addresses {
+                group.addTask { [weak self] in
+                    guard let self = self else { return [] }
+                    async let log = try api.pics(from: address)
+                    return try await log.map({ pic in
+                        PicModel(
+                            id: pic.id,
+                            owner: pic.address,
+                            description: pic.description,
+                            content: pic.url,
+                            date: pic.created
+                        )
+                    })
+                }
+                for try await log in group {
+                    pics.append(contentsOf: log)
+                }
+            }
+        })
+        return pics
+            .compactMap({ $0 })
+    }
+    
+    func fetchPic(_ id: String, from address: AddressName) async throws -> PicModel? {
+        do {
+            let pic = try await api.addressPic(address, id: id)
+            return PicModel(
+                id: pic.id,
+                owner: pic.address,
+                description: pic.description,
+                content: pic.url,
+                date: pic.created
+            )
+        } catch {
+            throw error
+        }
+    }
+    
+    func fetchPicContent(_ id: String, from address: AddressName) async throws -> Data? {
+        guard let pic = try await fetchPic(id, from: address) else { return nil }
+        // Prefer shared session for simplicity in sample code
+        let (data, _) = try await URLSession.shared.data(from: pic.content)
+        return data
     }
     
     public func fetchAddressStatuses(addresses: [AddressName]) async throws -> [StatusModel] {

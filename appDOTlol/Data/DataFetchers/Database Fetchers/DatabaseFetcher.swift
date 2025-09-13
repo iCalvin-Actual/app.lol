@@ -8,6 +8,7 @@
 import Blackbird
 import Foundation
 
+@Observable
 class DatabaseFetcher<M: BlackbirdModel>: Request {
     let db: Blackbird.Database
     

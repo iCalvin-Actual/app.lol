@@ -54,6 +54,15 @@ final class SampleData: OMGInterface {
     func fetchCompleteStatusLog() async throws -> [StatusModel] {
         try await fetchStatusLog()
     }
+    
+    func fetchPhotoFeed() async throws -> [PicModel] {
+        try await Task.sleep(nanoseconds: artificalDelay)
+        return [
+            .sample(with: "app"),
+            .sample(with: "alexcox"),
+            .sample(with: "merlinmann")
+        ]
+    }
 
     // MARK: Address Content
 
@@ -141,6 +150,23 @@ final class SampleData: OMGInterface {
         try await Task.sleep(nanoseconds: artificalDelay)
         let content = String.htmlContent
         return content
+    }
+    
+    func fetchAddressPics(_ addresses: [AddressName]) async throws -> [PicModel] {
+        try await Task.sleep(nanoseconds: artificalDelay)
+        return addresses.map({ .sample(with: $0) })
+    }
+    
+    func fetchPic(_ id: String, from address: AddressName) async throws -> PicModel? {
+        try await Task.sleep(nanoseconds: artificalDelay)
+        return .sample(with: address)
+    }
+    
+    func fetchPicContent(_ id: String, from address: AddressName) async throws -> Data? {
+        try await Task.sleep(nanoseconds: artificalDelay)
+        let pic = PicModel.sample(with: address)
+        let (data, _) = try await URLSession.shared.data(from: pic.content)
+        return data
     }
 
     func fetchAddressStatuses(addresses: [AddressName]) async throws -> [StatusModel] {
@@ -432,6 +458,20 @@ extension PURLModel {
             name: String(UUID().uuidString.prefix(5)),
             content: content,
             listed: true
+        )
+    }
+}
+
+extension PicModel {
+    static func sample(with address: AddressName) -> PicModel {
+        let contentItems = ["https://cdn.some.pics/app/6664e0824f1d1.jpg"]
+        let content = contentItems.randomElement()!
+        return PicModel.init(
+            id: UUID().uuidString,
+            owner: address,
+            description: "Some image description that may be pretty long",
+            content: URL(string: content)!,
+            date: Date(timeIntervalSince1970: .random(min: 1600000000.0, max: 1678019926.0)),
         )
     }
 }

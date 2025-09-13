@@ -18,9 +18,10 @@ class AppModel {
     
     static let termsUpdated: Date = .init(timeIntervalSince1970: 1757719870)
     
-    let imageCache: ImageCache = .init()
+    let avatarCache: AvatarCache = .init()
     let profileCache: ProfileCache = .init()
     let privateCache: PrivateCache = .init()
+    let imageCache: ImageCache = .init()
     
     let globalDirectoryFetcher: GlobalAddressDirectoryFetcher = .init()
     let globalStatusFetcher: GlobalStatusLogFetcher = .init()

@@ -13,7 +13,7 @@ struct AddressIconView<S: Shape>: View {
     @Environment(\.unfollowAddress) var unfollow
     @Environment(\.presentListable) var present
     
-    @Environment(\.imageCache) var imageCache
+    @Environment(\.avatarCache) var imageCache
     @Environment(\.addressSummaryFetcher) var summaryCache
     
     let address: AddressName

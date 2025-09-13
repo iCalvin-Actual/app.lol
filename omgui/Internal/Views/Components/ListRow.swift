@@ -96,6 +96,8 @@ struct ListRow<T: Listable>: View {
             purlView(purlModel)
         } else if let pasteModel = model as? PasteModel {
             pasteView(pasteModel)
+        } else if let picModel = model as? PicModel {
+            picView(picModel)
         } else {
             standardBody
         }
@@ -109,6 +111,11 @@ struct ListRow<T: Listable>: View {
     @ViewBuilder
     func gardenView(_ model: NowListing) -> some View {
         GardenItemView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardRadius: cardRadius, showSelection: showSelection)
+    }
+    
+    @ViewBuilder
+    func picView(_ model: PicModel) -> some View {
+        PicRowView(model: model, cardColor: cardColor, cardPadding: cardPadding, cardRadius: cardRadius, showSelection: showSelection)
     }
     
     @ViewBuilder

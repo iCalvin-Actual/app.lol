@@ -79,6 +79,18 @@ extension PasteModel: StringSortable {
     }
 }
 
+extension PicModel: StringSortable {
+    var primarySortValue: String { owner }
+    var dateValue: Date? { date }
+    
+    static let defaultSort: Sort = .newestFirst
+    static var sortOptions: [Sort] {
+        [
+            .newestFirst
+        ]
+    }
+}
+
 extension PURLModel: StringSortable {
     var primarySortValue: String { name }
     

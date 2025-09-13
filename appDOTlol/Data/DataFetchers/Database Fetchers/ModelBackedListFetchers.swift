@@ -50,7 +50,7 @@ class AddressPasteBinFetcher: ModelBackedListFetcher<PasteModel> {
     
     init(name: AddressName, credential: APICredential?, addressBook: AddressBook, filters: [FilterOption]? = nil) {
         self.addressName = name
-        super.init(addressBook: addressBook, filters: filters ?? [.from(name)])
+        super.init(addressBook: addressBook, limit: .max, filters: filters ?? [.from(name)])
     }
     
     func configure(credential: APICredential?, _ automation: AutomationPreferences = .init()) {
@@ -94,7 +94,7 @@ class AddressPURLsFetcher: ModelBackedListFetcher<PURLModel> {
     init(name: AddressName, purls: [PURLModel] = [], credential: APICredential?, addressBook: AddressBook, filters: [FilterOption]? = nil) {
         self.addressName = name
         self.credential = credential
-        super.init(addressBook: addressBook, filters: filters ?? [.from(name)])
+        super.init(addressBook: addressBook, limit: .max, filters: filters ?? [.from(name)])
     }
     
     func configure(_ newValue: APICredential?, _ automation: AutomationPreferences = .init()) {
@@ -164,6 +164,59 @@ class StatusLogFetcher: ModelBackedListFetcher<StatusModel> {
                 try await model.write(to: db)
             }
             return statuses.hashValue
+        }
+    }
+    
+    func configure(addressBook: AddressBook? = nil, filters: [FilterOption]? = nil, _ automation: AutomationPreferences = .init()) {
+        if let addressBook {
+            self.addressBook = addressBook
+        }
+        if let filters {
+            self.filters = filters
+        }
+        self.loading = true
+        self.loaded = .init()
+        self.loading = false
+    }
+}
+
+class PhotoFeedFetcher: ModelBackedListFetcher<PicModel> {
+    let displayTitle: String
+    let addresses: [AddressName]
+    
+    override var title: String {
+        displayTitle
+    }
+    
+    init(title: String? = nil, addresses: [AddressName] = [], addressBook: AddressBook, limit: Int = 42) {
+        self.displayTitle = title ?? {
+            switch addresses.count {
+            case 0:
+                return "🎞️ some.pics"
+            default:
+                return "some.pics"
+            }
+        }()
+        self.addresses = addresses
+        super.init(addressBook: addressBook, limit: limit, filters: addresses.isEmpty ? [] : [.fromOneOf(addresses)])
+    }
+    
+    override func fetchRemote() async throws -> Int {
+        defer {
+            nextPage = 0
+        }
+        if addresses.isEmpty {
+            let statuses = try await interface.fetchPhotoFeed()
+            for model in statuses {
+                try await model.write(to: db)
+            }
+            return statuses.hashValue
+        } else {
+            let pics = try await interface.fetchAddressPics(addresses)
+            for model in pics {
+                try await model.write(to: db)
+            }
+            return pics.hashValue
         }
     }
     

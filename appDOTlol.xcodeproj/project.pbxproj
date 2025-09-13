@@ -10,6 +10,8 @@
 		3E0A744E29B4950200EFD8E4 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0A744D29B4950200EFD8E4 /* App.swift */; };
 		3E0A745229B4950300EFD8E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E0A745129B4950300EFD8E4 /* Assets.xcassets */; };
 		3E0A745629B4950300EFD8E4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E0A745529B4950300EFD8E4 /* Preview Assets.xcassets */; };
+		3E115EC22E75EB5B009E2B65 /* PicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E115EC12E75EB5B009E2B65 /* PicView.swift */; };
+		3E115EC52E75EC9C009E2B65 /* AddressPicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E115EC42E75EC9C009E2B65 /* AddressPicsView.swift */; };
 		3E2FBCA42DCC5919007B9C24 /* AddressProfileEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC782DCC5919007B9C24 /* AddressProfileEditorView.swift */; };
 		3E2FBCA62DCC5919007B9C24 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC5E2DCC5919007B9C24 /* Request.swift */; };
 		3E2FBCA72DCC5919007B9C24 /* PURLDraftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBC7B2DCC5919007B9C24 /* PURLDraftView.swift */; };
@@ -117,6 +119,8 @@
 		3EA49C772E70D8F6008A99F1 /* AppClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA49C762E70D8F6008A99F1 /* AppClient.swift */; };
 		3EB190C02E2D6D8D00AD8397 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB190BE2E2D677D00AD8397 /* OptionsButton.swift */; };
 		3EB4F6042E75D4AA002FCDF9 /* omgIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 3EB4F6032E75D4AA002FCDF9 /* omgIcon.icon */; };
+		3EB4F6062E75DF31002FCDF9 /* SomePicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB4F6052E75DF31002FCDF9 /* SomePicsView.swift */; };
+		3EB4F6092E75E704002FCDF9 /* PicRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB4F6082E75E6F7002FCDF9 /* PicRowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -138,6 +142,8 @@
 		3E0A745129B4950300EFD8E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3E0A745329B4950300EFD8E4 /* appDOTlol.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = appDOTlol.entitlements; sourceTree = "<group>"; };
 		3E0A745529B4950300EFD8E4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		3E115EC12E75EB5B009E2B65 /* PicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicView.swift; sourceTree = "<group>"; };
+		3E115EC42E75EC9C009E2B65 /* AddressPicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AddressPicsView.swift; path = appDOTlol/Components/Pages/AddressPicsView.swift; sourceTree = SOURCE_ROOT; };
 		3E2FBC322DCC5919007B9C24 /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
 		3E2FBC332DCC5919007B9C24 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		3E2FBC362DCC5919007B9C24 /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
@@ -240,6 +246,8 @@
 		3EA49C762E70D8F6008A99F1 /* AppClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClient.swift; sourceTree = "<group>"; };
 		3EB190BE2E2D677D00AD8397 /* OptionsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsButton.swift; sourceTree = "<group>"; };
 		3EB4F6032E75D4AA002FCDF9 /* omgIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = omgIcon.icon; sourceTree = "<group>"; };
+		3EB4F6052E75DF31002FCDF9 /* SomePicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SomePicsView.swift; sourceTree = "<group>"; };
+		3EB4F6082E75E6F7002FCDF9 /* PicRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicRowView.swift; sourceTree = "<group>"; };
 		3EC12B2929BF92CA00367B45 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -309,6 +317,23 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3E115EC02E75EB4E009E2B65 /* Lists */ = {
+			isa = PBXGroup;
+			children = (
+				3EB4F6052E75DF31002FCDF9 /* SomePicsView.swift */,
+				3E115EC42E75EC9C009E2B65 /* AddressPicsView.swift */,
+			);
+			path = Lists;
+			sourceTree = "<group>";
+		};
+		3E115EC32E75EB5F009E2B65 /* Details */ = {
+			isa = PBXGroup;
+			children = (
+				3E115EC12E75EB5B009E2B65 /* PicView.swift */,
+			);
+			path = Details;
 			sourceTree = "<group>";
 		};
 		3E2FBC302DCC58E2007B9C24 /* omgui */ = {
@@ -588,6 +613,8 @@
 			isa = PBXGroup;
 			children = (
 				3E337F512E73402600119B95 /* ReportButton.swift */,
+				3EB4F60A2E75E70B002FCDF9 /* Cards */,
+				3EB4F6072E75E6ED002FCDF9 /* Pages */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -667,6 +694,23 @@
 				3E337F3C2E732E6B00119B95 /* Extensions */,
 			);
 			path = Data;
+			sourceTree = "<group>";
+		};
+		3EB4F6072E75E6ED002FCDF9 /* Pages */ = {
+			isa = PBXGroup;
+			children = (
+				3E115EC02E75EB4E009E2B65 /* Lists */,
+				3E115EC32E75EB5F009E2B65 /* Details */,
+			);
+			path = Pages;
+			sourceTree = "<group>";
+		};
+		3EB4F60A2E75E70B002FCDF9 /* Cards */ = {
+			isa = PBXGroup;
+			children = (
+				3EB4F6082E75E6F7002FCDF9 /* PicRowView.swift */,
+			);
+			path = Cards;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -781,6 +825,7 @@
 				3E2FBCBE2DCC5919007B9C24 /* AddressNameView.swift in Sources */,
 				3E337F542E7340B700119B95 /* ShareablePackets.swift in Sources */,
 				3E2FBCC02DCC5919007B9C24 /* Editable.swift in Sources */,
+				3E115EC22E75EB5B009E2B65 /* PicView.swift in Sources */,
 				3E2FBCC12DCC5919007B9C24 /* AddressBook.swift in Sources */,
 				3E2FBCC22DCC5919007B9C24 /* PresentationDetent+.swift in Sources */,
 				3E2FBCC32DCC5919007B9C24 /* HTMLContentView.swift in Sources */,
@@ -789,6 +834,7 @@
 				3E2FBCC42DCC5919007B9C24 /* ListFetcher.swift in Sources */,
 				3E2FBCC52DCC5919007B9C24 /* AddressIconView.swift in Sources */,
 				3E2FBCC62DCC5919007B9C24 /* CommunityView.swift in Sources */,
+				3EB4F6092E75E704002FCDF9 /* PicRowView.swift in Sources */,
 				3E337F6C2E734F9E00119B95 /* GlobalListFetchers.swift in Sources */,
 				3E2FBCC72DCC5919007B9C24 /* StatusRowView.swift in Sources */,
 				3E2FBCC82DCC5919007B9C24 /* GardenView.swift in Sources */,
@@ -803,6 +849,7 @@
 				3E2FBD102DCC591E007B9C24 /* ViewModels.swift in Sources */,
 				3E2FBD122DCC591E007B9C24 /* Hashable.swift in Sources */,
 				3E2FBCCB2DCC5919007B9C24 /* PURLRowView.swift in Sources */,
+				3E115EC52E75EC9C009E2B65 /* AddressPicsView.swift in Sources */,
 				3E2FBCCD2DCC5919007B9C24 /* StatusDraftView.swift in Sources */,
 				3E2FBCCE2DCC5919007B9C24 /* AccountAuthFetcher.swift in Sources */,
 				3E2FBCCF2DCC5919007B9C24 /* PasteRowView.swift in Sources */,
@@ -851,6 +898,7 @@
 				3E2FBCF22DCC5919007B9C24 /* StatusView.swift in Sources */,
 				3E2FBCF32DCC5919007B9C24 /* Menuable.swift in Sources */,
 				3E2FBCF42DCC5919007B9C24 /* CardViewModifier.swift in Sources */,
+				3EB4F6062E75DF31002FCDF9 /* SomePicsView.swift in Sources */,
 				3E337F3F2E73309A00119B95 /* InterfaceProtocol.swift in Sources */,
 				3E2FBCF52DCC5919007B9C24 /* HTMLFetcherView.swift in Sources */,
 				3E337F752E73550100119B95 /* ThemeModel+.swift in Sources */,
@@ -1028,7 +1076,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 2025.9.0;
+				MARKETING_VERSION = 2025.9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1091,7 +1139,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 2025.9.0;
+				MARKETING_VERSION = 2025.9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.chestnut.app.lol;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;

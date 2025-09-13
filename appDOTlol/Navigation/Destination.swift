@@ -18,6 +18,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     case community
     case directory
     case nowGarden
+    case somePics
     case lists
     
     case search
@@ -31,10 +32,12 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
     case purls      (_ name: AddressName)
     case pastebin   (_ name: AddressName)
     case statusLog  (_ name: AddressName)
+    case photoRoll  (_ name: AddressName)
     
     case paste  (_ name: AddressName, id: String)
     case purl   (_ name: AddressName, id: String)
     case status (_ name: AddressName, id: String)
+    case pic    (_ name: AddressName, id: String)
     
     case editWebpage(_ name: AddressName)
     case editPaste  (_ name: AddressName, id: String)
@@ -51,6 +54,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
         case .community:    return "community"
         case .directory:    return "directory"
         case .nowGarden:    return "garden"
+        case .somePics:     return "pics"
         case .lists:        return "lists"
         case .search:       return "search"
         case .latest:       return "latest"
@@ -62,10 +66,12 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
         case .purls(let address):       return "purls.\(address)"
         case .pastebin(let address):    return "pastes.\(address)"
         case .statusLog(let address):   return "status.\(address)"
+        case .photoRoll(let address):   return "photos.\(address)"
             
         case .status(let address, let id):      return "status.\(address).\(id)"
         case .paste(let address, let id):       return "paste.\(address).\(id)"
         case .purl(let address, let id):        return "purl.\(address).\(id)"
+        case .pic(let address, let id):         return "pic.\(address).\(id)"
 
         case .editWebpage(let address): return "webpage.\(address).edit"
         case .editNow(let address):     return "now.\(address).edit"
@@ -84,6 +90,7 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
         case "community":   self = .community
         case "directory":   self = .directory
         case "garden":      self = .nowGarden
+        case "pics":        self = .somePics
         case "lists":       self = .lists
         case "search":      self = .search
         case "latest":      self = .latest
@@ -139,6 +146,18 @@ enum NavigationDestination: Codable, Hashable, Identifiable, RawRepresentable {
             let address = splitString[1]
             let title = splitString[2]
             self = .purl(address, id: title)
+        case "photos":
+            guard splitString.count > 1 else {
+                return nil
+            }
+            self = .photoRoll(splitString[1])
+        case "pic":
+            guard splitString.count > 2 else {
+                return nil
+            }
+            let address = splitString[1]
+            let title = splitString[2]
+            self = .pic(address, id: title)
         case "status":
             switch splitString.count {
             case 0, 1:
