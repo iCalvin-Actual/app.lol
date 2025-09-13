@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct StatusView: View {
+    @Environment(\.namespace) var namespace
+    @Namespace var localNamespace
     
     @Environment(\.addressBook) var addressBook
     @Environment(\.viewContext) var viewContext
@@ -32,6 +34,7 @@ struct StatusView: View {
                 StatusRowView(model: model, cardPadding: 16)
                     .environment(\.viewContext, .detail)
                     .padding(.horizontal, 8)
+                    .matchedGeometryEffect(id: model.listID, in: namespace ?? localNamespace)
             } else if fetcher.loading {
                 LoadingView()
                     .padding()

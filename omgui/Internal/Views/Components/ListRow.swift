@@ -9,6 +9,9 @@ import SwiftUI
 import Foundation
 
 struct ListRow<T: Listable>: View {
+    @Namespace var localNamespace
+    @Environment(\.namespace) var namespace
+    
     @Environment(\.addressBook) var addressBook
     @Environment(\.viewContext) var context
     @Environment(\.pinAddress) var pin
@@ -20,6 +23,8 @@ struct ListRow<T: Listable>: View {
     @Environment(\.isSearching) var isSearching
     @Environment(\.presentListable) var present
     
+    @Environment(SceneModel.self) var sceneModel
+
     enum Style {
         case standard
         case smaller
@@ -78,12 +83,17 @@ struct ListRow<T: Listable>: View {
     }
     
     var body: some View {
-        appropriateBody
-            .animation(.easeInOut(duration: 0.42), value: selected.wrappedValue)
-            .contentShape(RoundedRectangle(cornerRadius: 12))
-            .onTapGesture {
-                present?(model.rowDestination())
-            }
+        NavigationLink {
+            sceneModel.viewContent(model.rowDestination())
+                .navigationTransition(.zoom(sourceID: model.listID, in: namespace ?? localNamespace))
+        } label: {
+            appropriateBody
+                .matchedGeometryEffect(id: model.listID, in: namespace ?? localNamespace)
+                .matchedTransitionSource(id: model.listID, in: namespace ?? localNamespace)
+        }
+        .tint(.primary)
+        .animation(.easeInOut(duration: 0.42), value: selected.wrappedValue)
+        .contentShape(RoundedRectangle(cornerRadius: 12))
     }
     
     @ViewBuilder

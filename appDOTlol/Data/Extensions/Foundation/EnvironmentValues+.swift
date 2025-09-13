@@ -18,6 +18,16 @@ typealias ProfileCache = NSCache<NSString, AddressSummaryFetcher>
 typealias PrivateCache = NSCache<NSString, AddressPrivateSummaryFetcher>
 typealias ImageCache = NSCache<NSString, AddressIconFetcher>
 
+struct SceneNamespaceKey: EnvironmentKey {
+    static var defaultValue: Namespace.ID? { nil }
+}
+extension EnvironmentValues {
+    var namespace: Namespace.ID? {
+        get { self[SceneNamespaceKey.self] }
+        set { self[SceneNamespaceKey.self] = newValue}
+    }
+}
+
 struct SceneModelKey: EnvironmentKey {
     static var defaultValue: SceneModel? { nil }
 }

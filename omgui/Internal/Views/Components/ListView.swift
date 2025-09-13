@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ListView<T: Listable>: View {
+    @Environment(\.namespace) var namespace
+    @Namespace var localNamespace
     
     @Environment(\.horizontalSizeClass) var horizontalSize
     @Environment(\.verticalSizeClass)   var verticalSize

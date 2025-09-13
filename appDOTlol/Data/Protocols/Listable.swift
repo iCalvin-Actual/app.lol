@@ -9,6 +9,7 @@ import Blackbird
 import Foundation
 
 protocol Listable: Filterable, Sortable, Menuable, Hashable, Identifiable {
+    var listID: String       { get }
     var listTitle: String    { get }
     var listSubtitle: String { get }
     var listCaption: String? { get }
@@ -16,6 +17,15 @@ protocol Listable: Filterable, Sortable, Menuable, Hashable, Identifiable {
     func rowDestination(detailPage: Bool) -> NavigationDestination
 }
 extension Listable {
+    var listID: String {
+        if let modelID = self.id as? String {
+            return modelID
+        } else if let modelID = self.id as? Int {
+            return "\(modelID)"
+        } else {
+            return "\(self.hashValue)"
+        }
+    }
     func rowDestination(detail: Bool = false) -> NavigationDestination {
         rowDestination(detailPage: detail)
     }

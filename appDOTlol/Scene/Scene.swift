@@ -6,6 +6,8 @@ private let logger = Logger(subsystem: "OMGScene", category: "scene-events")
 
 public struct OMGScene: View {
     
+    @Namespace var namespace
+    
     @SceneStorage("lol.address") var actingAddress: AddressName = ""
     
     @Environment(\.credentialFetcher) var credential
@@ -39,7 +41,9 @@ public struct OMGScene: View {
         
             .task { configureAddressBook() }
         
+            .environment(\.namespace, namespace)
             .environment(accountFetcher)
+            .environment(sceneModel)
             .environment(\.destinationConstructor, sceneModel)
             .environment(\.addressBook, sceneModel.addressBook)
             .environment(\.addressSummaryFetcher, { appropriateFetcher(for: $0) })
