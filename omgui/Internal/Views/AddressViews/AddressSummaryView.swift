@@ -149,7 +149,7 @@ struct AddressBioView: View {
             HStack(alignment: .top, spacing: 4) {
                 AddressIconView(
                     address: address,
-                    size: 66,
+                    size: 88,
                     showMenu: false,
                     contentShape:  RoundedRectangle(cornerRadius: containerCorner)
                 )
@@ -181,15 +181,15 @@ struct AddressBioView: View {
                     .foregroundStyle(.secondary)
                     Spacer()
                     HStack(spacing: 4) {
-                        button(.profile)
+                        button(.profile, grow: true)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
-                        button(.now, span: false)
+                        button(.now, span: false, grow: true)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .foregroundStyle(Material.regular)
                     .labelIconToTitleSpacing(4)
                 }
-                .frame(idealHeight: 60, maxHeight: 66)
+//                .frame(idealHeight: 60, maxHeight: 66)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
@@ -201,6 +201,10 @@ struct AddressBioView: View {
                 button(.statuslog)
                     .disabled(!fetcher.statusFetcher.hasContent)
                     .foregroundStyle(fetcher.statusFetcher.hasContent ? Material.regular : Material.ultraThin)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                button(.pic)
+                    .disabled(!fetcher.picFetcher.hasContent)
+                    .foregroundStyle(fetcher.picFetcher.hasContent ? Material.regular : Material.ultraThin)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 button(.purl)
                     .disabled(!fetcher.purlFetcher.hasContent)
@@ -227,7 +231,7 @@ struct AddressBioView: View {
                     topTrailingRadius: 8,
                     style: .circular
                 ))
-                .frame(minHeight: 125)
+                .frame(height: 200)
             }
         }
         .padding(16)
@@ -240,19 +244,23 @@ struct AddressBioView: View {
     }
     
     @ViewBuilder
-    func button(_ addressContent: AddressContent, text: any StringProtocol = "", span: Bool = true) -> some View {
+    func button(_ addressContent: AddressContent, text: any StringProtocol = "", span: Bool = true, grow: Bool = false) -> some View {
         Button {
             page.wrappedValue = addressContent
         } label: {
             Label(addressContent.displayString, systemImage: addressContent.icon)
                 .bold()
-                .frame(maxWidth: span ? .infinity : nil, alignment: addressContent == .profile ? .leading : .center)
+                .frame(
+                    maxWidth: span ? .infinity : nil,
+                    maxHeight: grow ? .infinity : nil,
+                    alignment: addressContent == .profile ? .leading : .center
+                )
         }
         .padding(2)
-        .padding(.horizontal, 2)
+        .padding(.horizontal, 4)
         .font(.callout)
         .fontDesign(.rounded)
-        .frame(minHeight: 33)
+        .frame(minHeight: 44)
         .background(addressContent.color)
         .colorScheme(.dark)
     }

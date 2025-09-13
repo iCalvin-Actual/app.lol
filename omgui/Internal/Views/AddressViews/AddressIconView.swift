@@ -34,7 +34,7 @@ struct AddressIconView<S: Shape>: View {
     
     init(
         address: AddressName,
-        size: CGFloat = 40.0,
+        size: CGFloat = 40,
         showMenu: Bool = true,
         contentShape: S = RoundedRectangle(cornerRadius: 8)
     ) {

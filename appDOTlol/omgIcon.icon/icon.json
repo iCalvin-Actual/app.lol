@@ -1,68 +1,169 @@
 {
   "fill" : {
     "linear-gradient" : [
-      "srgb:0.64706,0.84706,1.00000,1.00000",
-      "display-p3:0.81569,0.74902,1.00000,1.00000"
+      "display-p3:0.81569,0.74902,1.00000,1.00000",
+      "srgb:0.64706,0.84706,1.00000,1.00000"
     ]
   },
   "groups" : [
     {
-      "blend-mode" : "plus-darker",
-      "blur-material" : null,
       "layers" : [
         {
-          "blend-mode" : "overlay",
-          "fill" : {
-            "solid" : "srgb:0.00000,0.53333,1.00000,1.00000"
-          },
-          "hidden" : true,
-          "image-name" : "front26.png",
-          "name" : "front26",
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "hard-light"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.81569,0.74902,1.00000,1.00000",
+                  "srgb:0.96863,0.50980,0.67451,1.00000"
+                ]
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "automatic"
+            }
+          ],
+          "glass" : true,
+          "hidden-specializations" : [
+            {
+              "value" : false
+            },
+            {
+              "appearance" : "dark",
+              "value" : false
+            }
+          ],
+          "image-name" : "middle26.png",
+          "name" : "middle26",
           "position" : {
-            "scale" : 1,
+            "scale" : 0.8,
             "translation-in-points" : [
-              4,
-              -70
+              10,
+              20
             ]
           }
         },
         {
-          "blend-mode" : "normal",
-          "fill" : {
-            "linear-gradient" : [
-              "display-p3:0.81569,0.74902,1.00000,1.00000",
-              "srgb:0.96863,0.50980,0.67451,1.00000"
-            ]
-          },
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "hard-light"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.81569,0.74902,1.00000,1.00000",
+                  "srgb:0.96863,0.50980,0.67451,1.00000"
+                ]
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "automatic"
+            }
+          ],
           "glass" : true,
+          "hidden-specializations" : [
+            {
+              "value" : false
+            },
+            {
+              "appearance" : "dark",
+              "value" : false
+            }
+          ],
           "image-name" : "middle26.png",
-          "name" : "middle26"
+          "name" : "middle26",
+          "position" : {
+            "scale" : 1.2,
+            "translation-in-points" : [
+              10,
+              20
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode-specializations" : [
+        {
+          "value" : "plus-darker"
         },
         {
-          "blend-mode" : "plus-darker",
-          "fill" : {
-            "solid" : "srgb:0.93333,0.93333,0.93333,1.00000"
-          },
+          "appearance" : "dark",
+          "value" : "hard-light"
+        }
+      ],
+      "blur-material" : null,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.81569,0.74902,1.00000,1.00000",
+                  "srgb:0.96863,0.50980,0.67451,1.00000"
+                ]
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "automatic"
+            }
+          ],
+          "glass" : true,
+          "hidden-specializations" : [
+            {
+              "value" : false
+            },
+            {
+              "appearance" : "dark",
+              "value" : false
+            }
+          ],
           "image-name" : "back26.png",
           "name" : "back26",
           "position" : {
-            "scale" : 1,
+            "scale" : 1.2,
             "translation-in-points" : [
-              4,
-              0
+              18,
+              20
             ]
           }
         }
       ],
       "lighting" : "individual",
-      "name" : "Hearts",
-      "position" : {
-        "scale" : 1.1,
-        "translation-in-points" : [
-          0,
-          20
-        ]
-      },
       "shadow" : {
         "kind" : "layer-color",
         "opacity" : 1

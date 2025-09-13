@@ -184,6 +184,8 @@ extension NavigationDestination {
             return .lolTeal
         case .lists:
             return .lolPurple
+        case .somePics:
+            return .lolTeal
         default:
             return .lolRandom(rawValue, not: .lolOrange)
         }

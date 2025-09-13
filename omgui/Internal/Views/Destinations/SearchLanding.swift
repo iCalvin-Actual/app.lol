@@ -360,11 +360,13 @@ class SearchResultsFetcher: Request {
             statusFetcher.configure(filters: [.query(query), .notBlocked])
             pasteFetcher.configure(filters: [.query(query), .notBlocked])
             purlFetcher.configure(filters: [.query(query), .notBlocked])
+            picFetcher.configure(filters: [.query(query), .notBlocked])
         } else {
             directoryFetcher.configure(filters: .everyone)
             statusFetcher.configure(filters: .everyone)
             pasteFetcher.configure(filters: .everyone)
             purlFetcher.configure(filters: .everyone)
+            picFetcher.configure(filters: .everyone)
         }
         if let addressBook {
             self.addressBook = addressBook

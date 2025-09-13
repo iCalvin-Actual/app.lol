@@ -192,7 +192,7 @@ class PhotoFeedFetcher: ModelBackedListFetcher<PicModel> {
         self.displayTitle = title ?? {
             switch addresses.count {
             case 0:
-                return "🎞️ some.pics"
+                return "📸 some.pics"
             default:
                 return "some.pics"
             }

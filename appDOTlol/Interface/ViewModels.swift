@@ -758,6 +758,47 @@ struct PicModel: BlackbirdListable, Identifiable, Sendable {
         self.date = date
         self.listed = listed
     }
+    
+    var webLinks: [SharePacket] {
+        func extractImageNamesAndURLs(from markdown: String) -> [(name: String, url: URL)] {
+            var results = [(name: String, url: URL)]()
+            
+            do {
+                let markdownRegex = try NSRegularExpression(pattern: "\\[(.*?)\\]\\(([^)]+)\\)", options: [])
+                let nsString = NSString(string: markdown)
+                var matches = markdownRegex.matches(in: markdown, options: [], range: NSRange(location: 0, length: nsString.length))
+                
+                for set in matches.enumerated() {
+                    let match = set.element
+                    guard match.numberOfRanges == 3 else { continue }
+                    let nameRange = match.range(at: 1)
+                    let urlRange = match.range(at: 2)
+                    let matchingName = nsString.substring(with: nameRange)
+                    let name: String = matchingName
+                    let urlString = nsString.substring(with: urlRange)
+                    guard let url = URL(string: urlString) else {
+                        continue
+                    }
+                    results.append((name, url))
+                }
+                
+                let dataDetector: NSDataDetector = try .init(types: NSTextCheckingResult.CheckingType.link.rawValue)
+                matches = dataDetector.matches(in: markdown, range: NSMakeRange(0, nsString.length))
+                matches.forEach({ match in
+                    let matchString = nsString.substring(with: match.range)
+                    guard let urlMatch = URL(string: matchString), !results.contains(where: { $0.url == urlMatch }) else {
+                        return
+                    }
+                    results.append(("", urlMatch))
+                })
+            } catch {
+                dataModelLevelLogger.error("Error while processing regex: \(String(describing: error))")
+            }
+            
+            return results
+        }
+        return extractImageNamesAndURLs(from: description).map({ SharePacket(name: $0.name, content: $0.url) })
+    }
 }
 
 struct AddressSummaryModel: BlackbirdModel, Sendable {

@@ -31,6 +31,7 @@ class AddressSummaryFetcher: Request {
     let pasteFetcher: AddressPasteBinFetcher
     let statusFetcher: StatusLogFetcher
     let bioFetcher: AddressBioFetcher
+    let picFetcher: PhotoFeedFetcher
     
     let followingFetcher: AddressFollowingFetcher
     let followersFetcher: AddressFollowersFetcher
@@ -49,6 +50,7 @@ class AddressSummaryFetcher: Request {
         let credential: APICredential? = isMine ? addressBook.auth : nil
         self.bioFetcher = .init(address: name)
         self.statusFetcher = .init(addresses: [name], addressBook: addressBook)
+        self.picFetcher = .init(addresses: [name], addressBook: addressBook)
         
         self.followingFetcher = .init(address: name, credential: credential)
         self.followersFetcher = .init(address: name, credential: credential)
@@ -74,19 +76,31 @@ class AddressSummaryFetcher: Request {
             weak followersFetcher,
             weak pasteFetcher,
             weak statusFetcher,
-            weak purlFetcher
+            weak purlFetcher,
+            weak picFetcher
         ] in
             async let info = try AppClient.interface.fetchAddressInfo(addressName)
             self.registered = try await info.date
             self.url = try await info.url
             
-            await pasteFetcher?.updateIfNeeded()
-            await statusFetcher?.updateIfNeeded()
-            await purlFetcher?.updateIfNeeded()
+            async let paste: Void = pasteFetcher?.updateIfNeeded() ?? {}()
+            async let status: Void = statusFetcher?.updateIfNeeded() ?? {}()
+            async let pic: Void = picFetcher?.updateIfNeeded() ?? {}()
+            async let purl: Void = purlFetcher?.updateIfNeeded() ?? {}()
             
-            await bioFetcher?.updateIfNeeded()
-            await followingFetcher?.updateIfNeeded()
-            await followersFetcher?.updateIfNeeded()
+            async let bio: Void = bioFetcher?.updateIfNeeded() ?? {}()
+            async let following: Void = followingFetcher?.updateIfNeeded() ?? {}()
+            async let followers: Void = followersFetcher?.updateIfNeeded() ?? {}()
+            
+            let _ = await (
+                paste,
+                status,
+                pic,
+                purl,
+                bio,
+                following,
+                followers
+            )
         }
     }
     

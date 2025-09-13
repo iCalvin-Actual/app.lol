@@ -112,15 +112,20 @@ struct PicRowView: View {
     @ViewBuilder
     var rowBody: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(model.description)
+            appropriateMarkdown
                 .fontWeight(.medium)
                 .fontDesign(.rounded)
             imagePreview(model.content)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .lineLimit(context != .detail ? 3 : nil)
         .multilineTextAlignment(.leading)
+    }
+    
+    @State private var offset: CGFloat = 0
+    @ViewBuilder
+    var appropriateMarkdown: some View {
+        Markdown(model.description, hideImages: true)
     }
     
     @ViewBuilder
