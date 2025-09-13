@@ -24,7 +24,11 @@ struct CardViewModifier: ViewModifier {
         focused || selected
     }
     
-    init(material: Material = .ultraThin, padding: CGFloat, radius: CGFloat, selected: Bool, pullIn: Bool = false) {
+    let background: Gradient?
+    
+    init(destination: NavigationDestination?, material: Material = .ultraThin, padding: CGFloat, radius: CGFloat, selected: Bool, pullIn: Bool = false) {
+        self.background = destination?.gradient
+            .rotated(by: 135)
         self.material = material
         self.padding = padding
         self.radius = radius
@@ -34,37 +38,50 @@ struct CardViewModifier: ViewModifier {
     
     var shadowPadding: CGFloat { padding / 2 }
     
+    @ViewBuilder
+    func backgroundIfNeeded<V: View>(_ content: V) -> some View {
+        if let background {
+            content
+                .background(background)
+        } else {
+            content
+                .background(.primary)
+        }
+    }
+    
     func body(content: Content) -> some View {
-        content
-            .frame(maxWidth: .infinity)
-            .background(contrast == .increased ? Material.thick : material)
-            .cornerRadius(radius)
-            .padding(.horizontal, padding / 2)
-            .padding(.vertical, pullIn ? shadowPadding / 2 : shadowPadding)
-            .shadow(color: selected ? .black.opacity(0.8) : .secondary.opacity(colorScheme == .dark ? 0 : 0.5), radius: shadowPadding / 2)
+        backgroundIfNeeded(
+            content
+                .frame(maxWidth: .infinity)
+                .background(contrast == .increased ? Material.thick.opacity(100) : Material.ultraThin.opacity(100))
+        )
+        .cornerRadius(radius)
+        .padding(.horizontal, padding / 2)
+        .padding(.vertical, pullIn ? shadowPadding / 2 : shadowPadding)
+        .shadow(color: selected ? .black.opacity(0.8) : .secondary.opacity(colorScheme == .dark ? 0 : 0.5), radius: shadowPadding / 2)
     }
 }
 
 @MainActor
 extension HStack {
-    func asCard(material: Material = .thin, padding: CGFloat = 4, radius: CGFloat = 2, selected: Bool = false, pullIn: Bool = false) -> some View {
-        self.modifier(CardViewModifier(material: material, padding: padding, radius: radius, selected: selected, pullIn: pullIn))
+    func asCard(destination: NavigationDestination? = nil, material: Material = .thin, padding: CGFloat = 4, radius: CGFloat = 2, selected: Bool = false, pullIn: Bool = false) -> some View {
+        self.modifier(CardViewModifier(destination: destination, material: material, padding: padding, radius: radius, selected: selected, pullIn: pullIn))
     }
 }
 @MainActor
 extension VStack {
-    func asCard(material: Material = .thin, padding: CGFloat = 4, radius: CGFloat = 2, selected: Bool = false, pullIn: Bool = false) -> some View {
-        self.modifier(CardViewModifier(material: material, padding: padding, radius: radius, selected: selected, pullIn: pullIn))
+    func asCard(destination: NavigationDestination? = nil, material: Material = .thin, padding: CGFloat = 4, radius: CGFloat = 2, selected: Bool = false, pullIn: Bool = false) -> some View {
+        self.modifier(CardViewModifier(destination: destination, material: material, padding: padding, radius: radius, selected: selected, pullIn: pullIn))
     }
 }
 @MainActor
 extension View {
-    func asCard(material: Material = .thin, padding: CGFloat = 4, radius: CGFloat = 2, selected: Bool = false, pullIn: Bool = false) -> some View {
+    func asCard(destination: NavigationDestination? = nil, material: Material = .thin, padding: CGFloat = 4, radius: CGFloat = 2, selected: Bool = false, pullIn: Bool = false) -> some View {
         HStack {
             self
             Spacer(minLength: 0)
         }
-        .asCard(material: material, padding: padding, radius: radius, selected: selected, pullIn: pullIn)
+        .asCard(destination: destination, material: material, padding: padding, radius: radius, selected: selected, pullIn: pullIn)
     }
 }
 

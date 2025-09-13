@@ -96,8 +96,10 @@ struct Sidebar: View {
         }
     }
     
+    @Environment(\.colorSchemeContrast) var contrast
+    
     @ViewBuilder
     func destinationView(_ destination: NavigationDestination? = .webpage("app")) -> some View {
-        destinationConstructor?.destination(destination)
+        destinationConstructor?.destination(destination, contrast: contrast)
     }
 }

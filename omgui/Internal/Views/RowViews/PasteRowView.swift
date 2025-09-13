@@ -48,7 +48,7 @@ struct PasteRowView: View {
             
             RowFooter(model: model) { EmptyView() }
         }
-        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
+        .asCard(destination: model.rowDestination(), padding: cardPadding, radius: cardRadius, selected: showSelection)
     }
     
     @ViewBuilder
@@ -65,7 +65,7 @@ struct PasteRowView: View {
             .fontWeight(.medium)
             .fontDesign(.rounded)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .lineLimit(context == .column ? 4 : nil)
+            .lineLimit(context != .detail ? 4 : nil)
             .multilineTextAlignment(.leading)
     }
     

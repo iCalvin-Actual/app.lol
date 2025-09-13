@@ -86,7 +86,7 @@ extension String {
     static var hexPink: String     { "f782ac" }
     static var hexPurple: String   { "d0bfff" }
     static var hexBlue: String     { "a5d8ff" }
-    static var hexOrange: String   { "ffd8a8" }
+    static var hexOrange: String   { "ffa24c" }
     
     static var lolRandom: [String] {
         [

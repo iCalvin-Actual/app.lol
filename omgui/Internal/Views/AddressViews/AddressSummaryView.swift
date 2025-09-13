@@ -74,10 +74,11 @@ struct AddressSummaryView: View {
         }
     }
     
+    @Environment(\.colorSchemeContrast) var contrast
     @ViewBuilder
     func destination(_ item: AddressContent? = nil) -> some View {
         let workingItem = item ?? .profile
-        destinationConstructor?.destination(workingItem.destination(addressSummaryFetcher.addressName))
+        destinationConstructor?.destination(workingItem.destination(addressSummaryFetcher.addressName), contrast: contrast)
             .id(addressSummaryFetcher.addressName)
             .background(Color.clear)
             .navigationSplitViewColumnWidth(min: 250, ideal: 600)
@@ -102,6 +103,7 @@ struct AddressSummaryView: View {
 }
 
 struct AddressBioView: View {
+    @Environment(\.colorSchemeContrast) var contrast
     @Environment(\.pinAddress) var pin
     @Environment(\.unpinAddress) var unpin
     @Environment(\.blockAddress) var block

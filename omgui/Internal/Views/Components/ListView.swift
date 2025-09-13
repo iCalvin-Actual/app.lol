@@ -306,12 +306,13 @@ struct ListView<T: Listable>: View {
     
     struct Detail: View {
         @Environment(\.destinationConstructor) var destinationConstructor
+        @Environment(\.colorSchemeContrast) var contrast
         
         let selected: T?
         
         var body: some View {
             if let selected {
-                destinationConstructor?.destination(ListView.destination(for: selected, showingDetail: true))
+                destinationConstructor?.destination(ListView.destination(for: selected, showingDetail: true), contrast: contrast)
             } else {
                ThemedTextView(text: "no selection")
                    .padding()

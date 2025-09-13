@@ -135,7 +135,7 @@ struct PURLRowView: View {
             
             RowFooter(model: model) { EmptyView() }
         }
-        .asCard(padding: cardPadding, radius: cardRadius, selected: showSelection)
+        .asCard(destination: model.rowDestination(), padding: cardPadding, radius: cardRadius, selected: showSelection)
         .frame(maxWidth: .infinity)
     }
     

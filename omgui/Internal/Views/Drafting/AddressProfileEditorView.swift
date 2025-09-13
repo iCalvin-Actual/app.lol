@@ -49,7 +49,6 @@ public struct AddressProfileEditorView: View {
         #endif
             .cornerRadius(24)
             .padding()
-            .background(NavigationDestination.editWebpage(draftPoster.address).gradient)
             .interactiveDismissDisabled()
             .toolbar {
                 ToolbarItem(placement: .automatic) {
