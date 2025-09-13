@@ -1,0 +1,147 @@
+//
+//  SwiftUIView.swift
+//  
+//
+//  Created by Calvin Chestnut on 4/26/23.
+//
+
+import SwiftUI
+#if canImport(AppKit)
+import AppKit
+#endif
+
+struct PasteView: View {
+    @Environment(\.dismiss)
+    var dismiss
+    @Environment(\.horizontalSizeClass)
+    var sizeClass
+    @Environment(\.viewContext)
+    var viewContext
+    @Environment(\.openURL)
+    var openUrl
+    
+    @Environment(\.viewContext)
+    var context: ViewContext
+    @Environment(\.addressBook)
+    var addressBook
+    @Environment(\.credentialFetcher)
+    var credential
+    @Environment(\.addressSummaryFetcher)
+    var summaryFetcher
+    @Environment(\.presentListable)
+    var presentDestination
+    
+    @State
+    var shareURL: URL?
+    @State
+    var presentURL: URL?
+    
+    @State
+    var showDraft: Bool = false
+    @State
+    var detent: PresentationDetent = .draftDrawer
+    
+    @State
+    var fetcher: AddressPasteFetcher
+    
+    init(_ id: String, from address: AddressName) {
+        _fetcher = .init(wrappedValue: .init(name: address, title: id))
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let model = fetcher.result {
+                PasteRowView(model: model, cardPadding: 16)
+                    .padding(.horizontal, 8)
+                    .frame(maxHeight: .infinity, alignment: .top)
+            } else if fetcher.loading {
+                LoadingView()
+                    .padding()
+            } else {
+                LoadingView()
+                    .padding()
+                    .task { @MainActor [fetcher] in
+                        await fetcher.updateIfNeeded()
+                    }
+            }
+            Spacer()
+        }
+        .task {
+            let addressCredential = credential(fetcher.address)
+            if fetcher.credential != addressCredential {
+                fetcher.configure(credential: addressCredential)
+            }
+        }
+        .onChange(of: fetcher.title, {
+            Task { [fetcher] in
+                await fetcher.updateIfNeeded(forceReload: true)
+            }
+        })
+        .onChange(of: fetcher.credential, {
+            Task { [fetcher] in
+                await fetcher.updateIfNeeded(forceReload: true)
+            }
+        })
+#if canImport(UIKit) && !os(tvOS)
+        .sheet(item: $presentURL, content: { url in
+            SafariView(url: url)
+                .ignoresSafeArea(.container, edges: .all)
+        })
+#endif
+        .environment(\.viewContext, ViewContext.detail)
+#if !os(tvOS)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                if let url = fetcher.result?.shareURLs.first?.content {
+                    ShareLink(item: url)
+                }
+            }
+        }
+    #if !os(macOS)
+        .navigationBarTitleDisplayMode(.inline)
+    #endif
+#endif
+        .tint(.secondary)
+        .toolbar {
+            ToolbarItem(placement: .safePrincipal) {
+                if let summaryFetcher = summaryFetcher(fetcher.address), viewContext != .profile {
+                    AddressPrincipalView(
+                        addressSummaryFetcher: summaryFetcher,
+                        addressPage: .init(
+                            get: { .pastebin },
+                            set: {
+                                presentDestination?(.address(fetcher.address, page: $0))
+                            }
+                        )
+                    )
+                }
+            }
+        }
+        .onReceive(fetcher.result.publisher, perform: { _ in
+            withAnimation {
+                let address = fetcher.result?.addressName ?? ""
+                guard !address.isEmpty, addressBook.mine.contains(address) else {
+                    showDraft = false
+                    return
+                }
+                if fetcher.result == nil && fetcher.title.isEmpty {
+                    detent = .large
+                    showDraft = true
+                } else if fetcher.result != nil {
+                    detent = .draftDrawer
+                    showDraft = true
+                }
+            }
+        })
+    }
+    
+    @ViewBuilder
+    var draftContent: some View {
+//        if let poster = fetcher.draftPoster {
+//            PasteDraftView(draftFetcher: poster)
+//        } else {
+            EmptyView()
+//        }
+    }
+}
+

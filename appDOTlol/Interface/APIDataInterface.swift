@@ -6,10 +6,9 @@
 //
 
 import omgapi
-import omgui
 import Foundation
 
-final class APIDataInterface: DataInterface, Sendable {
+final class APIDataInterface: OMGInterface, Sendable {
     
     static let clientId:        String = "5e171c460ba4b7a7ceaf86295ac169d2"
     static let clientSecret:    String = "6937ec29a6811d676615d783ab071bb8"

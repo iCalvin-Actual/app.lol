@@ -1,5 +1,5 @@
 {
-  "originHash" : "2d73c99fcaa7ec71e28813b9939c79c5af5263cb70d048859b1420a299e1c044",
+  "originHash" : "9b4eaffba3ab26f3b8ef3f22f599cc7b4cad3bfe87e4b4a92a2a8dae4b307a85",
   "pins" : [
     {
       "identity" : "blackbird",
@@ -16,7 +16,7 @@
       "location" : "https://github.com/iCalvin-Actual/MarkdownEditor.git",
       "state" : {
         "branch" : "main",
-        "revision" : "4f40e85a59fa2906fe5da30c5615b1ba3f4f7df6"
+        "revision" : "500842bfa21113dc41916d3120f82003226168a3"
       }
     },
     {
@@ -33,16 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iCalvin-Actual/omgapi",
       "state" : {
-        "branch" : "main",
-        "revision" : "214ce6c91c06345b8fd48c040bdb7f6a33b5f21a"
-      }
-    },
-    {
-      "identity" : "omgui",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/iCalvin-Actual/omgui",
-      "state" : {
-        "revision" : "a56f17fa766a2a5c565c960c1c35ee31a567d209"
+        "branch" : "develop",
+        "revision" : "80c6e977a7310c7c19b8d256f82616723177c38f"
       }
     },
     {
@@ -60,7 +52,7 @@
       "location" : "https://github.com/iCalvin-Actual/swift-markdown-ui",
       "state" : {
         "branch" : "main",
-        "revision" : "bdbd43f80239966be3b451a5dba6c70753705975"
+        "revision" : "1f85dda7e92f7ab360d3cfddc6e8eb7d03deb2ea"
       }
     }
   ],
