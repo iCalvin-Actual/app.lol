@@ -33,7 +33,11 @@ struct AddressNowPageView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     ShareLink(item: fetcher.baseURL)
-                        .tint(.primary)
+#if os(visionOS)
+                        .tint(.clear)
+#else
+                        .foregroundStyle(.primary)
+#endif
                 }
             }
     }

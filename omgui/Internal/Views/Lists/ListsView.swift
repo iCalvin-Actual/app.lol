@@ -221,6 +221,7 @@ struct AccountView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(3)
                 }
+                .buttonStyle(.bordered)
                 .foregroundStyle(.secondary)
 #if canImport(UIKit)
                 .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))

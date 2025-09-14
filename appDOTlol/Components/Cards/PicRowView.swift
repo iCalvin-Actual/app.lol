@@ -60,7 +60,35 @@ struct PicRowView: View {
             mainBody
             
             RowFooter(model: model) {
-                EmptyView()
+                if !model.webLinks.isEmpty {
+                    Menu {
+                        ForEach(model.webLinks) { item in
+                            Button {
+                                guard item.content.scheme?.contains("http") ?? false else {
+                                    openUrl(item.content)
+                                    return
+                                }
+#if os(macOS)
+                                openUrl(item.content)
+#else
+                                withAnimation {
+                                    presentURL = item.content
+                                }
+#endif
+                            } label: {
+                                Text(item.name)
+                                    .font(.headline)
+                                Text(item.content.absoluteString)
+                                    .font(.subheadline)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "link.circle")
+                    }
+                    .buttonStyle(.borderless)
+                } else {
+                    EmptyView()
+                }
             }
         }
         .asCard(destination: model.rowDestination(), padding: cardPadding, radius: cardRadius, selected: showSelection)
@@ -132,7 +160,7 @@ struct PicRowView: View {
     func imagePreview(_ url: URL) -> some View {
         if context == .detail {
             Button {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
                 openUrl(url)
 #else
                 presentURL = url

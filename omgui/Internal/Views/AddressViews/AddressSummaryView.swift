@@ -156,6 +156,7 @@ struct AddressBioView: View {
                 VStack {
                     HStack(alignment: .firstTextBaseline) {
                         AddressNameView(address, font: .body)
+                            .foregroundStyle(.secondary)
                         
                         Spacer()
                         
@@ -176,9 +177,12 @@ struct AddressBioView: View {
                         } label: {
                             Image(systemName: "ellipsis.circle")
                         }
-                        .tint(.primary)
+#if os(visionOS)
+                        .tint(.clear)
+#else
+                        .foregroundStyle(.primary)
+#endif
                     }
-                    .foregroundStyle(.secondary)
                     Spacer()
                     HStack(spacing: 4) {
                         button(.profile, grow: true)
@@ -256,6 +260,7 @@ struct AddressBioView: View {
                     alignment: addressContent == .profile ? .leading : .center
                 )
         }
+        .buttonStyle(.borderless)
         .padding(2)
         .padding(.horizontal, 4)
         .font(.callout)
@@ -287,6 +292,9 @@ struct AddressPrincipalView: View {
         } label: {
             AddressBioButton(address: address, page: $addressPage, theme: addressSummaryFetcher.profileFetcher.theme)
         }
+#if os(visionOS)
+        .buttonStyle(.borderless)
+#endif
         .popover(isPresented: $presentBio) {
             AddressBioView(
                 fetcher: addressSummaryFetcher,
@@ -316,7 +324,7 @@ struct AddressBioButton: View {
     
     var body: some View {
         HStack(spacing: 2) {
-            #if !os(macOS)
+            #if !os(macOS) && !os(visionOS)
             AddressIconView(address: address, size: 30, showMenu: false, contentShape: Circle())
                 .frame(width: 30, height: 30)
             #endif
@@ -329,6 +337,9 @@ struct AddressBioButton: View {
                     ThemedTextView(text: page.displayString, font: .headline)
                 }
             }
+#if os(macOS)
+            .padding(.horizontal)
+#endif
         }
     }
 }

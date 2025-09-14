@@ -200,18 +200,22 @@ struct SearchNavigationButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundColor(selected ? .white : .primary)
             .frame(minHeight: 44)
-            .contentShape(Capsule())
-        #if !os(visionOS)
-            .glassEffect(glass)
-        #endif
+#if os(visionOS)
+            .background(Material.regular)
+            .clipShape(Capsule())
+#else
+            .glassEffect(glass, in: Capsule())
+#endif
     }
     
+#if !os(visionOS)
     var glass: Glass {
         if selected {
             return .regular.tint(Color.accentColor)
         }
         return .regular
     }
+#endif
 }
 
 struct SearchResultsView: View {

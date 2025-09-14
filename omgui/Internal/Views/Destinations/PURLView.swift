@@ -39,7 +39,11 @@ struct PURLView: View {
                 if let shareUrl = fetcher.result?.primaryURL {
                     ToolbarItem(placement: .primaryAction) {
                         ShareLink(item: shareUrl.content)
-                            .tint(.primary)
+#if os(visionOS)
+                            .tint(.clear)
+#else
+                            .foregroundStyle(.primary)
+#endif
                     }
                 }
             }

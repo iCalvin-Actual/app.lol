@@ -39,19 +39,36 @@ struct CardViewModifier: ViewModifier {
     
     @ViewBuilder
     func backgroundIfNeeded<V: View>(_ content: V) -> some View {
+#if os(visionOS)
+        content
+            .background(contrast == .increased ? Material.thick.opacity(100) : Material.regular.opacity(100))
+#else
         if let background {
             content
-                .background(background)
+                .background(colorScheme == .dark ? Material.ultraThin.opacity(100) : Material.ultraThin.opacity(0))
+                .background(background.inverted())
         } else {
             content
                 .background(contrast == .increased ? Material.thick.opacity(100) : Material.regular.opacity(100))
         }
+#endif
     }
     
     func body(content: Content) -> some View {
         backgroundIfNeeded(
             content
                 .frame(maxWidth: .infinity)
+#if os(visionOS)
+                .transform3DEffect(
+                    .init(
+                        translation: .init(
+                            x: 0,
+                            y: 0,
+                            z: emphasis ? 12 : 6
+                        )
+                    )
+                )
+#endif
         )
         .cornerRadius(radius)
         .padding(.horizontal, padding / 2)

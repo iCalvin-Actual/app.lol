@@ -334,23 +334,43 @@ struct TabBar: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
+#if !os(visionOS)
                     .buttonStyle(.glass)
+#endif
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                 } header: {
                     Label("pinned", systemImage: "pin")
                         .foregroundStyle(.secondary)
                 }
             }
-            #if os(iOS)
+#if os(iOS)
             .frame(minWidth: 180)
-            #else
+#elseif os(visionOS)
+            .clipShape(ConcentricRectangle())
+            .background(Material.regular)
+#else
             .frame(minWidth: 250)
-            #endif
+#endif
             .safeAreaInset(edge: .bottom) {
                 PinnedAddressesView(addAddress: $addAddress)
                     .environment(\.addressBook, addressBook)
                     .frame(maxHeight: 44)
+#if os(visionOS)
+                    .transform3DEffect(
+                        .init(
+                            translation: .init(
+                                x: 0,
+                                y: 0,
+                                z: 6
+                            )
+                        )
+                    )
+                    .padding(2)
+                    .background(Material.regular)
+                    .clipShape(Capsule())
+#else
                     .glassEffect(.regular, in: .capsule)
+#endif
                     .id(addressBook.hashValue)
                     .onTapGesture {
                         selected = .account
