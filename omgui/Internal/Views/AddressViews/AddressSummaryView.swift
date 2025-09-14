@@ -262,7 +262,7 @@ struct AddressBioView: View {
         .fontDesign(.rounded)
         .frame(minHeight: 44)
         .background(addressContent.color)
-        .colorScheme(.dark)
+        .colorScheme(.light)
     }
 }
 
@@ -316,8 +316,10 @@ struct AddressBioButton: View {
     
     var body: some View {
         HStack(spacing: 2) {
+            #if !os(macOS)
             AddressIconView(address: address, size: 30, showMenu: false, contentShape: Circle())
                 .frame(width: 30, height: 30)
+            #endif
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 AddressNameView(address, font: .headline)
                     .bold()

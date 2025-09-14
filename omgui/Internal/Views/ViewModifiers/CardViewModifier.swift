@@ -28,7 +28,6 @@ struct CardViewModifier: ViewModifier {
     
     init(destination: NavigationDestination?, material: Material = .ultraThin, padding: CGFloat, radius: CGFloat, selected: Bool, pullIn: Bool = false) {
         self.background = destination?.gradient
-            .rotated(by: 135)
         self.material = material
         self.padding = padding
         self.radius = radius
@@ -45,7 +44,7 @@ struct CardViewModifier: ViewModifier {
                 .background(background)
         } else {
             content
-                .background(.primary)
+                .background(contrast == .increased ? Material.thick.opacity(100) : Material.regular.opacity(100))
         }
     }
     
@@ -53,7 +52,6 @@ struct CardViewModifier: ViewModifier {
         backgroundIfNeeded(
             content
                 .frame(maxWidth: .infinity)
-                .background(contrast == .increased ? Material.thick.opacity(100) : Material.ultraThin.opacity(100))
         )
         .cornerRadius(radius)
         .padding(.horizontal, padding / 2)

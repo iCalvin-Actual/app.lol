@@ -130,7 +130,7 @@ class SceneModel {
         
     @ViewBuilder
     func viewContent(_ destination: NavigationDestination?) -> some View {
-        let destination = destination ?? .community
+        let destination = destination ?? NavigationModel.initial.destination
         switch destination {
         case .community:
             CommunityView(communityFetcher: statusFetcher)

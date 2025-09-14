@@ -117,7 +117,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case .community:
             return "star.bubble"
         case .pinnedAddress:
-            return "pin"
+            return "person"
         case .safety:
             return "hand.raised"
         case .lists:

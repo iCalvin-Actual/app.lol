@@ -25,12 +25,19 @@ struct omgApp: App {
     @ViewBuilder
     func loadingView() -> some View {
         LoadingView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(gradient)
+    }
+    
+    var gradient: Gradient {
+        NavigationModel.initial.destination.gradient
     }
     
     var body: some Scene {
         WindowGroup {
             if let appModel {
                 OMGScene(appModel: appModel)
+                    .background(gradient)
                     .task {
                         appModel.performFirstRun()
                     }

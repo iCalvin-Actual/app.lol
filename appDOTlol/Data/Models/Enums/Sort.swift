@@ -19,7 +19,7 @@ enum Sort: String, Identifiable {
     var displayString: String {
         switch self {
         case .alphabet:
-            return "alphabetical"
+            return "a-z"
         case .newestFirst:
             return "recent"
         case .oldestFirst:

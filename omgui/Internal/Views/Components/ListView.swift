@@ -62,6 +62,11 @@ struct ListView<T: Listable>: View {
             })
         case .now(let name):
             selected = dataFetcher.results.first(where: { ($0 as? NowListing)?.addressName == name })
+        case .pic(let name, id: let id):
+            selected = dataFetcher.results.first(where: {
+                ($0 as? PicModel)?.addressName == name &&
+                ($0 as? PicModel)?.id == id
+            })
         case .address(let name, let page):
             switch page {
             case .profile:
@@ -337,6 +342,8 @@ extension ListView {
             return .status(statusModel.address, id: statusModel.id)
         case let addressModel as AddressModel:
             return .address(addressModel.addressName, page: .profile)
+        case let picModel as PicModel:
+            return .pic(picModel.owner, id: picModel.id)
         default:
             if context == .column {
                 return .address(item.addressName, page: .profile)

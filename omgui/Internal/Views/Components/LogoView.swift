@@ -15,34 +15,10 @@ struct LogoView: View {
     }
     
     var body: some View {
-        coreIcon
+        Image("AppIcon")
+            .resizable()
             .aspectRatio(1, contentMode: .fit)
             .frame(width: size, height: size)
-    }
-    
-    @ViewBuilder
-    var coreIcon: some View {
-        foreground
-    }
-    
-    @ViewBuilder
-    var foreground: some View {
-        Heart()
-    }
-    
-    @ViewBuilder
-    var iconBackground: some View {
-        Color.lolBackground
-    }
-    
-    @ViewBuilder
-    var roundRectMask: some View {
-        RoundedRectangle(cornerRadius: 12)
-    }
-    
-    @ViewBuilder
-    var circleMask: some View {
-        Circle()
     }
 }
 

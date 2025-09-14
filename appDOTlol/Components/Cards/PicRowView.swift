@@ -168,7 +168,7 @@ struct PicRowView: View {
             // Fallback placeholder on failure
             Color.secondary.opacity(0.2)
                 .frame(maxWidth: .infinity)
-                .aspectRatio(5/3, contentMode: .fill)
+                .aspectRatio(5/3, contentMode: .fit)
                 .overlay(
                     LoadingView()
                 )

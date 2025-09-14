@@ -12,6 +12,8 @@ import SwiftUI
 @MainActor
 @Observable
 class NavigationModel {
+    static var initial: NavigationItem = .community
+    
     enum Section: String, Identifiable, Hashable {
         var id: String { rawValue }
         

@@ -30,7 +30,7 @@ struct TabBar: View {
     }
     
     @SceneStorage("app.tab.selected")
-    var cachedSelection: NavigationItem = .community
+    var cachedSelection: NavigationItem = NavigationModel.initial
     
     @State
     var selected: NavigationItem?
@@ -114,6 +114,8 @@ struct TabBar: View {
         switch destination {
         case .account:
             presentAccount = true
+        case .address(let address, _):
+            selected = .pinnedAddress(address)
         default:
             path.append(destination)
         }
@@ -137,7 +139,7 @@ struct TabBar: View {
                 }
 
                 guard !urlPath.isEmpty else {
-                    present(.community)
+                    present(NavigationModel.initial.destination)
                     return
                 }
                 present(.address(urlPath, page: .profile))
@@ -176,7 +178,7 @@ struct TabBar: View {
                         addressName = splitComponents.first
                     }
                     guard let addressName else {
-                        present(.community)
+                        present(NavigationModel.initial.destination)
                         return
                     }
                     if givenURL.path() == "now" {
@@ -308,15 +310,6 @@ struct TabBar: View {
                     }
                 }
                 Section(isExpanded: isExpanded(.directory)) {
-                    Button {
-                        withAnimation { addAddress.toggle() }
-                    } label: {
-                        Label {
-                            Text("Add pin")
-                        } icon: {
-                            Image(systemName: "plus.circle")
-                        }
-                    }
                     ForEach(tabModel.items(for: NavigationModel.Section.directory, sizeClass: .regular, context: .column), id: \.self) { item in
                         NavigationLink(value: item) {
                             if item == tabModel.items(for: .directory, sizeClass: .regular, context: .column).first {
@@ -331,12 +324,28 @@ struct TabBar: View {
                             }
                         }
                     }
+                    Button {
+                        withAnimation { addAddress.toggle() }
+                    } label: {
+                        Label {
+                            Text("Add pin")
+                        } icon: {
+                            Image(systemName: "plus.circle")
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .buttonStyle(.glass)
+                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                 } header: {
                     Label("pinned", systemImage: "pin")
                         .foregroundStyle(.secondary)
                 }
             }
+            #if os(iOS)
             .frame(minWidth: 180)
+            #else
+            .frame(minWidth: 250)
+            #endif
             .safeAreaInset(edge: .bottom) {
                 PinnedAddressesView(addAddress: $addAddress)
                     .environment(\.addressBook, addressBook)
@@ -373,7 +382,7 @@ struct TabBar: View {
     
     
     private var activePath: Binding<NavigationPath> {
-        path(for: selected ?? .community)
+        path(for: selected ?? NavigationModel.initial)
     }
     private func path(for item: NavigationItem) -> Binding<NavigationPath> {
         .init {
@@ -426,68 +435,42 @@ struct PinnedAddressesView: View {
     var body: some View {
         HStack(spacing: 2) {
             if addressBook.signedIn {
+                #if os(macOS)
+                AddressIconView(address: addressBook.me, showMenu: false, contentShape: Circle())
+                #else
                 Menu {
-                    Button(action: {
-                        withAnimation { confirmLogout = true }
-                    }) {
-                        Label {
-                            Text("Log out")
-                        } icon: {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                        }
-                        .bold()
-                        .font(.callout)
-                        .fontDesign(.serif)
-                    }
-                    ForEach(addressBook.mine.sorted().reversed()) { address in
-                        Section(address.addressDisplayString) {
-                            Button {
-                                withAnimation {
-                                    presentListable?(.address(address, page: .profile))
-                                }
-                            } label: {
-                                Label {
-                                    Text("Profile")
-                                } icon: {
-                                    Image(systemName: "person")
-                                }
-                            }
-                            if addressBook.me != address {
-                                Button {
-                                    withAnimation {
-                                        set(address)
-                                    }
-                                } label: {
-                                    Label {
-                                        Text("Use address")
-                                    } icon: {
-                                        Image(systemName: "shuffle")
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    primaryMenu
                 } label: {
                     AddressIconView(address: addressBook.me, showMenu: false, contentShape: Circle())
                 }
+                .menuStyle(.borderlessButton)
                 .padding(.top, -1)
                 .padding(.leading, 1)
-                .alert("Log out?", isPresented: $confirmLogout, actions: {
-                    Button("Cancel", role: .cancel) { }
-                    Button(
-                        "Yes",
-                        role: .destructive,
-                        action: {
-                            authenticate("")
-                        })
-                }, message: {
-                    Text("Are you sure you want to sign out of omg.lol?")
-                })
+                .alert(
+                    "Log out?",
+                    isPresented: $confirmLogout,
+                    actions: {
+                        Button("Cancel", role: .cancel) { }
+                        Button(
+                            "Yes",
+                            role: .destructive,
+                            action: {
+                                authenticate("")
+                            }
+                        )
+                    }, message: {
+                        Text("Are you sure you want to sign out of omg.lol?")
+                    }
+                )
                 .contentShape(Rectangle())
+                #endif
             } else {
                 OptionsButton()
+                    .font(.largeTitle)
+                    .buttonStyle(.borderless)
                     .foregroundStyle(.secondary)
             }
+            
             VStack(alignment: .leading) {
                 if !addressBook.signedIn && !hasShownLoginPrompt {
                     HStack {
@@ -524,127 +507,196 @@ struct PinnedAddressesView: View {
             }
             .padding(4)
             .frame(maxWidth: .infinity, alignment: .leading)
+            
+            #if os(iOS)
             Menu {
-                Button {
-                    withAnimation { addAddress.toggle() }
-                } label: {
-                    Label {
-                        Text("Add pin")
-                    } icon: {
-                        Image(systemName: "plus.circle")
-                    }
-                }
-                if addressBook.following.isEmpty {
-                    Menu {
-                        ForEach(addressBook.following) { address in
-                            Button {
-                                withAnimation {
-                                    presentListable?(.address(address, page: .profile))
-                                }
-                            } label: {
-                                Text(address.addressDisplayString)
-                            }
-                        }
-                    } label: {
-                        Label("Following", systemImage: "binoculars")
-                    }
-                }
-                Section("Pins") {
-                    ForEach(addressBook.pinned) { address in
-                        Button {
-                            withAnimation {
-                                presentListable?(.address(address, page: .profile))
-                            }
-                        } label: {
-                            Label {
-                                Text(address.addressDisplayString)
-                            } icon: {
-                                if address == addressBook.pinned.last {
-                                    Image(systemName: "pin")
-                                }
-                            }
-                        }
-                    }
-                }
-                Divider()
-                if !addressBook.following.isEmpty {
-                    Menu {
-                        Button {
-                            highlightFollows = true
-                        } label: {
-                            Label("Follows", systemImage: shouldHighlightFollows ? "checkmark" : "binoculars")
-                                .bold(shouldHighlightFollows)
-                        }
-                        .bold(shouldHighlightFollows)
-                        .disabled(!addressBook.signedIn)
-                        Button {
-                            highlightFollows = false
-                        } label: {
-                            Label("Pinned", systemImage: shouldHighlightFollows ? "pin" : "checkmark")
-                        }
-                        .bold(shouldHighlightFollows)
-                    } label: {
-                        Label("Highlight", systemImage: "star")
-                    }
-                }
+                secondaryMenu
             } label: {
-                HStack(spacing: 2) {
-                    HStack(alignment: .bottom, spacing: -12) {
-                        if highlights.count > 2 {
-                            AddressIconView(address: highlights[2], size: 24, showMenu: false, contentShape: Circle())
-                        }
-                        if highlights.count > 1 {
-                            AddressIconView(address: highlights[1], size: 32, showMenu: false, contentShape: Circle())
-                                .padding(.trailing, -4)
-                        }
-                        if let firstPin = highlights.first {
-                            AddressIconView(address: firstPin, size: 36, showMenu: false, contentShape: Circle())
-                        }
-                    }
-                    VStack {
-                        if addressBook.following.isEmpty {
-                            if addressBook.pinned.count == 0 {
-                                Image(systemName: "pin.circle")
-                                    .font(.body)
-                                    .bold()
-                                    .foregroundStyle(Color.lolAccent)
-                            } else if addressBook.pinned.count > 2 {
-                                Image(systemName: "pin.circle")
-                                    .bold()
-                                    .foregroundStyle(Color.lolAccent)
-                            }
-                        } else {
-                            Image(systemName: "pin.circle")
-                                .bold(!shouldHighlightFollows)
-                                .foregroundStyle(shouldHighlightFollows ? Color.primary : Color.lolAccent)
-                            Image(systemName: "person.2.circle")
-                                .bold(shouldHighlightFollows)
-                                .foregroundStyle(shouldHighlightFollows ? Color.lolAccent : Color.primary)
-                        }
-                    }
-                    .font(.caption2)
-                    if addressBook.pinned.count > 2 || !addressBook.following.isEmpty {
-                        VStack(alignment: .leading) {
-                            Text("\(addressBook.pinned.count)")
-                                .bold(!shouldHighlightFollows)
-                                .foregroundStyle(shouldHighlightFollows ? Color.primary : Color.lolAccent)
-                            if !addressBook.following.isEmpty {
-                                Text("\(addressBook.following.count)")
-                                    .bold(shouldHighlightFollows)
-                                    .foregroundStyle(shouldHighlightFollows ? Color.lolAccent : Color.primary)
-                            }
-                        }
-                        .font(.caption)
-                    }
-                }
-                .foregroundStyle(Color.secondary)
-                .animation(.default, value: addressBook.pinned)
-                .animation(.default, value: addressBook.following)
-                .padding(.trailing, 4)
+                highlightIcons
             }
             .padding(.trailing, 2)
+            .menuStyle(.borderlessButton)
+            #else
+            highlightIcons
+            Menu {
+                primaryMenu
+                secondaryMenu
+            } label: {
+                Label(title: {  }, icon: { Image(systemName: "ellipsis.circle")})
+            }
+            .menuStyle(.borderlessButton)
+            #endif
         }
         .padding(.top, 2)
         .padding(.horizontal, 2)
+    }
+    
+    @ViewBuilder
+    var highlightIcons: some View {
+        HStack(spacing: 2) {
+            HStack(alignment: .bottom, spacing: -12) {
+                if highlights.count > 2 {
+                    AddressIconView(address: highlights[2], size: 24, showMenu: false, contentShape: Circle())
+                }
+                if highlights.count > 1 {
+                    AddressIconView(address: highlights[1], size: 32, showMenu: false, contentShape: Circle())
+                        .padding(.trailing, -4)
+                }
+                if let firstPin = highlights.first {
+                    AddressIconView(address: firstPin, size: 36, showMenu: false, contentShape: Circle())
+                }
+            }
+#if !os(macOS)
+            VStack {
+                if addressBook.following.isEmpty {
+                    if addressBook.pinned.count == 0 {
+                        Image(systemName: "pin.circle")
+                            .font(.body)
+                            .bold()
+                            .foregroundStyle(Color.lolAccent)
+                    } else if addressBook.pinned.count > 2 {
+                        Image(systemName: "pin.circle")
+                            .bold()
+                            .foregroundStyle(Color.lolAccent)
+                    }
+                } else {
+                    Image(systemName: "pin.circle")
+                        .bold(!shouldHighlightFollows)
+                        .foregroundStyle(shouldHighlightFollows ? Color.primary : Color.lolAccent)
+                    Image(systemName: "person.2.circle")
+                        .bold(shouldHighlightFollows)
+                        .foregroundStyle(shouldHighlightFollows ? Color.lolAccent : Color.primary)
+                }
+            }
+            .font(.caption2)
+            if addressBook.pinned.count > 2 || !addressBook.following.isEmpty {
+                VStack(alignment: .leading) {
+                    Text("\(addressBook.pinned.count)")
+                        .bold(!shouldHighlightFollows)
+                        .foregroundStyle(shouldHighlightFollows ? Color.primary : Color.lolAccent)
+                    if !addressBook.following.isEmpty {
+                        Text("\(addressBook.following.count)")
+                            .bold(shouldHighlightFollows)
+                            .foregroundStyle(shouldHighlightFollows ? Color.lolAccent : Color.primary)
+                    }
+                }
+                .font(.caption)
+            }
+#endif
+        }
+        .foregroundStyle(Color.secondary)
+        .animation(.default, value: addressBook.pinned)
+        .animation(.default, value: addressBook.following)
+        .padding(.trailing, 4)
+    }
+    
+    @ViewBuilder
+    var primaryMenu: some View {
+        Button(action: {
+            withAnimation { confirmLogout = true }
+        }) {
+            Label {
+                Text("Log out")
+            } icon: {
+                Image(systemName: "rectangle.portrait.and.arrow.right")
+            }
+            .bold()
+            .font(.callout)
+            .fontDesign(.serif)
+        }
+        ForEach(addressBook.mine.sorted().reversed()) { address in
+            Section(address.addressDisplayString) {
+                Button {
+                    withAnimation {
+                        presentListable?(.address(address, page: .profile))
+                    }
+                } label: {
+                    Label {
+                        Text("Profile")
+                    } icon: {
+                        Image(systemName: "person")
+                    }
+                }
+                if addressBook.me != address {
+                    Button {
+                        withAnimation {
+                            set(address)
+                        }
+                    } label: {
+                        Label {
+                            Text("Use address")
+                        } icon: {
+                            Image(systemName: "shuffle")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    var secondaryMenu: some View {
+        Button {
+            withAnimation { addAddress.toggle() }
+        } label: {
+            Label {
+                Text("Add pin")
+            } icon: {
+                Image(systemName: "plus.circle")
+            }
+        }
+        if addressBook.following.isEmpty {
+            Menu {
+                ForEach(addressBook.following) { address in
+                    Button {
+                        withAnimation {
+                            presentListable?(.address(address, page: .profile))
+                        }
+                    } label: {
+                        Text(address.addressDisplayString)
+                    }
+                }
+            } label: {
+                Label("Following", systemImage: "binoculars")
+            }
+        }
+        Section("Pins") {
+            ForEach(addressBook.pinned) { address in
+                Button {
+                    withAnimation {
+                        presentListable?(.address(address, page: .profile))
+                    }
+                } label: {
+                    Label {
+                        Text(address.addressDisplayString)
+                    } icon: {
+                        if address == addressBook.pinned.last {
+                            Image(systemName: "pin")
+                        }
+                    }
+                }
+            }
+        }
+        Divider()
+        if !addressBook.following.isEmpty {
+            Menu {
+                Button {
+                    highlightFollows = true
+                } label: {
+                    Label("Follows", systemImage: shouldHighlightFollows ? "checkmark" : "binoculars")
+                        .bold(shouldHighlightFollows)
+                }
+                .bold(shouldHighlightFollows)
+                .disabled(!addressBook.signedIn)
+                Button {
+                    highlightFollows = false
+                } label: {
+                    Label("Pinned", systemImage: shouldHighlightFollows ? "pin" : "checkmark")
+                }
+                .bold(shouldHighlightFollows)
+            } label: {
+                Label("Highlight", systemImage: "star")
+            }
+        }
     }
 }

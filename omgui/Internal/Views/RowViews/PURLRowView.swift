@@ -15,10 +15,18 @@ struct RowHeader<T: Listable, V: View>: View {
     let model: T
     let cornerView: () -> V
     
+    var showMenu: Bool {
+        #if os(macOS)
+        return false
+        #else
+        context != .detail
+        #endif
+    }
+    
     var body: some View {
         HStack(alignment: .bottom, spacing: 4) {
             if context != .profile {
-                AddressIconView(address: model.addressName, showMenu: context != .detail, contentShape: RoundedRectangle(cornerRadius: 12))
+                AddressIconView(address: model.addressName, showMenu: showMenu, contentShape: RoundedRectangle(cornerRadius: 12))
                     .padding(.horizontal, 2)
             }
             HStack (alignment: .lastTextBaseline, spacing: 4) {
@@ -88,6 +96,7 @@ struct RowFooter<T: Listable, A: View>: View {
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
+            .buttonStyle(.borderless)
         }
         .foregroundStyle(.secondary)
         .padding(4)

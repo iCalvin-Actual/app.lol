@@ -70,6 +70,7 @@ struct PURLView: View {
                         cardRadius: 16,
                         showSelection: true
                     )
+                    .environment(\.viewContext, .detail)
                     .padding(8)
                 }
             }

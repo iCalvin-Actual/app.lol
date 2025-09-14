@@ -24,9 +24,6 @@ struct OptionsButton: View {
             moreSection
         } label: {
             Image(systemName: "person.circle.fill")
-                .resizable()
-                .frame(width: 36, height: 36)
-                .padding(.horizontal, 4)
         }
     }
     

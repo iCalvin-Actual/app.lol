@@ -45,7 +45,7 @@ struct OnboardingView: View {
                     .matchedGeometryEffect(id: "title", in: namespace)
             }
             .frame(maxWidth: .infinity)
-            .padding(.top)
+            .padding(.top, 32)
             
             Text("an omg.lol client")
                 .font(.headline)
