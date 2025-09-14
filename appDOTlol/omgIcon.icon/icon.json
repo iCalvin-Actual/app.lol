@@ -7,6 +7,7 @@
   },
   "groups" : [
     {
+      "hidden" : false,
       "layers" : [
         {
           "blend-mode-specializations" : [
@@ -51,8 +52,8 @@
           "position" : {
             "scale" : 0.8,
             "translation-in-points" : [
-              10,
-              20
+              0,
+              0
             ]
           }
         },
@@ -99,12 +100,19 @@
           "position" : {
             "scale" : 1.2,
             "translation-in-points" : [
-              10,
-              20
+              0,
+              0
             ]
           }
         }
       ],
+      "position" : {
+        "scale" : 1,
+        "translation-in-points" : [
+          0,
+          10
+        ]
+      },
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5
@@ -157,7 +165,7 @@
           "position" : {
             "scale" : 1.2,
             "translation-in-points" : [
-              18,
+              0,
               20
             ]
           }
