@@ -17,10 +17,6 @@ struct EmojiPicker: View {
 #if canImport(UIKit)
 class UIEmojiTextField: UITextField {
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-    
     override var textInputContextIdentifier: String? { "" }
 
     override var textInputMode: UITextInputMode? {

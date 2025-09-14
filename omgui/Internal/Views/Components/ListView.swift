@@ -241,14 +241,16 @@ struct ListView<T: Listable>: View {
                     await dataFetcher.updateIfNeeded(forceReload: true)
                 })
                 .listStyle(.plain)
-    #if canImport(UIKit) && !os(tvOS)
+#if canImport(UIKit) && !os(tvOS)
                 .listRowSpacing(0)
-    #endif
+#endif
             }
+#if !os(visionOS)
             .scrollEdgeEffectStyle(.soft, for: .top)
-            #if !os(tvOS)
+#endif
+#if !os(tvOS)
             .scrollContentBackground(.hidden)
-            #endif
+#endif
             .frame(minWidth: 200)
             .navigationTitle(dataFetcher.title)
             .toolbarTitleDisplayMode(.inlineLarge)
