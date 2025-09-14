@@ -28,6 +28,7 @@ struct RowHeader<T: Listable, V: View>: View {
             if context != .profile {
                 AddressIconView(address: model.addressName, showMenu: showMenu, contentShape: RoundedRectangle(cornerRadius: 12))
                     .padding(.horizontal, 2)
+                    .buttonStyle(.borderless)
             }
             HStack (alignment: .lastTextBaseline, spacing: 4) {
                 VStack(alignment: .leading, spacing: 2) {

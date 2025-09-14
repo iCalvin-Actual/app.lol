@@ -66,11 +66,10 @@ struct StatusRowView: View {
 #if os(macOS)
                                 openUrl(item.content)
 #else
-                                presentURL = item.content
-#endif
                                 withAnimation {
                                     presentURL = item.content
                                 }
+#endif
                             } label: {
                                 Text(item.name)
                                     .font(.headline)
@@ -81,6 +80,7 @@ struct StatusRowView: View {
                     } label: {
                         Image(systemName: "link.circle")
                     }
+                    .buttonStyle(.borderless)
                 } else {
                     EmptyView()
                 }
@@ -202,8 +202,8 @@ struct StatusRowView: View {
                     Color.secondary.opacity(0.2)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .buttonStyle(.plain)
     }
     

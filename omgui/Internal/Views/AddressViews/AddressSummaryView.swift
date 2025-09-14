@@ -287,6 +287,7 @@ struct AddressPrincipalView: View {
         } label: {
             AddressBioButton(address: address, page: $addressPage, theme: addressSummaryFetcher.profileFetcher.theme)
         }
+        .buttonStyle(.borderless)
         .popover(isPresented: $presentBio) {
             AddressBioView(
                 fetcher: addressSummaryFetcher,
@@ -316,7 +317,7 @@ struct AddressBioButton: View {
     
     var body: some View {
         HStack(spacing: 2) {
-            #if !os(macOS)
+            #if !os(macOS) && !os(visionOS)
             AddressIconView(address: address, size: 30, showMenu: false, contentShape: Circle())
                 .frame(width: 30, height: 30)
             #endif
@@ -329,6 +330,9 @@ struct AddressBioButton: View {
                     ThemedTextView(text: page.displayString, font: .headline)
                 }
             }
+#if os(macOS)
+            .padding(.horizontal)
+#endif
         }
     }
 }

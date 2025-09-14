@@ -206,12 +206,14 @@ struct SearchNavigationButtonStyle: ButtonStyle {
         #endif
     }
     
+#if !os(visionOS)
     var glass: Glass {
         if selected {
             return .regular.tint(Color.accentColor)
         }
         return .regular
     }
+#endif
 }
 
 struct SearchResultsView: View {

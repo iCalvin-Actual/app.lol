@@ -132,9 +132,7 @@ struct ListRow<T: Listable>: View {
     var standardBody: some View {
         VStack(alignment: .leading, spacing: 0) {
             RowHeader(model: model) {
-                Text("/profile")
-                    .fontDesign(.serif)
-                    .font(.subheadline)
+                EmptyView()
             }
             
             Text(
