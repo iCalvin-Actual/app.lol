@@ -44,13 +44,22 @@ class NavigationModel {
         }
     }
     
+    var legacyAccountTab: NavigationItem? {
+        if #available(iOS 26.0, *) {
+            return nil
+        } else {
+            return .account
+        }
+    }
+    
     var tabs: [NavigationItem] {
         [
             .community,
             .somePics,
             .nowGarden,
+            legacyAccountTab,
             .search
-        ]
+        ].compactMap({ $0 })
     }
     
     var sections: [Section] {
@@ -71,7 +80,7 @@ class NavigationModel {
         switch section {
             
         case .directory:
-            return addressBook.pinned.sorted().map({ .pinnedAddress($0) })
+            return addressBook.pinned.sorted().map({ .address($0, page: .profile) })
             
         case .now:
             return [.nowGarden]

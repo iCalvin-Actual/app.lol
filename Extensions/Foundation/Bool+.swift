@@ -8,6 +8,7 @@
 import SwiftUI
 
 extension Bool {
+    @MainActor
     static func usingRegularTabBar(sizeClass: UserInterfaceSizeClass?, width: CGFloat? = nil) -> Bool {
         let width = width ?? .minimumRegularWidth
         #if canImport(UIKit)
@@ -17,7 +18,7 @@ extension Bool {
                  .tv:
             return true
         case .pad:
-            return (sizeClass ?? .regular) != .compact && width >= minimumRegularWidth
+            return (sizeClass ?? .regular) != .compact && width >= CGFloat.minimumRegularWidth
         default:
             return false
         }

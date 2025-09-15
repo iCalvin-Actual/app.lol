@@ -10,9 +10,6 @@ import WebKit
 
 struct AddressProfileView: View {
     
-    @Environment(\.addressSummaryFetcher)
-        var summaryFetcher
-    
     @State
         var fetcher: AddressProfilePageFetcher = .init(addressName: "")
     @State
@@ -25,9 +22,7 @@ struct AddressProfileView: View {
     }
     
     var body: some View {
-        WebView(url: fetcher.baseURL)
-            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
-            .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
+        coreBody
 #if os(iOS)
             .sheet(item: $presentedURL, content: { url in
                 SafariView(url: url)
@@ -50,4 +45,43 @@ struct AddressProfileView: View {
                 await fetcher.updateIfNeeded()
             }
     }
+    
+    @ViewBuilder
+    var coreBody: some View {
+#if os(iOS)
+        if #available(iOS 26.0, *) {
+            modernBody
+        } else {
+            legacyBody
+        }
+#else
+        modernBody
+#endif
+    }
+    
+    @ViewBuilder
+    @available(iOS 26.0, *)
+    var modernBody: some View {
+        WebView(url: fetcher.baseURL)
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+            .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
+    }
+    
+    #if os(iOS)
+    @ViewBuilder
+    var legacyBody: some View {
+        HTMLContentView(
+            activeAddress: addressName,
+            htmlContent: fetcher.html,
+            baseURL: fetcher.baseURL,
+            activeURL: $presentedURL
+        )
+        .ignoresSafeArea(.container, edges: (sizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad) ? [.bottom] : [])
+    }
+    #endif
+    
+    @Environment(\.addressSummaryFetcher)
+        var summaryFetcher
+    @Environment(\.horizontalSizeClass)
+        var sizeClass
 }

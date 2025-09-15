@@ -221,6 +221,18 @@ struct ListView<T: Listable>: View {
         }
         
         var body: some View {
+            if #available(iOS 26.0, *) {
+                coreBody
+#if !os(tvOS)
+                    .scrollContentBackground(.hidden)
+#endif
+            } else {
+                coreBody
+            }
+        }
+        
+        @ViewBuilder
+        var coreBody: some View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: -4) {
                     listItems()
@@ -245,12 +257,6 @@ struct ListView<T: Listable>: View {
                 .listRowSpacing(0)
 #endif
             }
-#if !os(visionOS)
-            .scrollEdgeEffectStyle(.soft, for: .top)
-#endif
-#if !os(tvOS)
-            .scrollContentBackground(.hidden)
-#endif
             .frame(minWidth: 200)
             .navigationTitle(dataFetcher.title)
             .toolbarTitleDisplayMode(.inlineLarge)

@@ -54,20 +54,8 @@ struct Sidebar: View {
                         }
                     }
                 }
-                Button {
-                    withAnimation { addAddress.toggle() }
-                } label: {
-                    Label {
-                        Text("Add pin")
-                    } icon: {
-                        Image(systemName: "plus.circle")
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-#if !os(visionOS)
-                .buttonStyle(.glass)
-#endif
-                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                addPinButton
+                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
             } header: {
                 Label("pinned", systemImage: "pin")
                     .foregroundStyle(.secondary)
@@ -82,7 +70,7 @@ struct Sidebar: View {
         .frame(minWidth: 250)
 #endif
         .safeAreaInset(edge: .bottom) {
-            AccountAccessoryView(addAddress: $addAddress)
+            glassAccessoryIfAvailable()
                 .environment(\.addressBook, addressBook)
                 .frame(maxHeight: 44)
 #if os(visionOS)
@@ -98,8 +86,6 @@ struct Sidebar: View {
                 .padding(2)
                 .background(Material.regular)
                 .clipShape(Capsule())
-#else
-                .glassEffect(.regular, in: .capsule)
 #endif
                 .id(addressBook.hashValue)
                 .onTapGesture {
@@ -107,6 +93,32 @@ struct Sidebar: View {
                 }
                 .padding(.horizontal, 8)
                 .padding(.bottom, 8)
+        }
+    }
+    
+    @ViewBuilder
+    var addPinButton: some View {
+        Button {
+            withAnimation { addAddress.toggle() }
+        } label: {
+            Label {
+                Text("Add pin")
+            } icon: {
+                Image(systemName: "plus.circle")
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    
+    @ViewBuilder
+    func glassAccessoryIfAvailable() -> some View {
+        if #available(iOS 26.0, *) {
+            AccountAccessoryView(addAddress: $addAddress)
+#if !os(visionOS)
+                .glassEffect(.regular, in: .capsule)
+#endif
+        } else {
+            AccountAccessoryView(addAddress: $addAddress)
         }
     }
     

@@ -190,17 +190,22 @@ struct StatusRowView: View {
     @ViewBuilder
     var appropriateMarkdown: some View {
         if context == .detail {
-            ScrollView {
-                Markdown(model.displayStatus, hideImages: true)
-            }
-            .onScrollGeometryChange(for: CGFloat.self, of: { proxy in
-                proxy.contentOffset.y
-            }, action: { oldValue, newValue in
-                offset = newValue
-            })
+            observingChangeIfAvailable
         } else {
             Markdown(model.displayStatus, hideImages: true)
         }
+    }
+    
+    @ViewBuilder
+    var observingChangeIfAvailable: some View {
+        ScrollView {
+            Markdown(model.displayStatus, hideImages: true)
+        }
+        .onScrollGeometryChange(for: CGFloat.self, of: { proxy in
+            proxy.contentOffset.y
+        }, action: { oldValue, newValue in
+            offset = newValue
+        })
     }
 }
 

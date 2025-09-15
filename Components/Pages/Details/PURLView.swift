@@ -12,9 +12,15 @@ import Blackbird
 import SwiftUI
 import WebKit
 
+struct WrappedPage {
+    
+}
+
 struct PURLView: View {
     @Environment(\.credentialFetcher)
         var credential
+    @Environment(\.horizontalSizeClass)
+        var sizeClass
     
     @State
         var showDraft: Bool = false
@@ -39,7 +45,7 @@ struct PURLView: View {
     }
     
     var body: some View {
-        WebView(fetcher.page)
+        coreBody
             .safeAreaInset(edge: .bottom) {
                 if let model = fetcher.result {
                     PURLRowView(
@@ -52,6 +58,9 @@ struct PURLView: View {
                     .environment(\.viewContext, .detail)
                     .padding(8)
                 }
+            }
+            .task {
+                await configureFetcher()
             }
             .onChange(of: fetcher.address, {
                 Task { await configureFetcher() }
@@ -75,6 +84,38 @@ struct PURLView: View {
                 }
             }
     }
+    
+    @ViewBuilder
+    var coreBody: some View {
+#if os(iOS)
+        if #available(iOS 26.0, *) {
+            modernBody
+        } else {
+            legacyBody
+        }
+#else
+        modernBody
+#endif
+    }
+    
+    @ViewBuilder
+    @available(iOS 26.0, *)
+    var modernBody: some View {
+        WebView(url: fetcher.result?.url)
+    }
+    
+#if os(iOS)
+    @ViewBuilder
+    var legacyBody: some View {
+        HTMLContentView(
+            activeAddress: address,
+            htmlContent: "",
+            baseURL: fetcher.result?.url,
+            activeURL: $presented
+        )
+        .ignoresSafeArea(.container, edges: (sizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad) ? [.bottom] : [])
+    }
+#endif
     
     func configureFetcher() async {
         let credential = credential(address)

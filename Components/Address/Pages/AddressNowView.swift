@@ -21,8 +21,7 @@ struct AddressNowView: View {
     }
     
     var body: some View {
-        WebView(url: fetcher.baseURL)
-            .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
+        coreBody
             #if os(iOS)
             .sheet(item: $presentedURL, content: { url in
                 SafariView(url: url)
@@ -64,6 +63,40 @@ struct AddressNowView: View {
 #endif
     }
     
+    @ViewBuilder
+    var coreBody: some View {
+#if os(iOS)
+        if #available(iOS 26.0, *) {
+            modernBody
+        } else {
+            legacyBody
+        }
+#else
+        modernBody
+#endif
+    }
+    
+    @ViewBuilder
+    @available(iOS 26.0, *)
+    var modernBody: some View {
+        WebView(url: fetcher.baseURL)
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+            .webViewContentBackground(fetcher.theme.backgroundBehavior ? .visible : .hidden)
+    }
+    
+#if os(iOS)
+    @ViewBuilder
+    var legacyBody: some View {
+        HTMLContentView(
+            activeAddress: addressName,
+            htmlContent: fetcher.html,
+            baseURL: fetcher.baseURL,
+            activeURL: $presentedURL
+        )
+        .ignoresSafeArea(.container, edges: (sizeClass == .regular && UIDevice.current.userInterfaceIdiom == .pad) ? [.bottom] : [])
+    }
+#endif
+    
     func configureFetcher() async {
         if addressName != fetcher.address {
             let newFetcher = AddressNowPageFetcher(addressName: addressName)
@@ -78,4 +111,6 @@ struct AddressNowView: View {
         var summaryFetcher
     @Environment(\.viewContext)
         var viewContext
+    @Environment(\.horizontalSizeClass)
+        var sizeClass
 }

@@ -8,16 +8,15 @@
 import Foundation
 import WebKit
 
-typealias AddressProfilePageFetcher = WebPageFetcher<AddressProfilePage>
-typealias AddressNowPageFetcher = WebPageFetcher<NowModel>
+typealias AddressProfilePageFetcher = WebFetcher<AddressProfilePage>
+typealias AddressNowPageFetcher = WebFetcher<NowModel>
 
 @MainActor
 @Observable
-class WebPageFetcher<M: RemoteBackedBlackbirdModel>: DatabaseFetcher<M>, Sendable {
+class WebFetcher<M: RemoteBackedBlackbirdModel>: DatabaseFetcher<M>, Sendable {
     let address: AddressName
     
     var html: String?
-    var page = WebPage()
     var theme: ThemeModel?
     
     @MainActor
@@ -33,6 +32,34 @@ class WebPageFetcher<M: RemoteBackedBlackbirdModel>: DatabaseFetcher<M>, Sendabl
         self.address = addressName
         self.html = html
         super.init()
+    }
+    
+    override func fetchModels() async throws {
+        self.result = try await M.read(from: db, id: address)
+        if let resultContent = result?.htmlContent, html != resultContent {
+            self.html = resultContent
+        }
+    }
+    
+    nonisolated override func fetchRemote() async throws -> Int {
+        let (data, _) = try await URLSession.shared.data(from: baseURL)
+        let html = await MainActor.run { [weak self] in
+            let htmlData = String(data: data, encoding: .utf8)
+            self?.html = htmlData
+            return htmlData ?? ""
+        }
+        return html.hashValue
+    }
+}
+
+@MainActor
+@Observable
+@available(iOS 26.0, *)
+class WebPageFetcher<M: RemoteBackedBlackbirdModel>: WebFetcher<M>, Sendable {
+    var page = WebPage()
+    
+    override init(addressName: AddressName, html: String? = nil) {
+        super.init(addressName: addressName, html: html)
         if let html {
             Task {
                 await loadPage(html)
@@ -88,21 +115,15 @@ class WebPageFetcher<M: RemoteBackedBlackbirdModel>: DatabaseFetcher<M>, Sendabl
     }
     
     override func fetchModels() async throws {
-        self.result = try await M.read(from: db, id: address)
+        try await super.fetchModels()
+        
         if let resultContent = result?.htmlContent, html != resultContent {
-            self.html = resultContent
             await loadPage(resultContent)
         }
     }
     
-    nonisolated override func fetchRemote() async throws -> Int {
-        let (data, _) = try await URLSession.shared.data(from: baseURL)
+    override func throwingRequest() async throws {
         await loadPage(URLRequest(url: baseURL))
-        let html = await MainActor.run { [weak self] in
-            let htmlData = String(data: data, encoding: .utf8)
-            self?.html = htmlData
-            return htmlData ?? ""
-        }
-        return html.hashValue
+        try await super.throwingRequest()
     }
 }

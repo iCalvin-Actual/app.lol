@@ -199,9 +199,6 @@ class AddressPURLFetcher: DatabaseFetcher<PURLModel> {
     let title: String
     var credential: APICredential?
     
-    @MainActor
-    lazy var page = { WebPage() }()
-    
     init(name: AddressName, title: String, credential: APICredential? = nil) {
         self.address = name
         self.title = title
@@ -239,9 +236,6 @@ class AddressPURLFetcher: DatabaseFetcher<PURLModel> {
     @MainActor
     override func fetchModels() async throws {
         self.result = try await PURLModel.read(from: db, multicolumnPrimaryKey: [address, title])
-        if let url = result?.url {
-            page.load(URLRequest(url: url))
-        }
     }
     
     override func fetchRemote() async throws -> Int {
@@ -249,9 +243,6 @@ class AddressPURLFetcher: DatabaseFetcher<PURLModel> {
             return 0
         }
         let purl = try await interface.fetchPURL(title, from: address, credential: credential)
-        if let url = result?.url {
-            page.load(URLRequest(url: url))
-        }
         try await purl?.write(to: db)
         return purl?.hashValue ?? 0
     }

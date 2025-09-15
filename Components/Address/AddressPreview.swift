@@ -99,7 +99,6 @@ struct AddressPreview: View {
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .foregroundStyle(Material.regular)
-                    .labelIconToTitleSpacing(4)
                 }
 //                .frame(idealHeight: 60, maxHeight: 66)
             }

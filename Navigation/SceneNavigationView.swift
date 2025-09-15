@@ -52,7 +52,7 @@ struct SceneNavigationView: View {
     }
     
     var body: some View {
-        appropriateBody
+        focusedIfNecessary
             .onAppear(perform: {
                 if selected == nil {
                     selected = cachedSelection
@@ -94,8 +94,6 @@ struct SceneNavigationView: View {
         switch destination {
         case .account:
             presentAccount = true
-        case .address(let address, _):
-            selected = .pinnedAddress(address)
         default:
             path.append(destination)
         }
@@ -185,7 +183,59 @@ struct SceneNavigationView: View {
         if .usingRegularTabBar(sizeClass: horizontalSizeClass) {
             regularNavigation
         } else {
-            compactNavigaion
+            if #available(iOS 26.0, *) {
+                glassCompatibleNavigation()
+            } else {
+                compactNavigaion
+            }
+        }
+    }
+    
+    @ViewBuilder
+    @available(iOS 26.0, *)
+    func glassCompatibleNavigation() -> some View {
+        compactNavigaion
+#if os(iOS)
+            .tabBarMinimizeBehavior(.onScrollDown)
+                .tabViewBottomAccessory {
+                    AccountAccessoryView(addAddress: $addAddress)
+                        .environment(\.addressBook, addressBook)
+                        .id(addressBook.hashValue)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            presentAccount.toggle()
+                        }
+                        .sheet(isPresented: $presentAccount) {
+                            NavigationStack(path: $presentedPath) {
+                                navigationContent(.account)
+                                    .navigationDestination(for: NavigationDestination.self) { destination in
+                                        destinationConstructor?.destination(destination, contrast: contrast)
+                                    }
+                            }
+                            .environment(\.setAddress, setAddress)
+                            .environment(\.presentListable, { listItem in
+                                switch listItem {
+                                case .safety, .support, .latest:
+                                    presentedPath.append(listItem)
+                                default:
+                                    path.append(listItem)
+                                }
+                            })
+                            .environment(\.addressBook, addressBook)
+                        }
+                }
+#endif
+    }
+    
+    @ViewBuilder
+    var focusedIfNecessary: some View {
+        if #available(iOS 26.0, *) {
+            appropriateBody
+#if !os(tvOS)
+                .searchFocused($searching)
+#endif
+        } else {
+            appropriateBody
         }
     }
     
@@ -197,39 +247,6 @@ struct SceneNavigationView: View {
             tabContent: tabContent(_:)
         )
         .searchable(text: $searchQuery)
-#if !os(tvOS)
-        .searchFocused($searching)
-#endif
-#if os(iOS)
-        .tabBarMinimizeBehavior(.onScrollDown)
-            .tabViewBottomAccessory {
-                PinnedAddressesView(addAddress: $addAddress)
-                    .environment(\.addressBook, addressBook)
-                    .id(addressBook.hashValue)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        presentAccount.toggle()
-                    }
-                    .sheet(isPresented: $presentAccount) {
-                        NavigationStack(path: $presentedPath) {
-                            navigationContent(.account)
-                                .navigationDestination(for: NavigationDestination.self) { destination in
-                                    destinationConstructor?.destination(destination, contrast: contrast)
-                                }
-                        }
-                        .environment(\.setAddress, setAddress)
-                        .environment(\.presentListable, { listItem in
-                            switch listItem {
-                            case .safety, .support, .latest:
-                                presentedPath.append(listItem)
-                            default:
-                                path.append(listItem)
-                            }
-                        })
-                        .environment(\.addressBook, addressBook)
-                    }
-            }
-#endif
     }
     
     @ViewBuilder
@@ -241,9 +258,6 @@ struct SceneNavigationView: View {
             tabContent: tabContent(_:)
         )
         .searchable(text: $searchQuery)
-        #if !os(tvOS)
-        .searchFocused($searching)
-        #endif
     }
     
     @ViewBuilder
@@ -278,3 +292,4 @@ struct SceneNavigationView: View {
             .environment(\.addressBook, addressBook)
     }
 }
+

@@ -26,7 +26,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
     case newPURL
     case newStatus
     
-    case pinnedAddress  (_ address: AddressName)
+    case address  (_ address: AddressName, page: AddressContent)
     
     var rawValue: String {
         switch self {
@@ -46,8 +46,8 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case .newPURL:                  return "new PURL"
         case .newPaste:                 return "new paste"
             
-        case .pinnedAddress(let address):
-                                        return "pinned.\(address)"
+        case .address(let address, let page):
+                                        return "pinned.\(address).\(page)"
         }
     }
     
@@ -72,11 +72,10 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
             self = .newPaste
             
         case "pinned":
-            guard splitString.count > 1 else {
+            guard splitString.count > 2 else {
                 return nil
             }
-            self = .pinnedAddress(splitString[1])
-            
+            self = .address(splitString[1], page: .init(rawValue: splitString[2]) ?? .profile)
         default:
             return nil
         }
@@ -99,7 +98,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         case .newPURL:      return "purl/new"
         case .newPaste:     return "paste/new"
             
-        case .pinnedAddress(let address):
+        case .address(let address, _):
             return address.addressDisplayString
         }
     }
@@ -116,7 +115,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
             return "camera.macro"
         case .community:
             return "star.bubble"
-        case .pinnedAddress:
+        case .address:
             return "person"
         case .safety:
             return "hand.raised"
@@ -133,6 +132,7 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
         }
     }
     
+    @available(iOS 18.0, *)
     var role: TabRole? {
         switch self {
         case .search:
@@ -154,8 +154,8 @@ enum NavigationItem: Codable, Hashable, Identifiable, RawRepresentable {
             return .community
         case .somePics:
             return .somePics
-        case .pinnedAddress(let name):
-            return .address(name, page: .profile)
+        case .address(let name, let page):
+            return .address(name, page: page)
         case .safety:
             return .safety
         case .lists:
