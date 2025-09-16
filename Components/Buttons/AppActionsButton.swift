@@ -24,7 +24,10 @@ struct AppActionsButton: View {
             moreSection
         } label: {
             Image(systemName: "person.circle.fill")
+                .resizable()
+                .frame(width: 38, height: 38)
         }
+        .padding(.horizontal, 2)
     }
     
     @ViewBuilder

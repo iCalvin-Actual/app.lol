@@ -45,7 +45,7 @@ class AddressPasteBinFetcher: ModelBackedListFetcher<PasteModel> {
     var credential: APICredential?
     
     override var title: String {
-        "Pastebin"
+        "Pastes"
     }
     
     init(name: AddressName, credential: APICredential?, addressBook: AddressBook, filters: [FilterOption]? = nil) {

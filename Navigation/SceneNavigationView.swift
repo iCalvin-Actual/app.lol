@@ -28,6 +28,8 @@ struct SceneNavigationView: View {
     var present
     @Environment(\.pinAddress)
     var pin
+    @Environment(\.openURL)
+    var openURL
     
     @State var address: String = ""
     @State var addAddress: Bool = false
@@ -37,6 +39,7 @@ struct SceneNavigationView: View {
     @State var paths: [NavigationItem: NavigationPath] = .init()
     @State var path: NavigationPath = .init()
     @State var presentedPath: NavigationPath = .init()
+    @State var confirmDelete: Bool = false
     
     @FocusState
     var searching: Bool {
@@ -79,7 +82,7 @@ struct SceneNavigationView: View {
                 searchFilter = $0
                 destinationConstructor?.search(searchFilters: $0)
             })
-            .onOpenURL(perform: openURL(_:))
+            .onOpenURL(perform: handleURL(_:))
             .alert("Add pinned address", isPresented: $addAddress) {
                 TextField("Address", text: $address)
                 Button("Cancel") { }
@@ -87,6 +90,12 @@ struct SceneNavigationView: View {
                     addAddress = false
                     pin(address)
                 }.disabled(address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            .alert("Delete \(addressBook.me.addressDisplayString)?", isPresented: $confirmDelete) {
+                Button("Delete", role: .destructive) {
+                    guard let deleteURL = URL(string: "https://home.omg.lol/address/\(addressBook.me)/delete") else { return }
+                    openURL(deleteURL)
+                }
             }
     }
     
@@ -99,7 +108,7 @@ struct SceneNavigationView: View {
         }
     }
     
-    func openURL(_ givenURL: URL) {
+    func handleURL(_ givenURL: URL) {
         switch givenURL.scheme {
         case "app-omg-lol",
             "lol",
@@ -108,7 +117,10 @@ struct SceneNavigationView: View {
             
             // Check unique cases
             let givenHost = givenURL.host
-            if givenHost == "omg.lol" || givenHost == "profile.omg.lol" {
+            if givenHost == "deleteme", !addressBook.me.isEmpty, addressBook.signedIn {
+                confirmDelete = true
+                return
+            } else if givenHost == "omg.lol" || givenHost == "profile.omg.lol" {
                 var urlPath = givenURL.pathComponents.first ?? ""
                 if urlPath.hasPrefix("@") {
                     urlPath = urlPath.replacingOccurrences(of: "@", with: "")

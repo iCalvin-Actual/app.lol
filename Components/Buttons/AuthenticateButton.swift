@@ -44,14 +44,9 @@ struct AuthenticateButton: View {
                 } icon: {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                 }
-                .bold()
-                .font(.callout)
-                .fontDesign(.serif)
-                .frame(maxWidth: .infinity)
-                .padding(3)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.capsule)
+            .buttonStyle(.plain)
             .alert("Log out?", isPresented: $confirmLogout, actions: {
                 Button("Cancel", role: .cancel) { }
                 Button(
@@ -63,6 +58,7 @@ struct AuthenticateButton: View {
             }, message: {
                 Text("Are you sure you want to sign out of omg.lol?")
             })
+            
         }
     }
 }

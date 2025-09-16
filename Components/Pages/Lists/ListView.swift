@@ -124,6 +124,7 @@ struct ListView<T: Listable>: View {
                     }
                 }
             }
+            .tint(.primary)
         })
 #if os(visionOS)
         .tint(.clear)

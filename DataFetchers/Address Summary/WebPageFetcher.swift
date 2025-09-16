@@ -60,10 +60,8 @@ class WebPageFetcher<M: RemoteBackedBlackbirdModel>: WebFetcher<M>, Sendable {
     
     override init(addressName: AddressName, html: String? = nil) {
         super.init(addressName: addressName, html: html)
-        if let html {
-            Task {
-                await loadPage(html)
-            }
+        Task {
+            await loadPage(html)
         }
     }
     

@@ -78,7 +78,7 @@ struct PURLView: View {
 #if os(visionOS)
                             .tint(.clear)
 #else
-                            .foregroundStyle(.primary)
+                            .tint(.primary)
 #endif
                     }
                 }

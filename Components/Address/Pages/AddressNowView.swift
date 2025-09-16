@@ -34,14 +34,15 @@ struct AddressNowView: View {
 #if os(visionOS)
                         .tint(.clear)
 #else
-                        .foregroundStyle(.primary)
+                        .tint(.primary)
 #endif
                 }
             }
-        .task { await configureFetcher() }
-        .onChange(of: fetcher.address, {
-            Task { await configureFetcher() }
-        })
+            .task {
+                let newFetcher = summaryFetcher(addressName)?.nowFetcher ?? .init(addressName: addressName)
+                fetcher = newFetcher
+                await fetcher.updateIfNeeded()
+            }
 #if !os(tvOS)
         .principalAddressItem(
             viewContext == .detail,

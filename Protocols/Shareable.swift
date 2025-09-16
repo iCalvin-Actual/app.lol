@@ -254,6 +254,7 @@ extension Sharable where Self: Menuable {
         ShareLink(item: option.content) {
             Label("share \(option.name)", systemImage: "square.and.arrow.up")
         }
+        .foregroundStyle(.primary)
     }
     #endif
 }

@@ -154,18 +154,11 @@ struct AccountView: View {
                     } icon: {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
                     }
-                    .bold()
                     .font(.callout)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(3)
                 }
-                .buttonStyle(.bordered)
-                .foregroundStyle(.secondary)
-#if canImport(UIKit)
-                .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-#elseif os(macOS)
-                .padding(.vertical, 16)
-#endif
+                .buttonStyle(.borderless)
                 .contentShape(Rectangle())
                 .alert("Log out?", isPresented: $confirmLogout, actions: {
                     Button("Cancel", role: .cancel) { }
@@ -187,17 +180,12 @@ struct AccountView: View {
                     } icon: {
                         Image(systemName: "key")
                     }
-                    .bold()
                     .font(.callout)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(3)
                 }
+                .buttonStyle(.borderless)
                 .foregroundStyle(.primary)
-#if canImport(UIKit)
-                .listRowBackground(Color(UIColor.systemBackground).opacity(0.82))
-#elseif os(macOS)
-                .padding(.vertical, 16)
-#endif
             }
         }
         .animation(.default, value: addressBook.signedIn)

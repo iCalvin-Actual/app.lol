@@ -24,8 +24,8 @@ class AddressSummaryFetcher: Request {
     var purls: [String: AddressPURLFetcher] = [:]
     var pastes: [String: AddressPasteFetcher] = [:]
     
-    let profileFetcher: AddressProfilePageFetcher
-    let nowFetcher: AddressNowPageFetcher
+    let profileFetcher: WebFetcher<AddressProfilePage>
+    let nowFetcher: WebFetcher<NowModel>
     
     let purlFetcher: AddressPURLsFetcher
     let pasteFetcher: AddressPasteBinFetcher
@@ -55,8 +55,13 @@ class AddressSummaryFetcher: Request {
         self.followingFetcher = .init(address: name, credential: credential)
         self.followersFetcher = .init(address: name, credential: credential)
         
-        self.profileFetcher = .init(addressName: name)
-        self.nowFetcher = .init(addressName: name)
+        if #available(iOS 26.0, *) {
+            self.profileFetcher = WebPageFetcher(addressName: name)
+            self.nowFetcher = WebPageFetcher(addressName: name)
+        } else {
+            self.profileFetcher = WebFetcher(addressName: name)
+            self.nowFetcher = WebFetcher(addressName: name)
+        }
         
         self.purlFetcher = .init(name: name, credential: credential, addressBook: addressBook)
         self.pasteFetcher = .init(name: name, credential: credential, addressBook: addressBook)
