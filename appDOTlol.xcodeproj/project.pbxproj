@@ -44,7 +44,6 @@
 		3E2FBD122DCC591E007B9C24 /* Hashable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBCF82DCC591E007B9C24 /* Hashable.swift */; };
 		3E2FBD152DCC5A0C007B9C24 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3E2FBD142DCC5A0C007B9C24 /* MarkdownUI */; };
 		3E2FBD182DCC5A1A007B9C24 /* Blackbird in Frameworks */ = {isa = PBXBuildFile; productRef = 3E2FBD172DCC5A1A007B9C24 /* Blackbird */; };
-		3E2FBD1B2DCC5A26007B9C24 /* MarkdownEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 3E2FBD1A2DCC5A26007B9C24 /* MarkdownEditor */; };
 		3E2FBD1E2DCC5A3A007B9C24 /* Punycode in Frameworks */ = {isa = PBXBuildFile; productRef = 3E2FBD1D2DCC5A3A007B9C24 /* Punycode */; };
 		3E337F3A2E732B1200119B95 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E337F392E732B1200119B95 /* AppModel.swift */; };
 		3E337F3F2E73309A00119B95 /* InterfaceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E337F3E2E73309A00119B95 /* InterfaceProtocol.swift */; };
@@ -298,7 +297,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E2FBD1B2DCC5A26007B9C24 /* MarkdownEditor in Frameworks */,
 				3E2FBD182DCC5A1A007B9C24 /* Blackbird in Frameworks */,
 				3E7C162329C35777007C85EC /* omgapi in Frameworks */,
 				3E2FBD1E2DCC5A3A007B9C24 /* Punycode in Frameworks */,
@@ -765,7 +763,6 @@
 				3E7C162229C35777007C85EC /* omgapi */,
 				3E2FBD142DCC5A0C007B9C24 /* MarkdownUI */,
 				3E2FBD172DCC5A1A007B9C24 /* Blackbird */,
-				3E2FBD1A2DCC5A26007B9C24 /* MarkdownEditor */,
 				3E2FBD1D2DCC5A3A007B9C24 /* Punycode */,
 			);
 			productName = appDOTlol;
@@ -800,7 +797,6 @@
 				3E7C162129C35777007C85EC /* XCRemoteSwiftPackageReference "omgapi" */,
 				3E2FBD132DCC5A0C007B9C24 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				3E2FBD162DCC5A1A007B9C24 /* XCRemoteSwiftPackageReference "Blackbird" */,
-				3E2FBD192DCC5A26007B9C24 /* XCRemoteSwiftPackageReference "MarkdownEditor" */,
 				3E2FBD1C2DCC5A3A007B9C24 /* XCRemoteSwiftPackageReference "PunycodeSwift" */,
 			);
 			productRefGroup = 3E0A744B29B4950200EFD8E4 /* Products */;
@@ -1248,14 +1244,6 @@
 				kind = branch;
 			};
 		};
-		3E2FBD192DCC5A26007B9C24 /* XCRemoteSwiftPackageReference "MarkdownEditor" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/iCalvin-Actual/MarkdownEditor.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		3E2FBD1C2DCC5A3A007B9C24 /* XCRemoteSwiftPackageReference "PunycodeSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/iCalvin-Actual/PunycodeSwift";
@@ -1284,11 +1272,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3E2FBD162DCC5A1A007B9C24 /* XCRemoteSwiftPackageReference "Blackbird" */;
 			productName = Blackbird;
-		};
-		3E2FBD1A2DCC5A26007B9C24 /* MarkdownEditor */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E2FBD192DCC5A26007B9C24 /* XCRemoteSwiftPackageReference "MarkdownEditor" */;
-			productName = MarkdownEditor;
 		};
 		3E2FBD1D2DCC5A3A007B9C24 /* Punycode */ = {
 			isa = XCSwiftPackageProductDependency;
